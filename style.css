@@ -1,0 +1,109 @@
+* {margin: 0; padding: 0; box-sizing: border-box;}
+
+body {
+  width: 100%;
+  min-height: 100vh;
+  font-family: Arial, sans-serif;
+  background-image: url("https://png.pngtree.com/background/20230616/original/pngtree-anime-tree-picture-image_3629955.jpg");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: scroll;
+}
+
+#chatWindow {
+  width: 100%;
+  max-width: 360px;
+  background: rgba(255,255,255,0.35);
+  padding: 12px;
+  border-radius: 12px;
+  backdrop-filter: blur(1px);
+  border: 1px solid rgba(255,255,255,0.4);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+  margin: 18px auto;
+}
+
+#chatManagerRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.manager-icon {
+  font-size: 34px;
+  color: white;
+  text-shadow: 0 0 6px black;
+}
+
+#chatInput {
+  flex: 1;
+  padding: 6px 8px;
+  font-size: 13px;
+  border-radius: 6px;
+  border: 1px solid rgba(255,255,255,0.6);
+  background: rgba(255,255,255,0.35);
+  color: #000;
+}
+
+#addBtn {
+  width: 28px;
+  height: 28px;
+  font-size: 18px;
+  font-weight: bold;
+  border-radius: 6px;
+  border: none;
+  background: rgba(0,150,255,0.8);
+  color: white;
+  cursor: pointer;
+}
+
+#chatArea {
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px,1fr));
+  gap: 12px;
+  padding: 0 12px 40px;
+  justify-items: center;
+}
+
+.chat-box {
+  position: relative;
+  width: 250px;
+  height: 350px;
+  background: rgba(255,255,255,0.95);
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.3);
+  will-change: transform;
+}
+
+.chat-container {
+  width: 100%;
+  height: 100%;
+}
+
+.chat-container iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+.close-btn {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 28px;
+  height: 28px;
+  background: #ff0000;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  font-size: 18px;
+  cursor: pointer;
+  z-index: 10;
+}
+
+@media (max-width: 480px) {
+  #chatWindow { max-width: calc(100% - 20px); }
+  .chat-box { width: 100%; height: 60vh; }
+}
