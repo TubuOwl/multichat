@@ -5,24 +5,35 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Chatango Multi Room x Shoujo Chat</title>
 
-<link rel="stylesheet" href="style.css" />
+<link rel="stylesheet" href="css/style.css" />
 </head>
 
 <body>
-  
+
+<!-- INPUT ROOM -->
 <div id="chatWindow">
   <div id="chatManagerRow">
     <span class="manager-icon">🗪</span>
     <input type="text" id="chatInput" placeholder="nama-room Chatango">
-    <button id="addBtn" onclick="addChat()">+</button>
+    <button id="addBtn">+</button>
   </div>
 </div>
 
+<!-- TEMPAT CHATROOM -->
 <div id="chatArea"></div>
 
-<button id="prevBtn" class="nav-btn" onclick="prevChat()">❮</button>
-<button id="nextBtn" class="nav-btn" onclick="nextChat()">❯</button>
+<!-- NAV -->
+<button id="prevBtn" class="nav-btn">❮</button>
+<button id="nextBtn" class="nav-btn">❯</button>
 
-<script src="script.js"></script>
+<!-- JS MODULES -->
+<script src="js/utils.js"></script>
+<script src="js/device-check.js"></script>
+<script src="js/chat-create.js"></script>
+<script src="js/chat-init.js"></script>
+<script src="js/chat-add.js"></script>
+<script src="js/chat-nav.js"></script>
+<script src="js/main.js"></script>
+
 </body>
 </html>
