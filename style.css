@@ -11,6 +11,7 @@ body {
   background-attachment: scroll;
 }
 
+/* AREA INPUT */
 #chatWindow {
   width: 100%;
   max-width: 360px;
@@ -57,6 +58,7 @@ body {
   cursor: pointer;
 }
 
+/* DESKTOP MODE: GRID */
 #chatArea {
   width: 100%;
   display: grid;
@@ -64,6 +66,7 @@ body {
   gap: 12px;
   padding: 0 12px 40px;
   justify-items: center;
+  scroll-behavior: smooth;
 }
 
 .chat-box {
@@ -78,7 +81,7 @@ body {
 }
 
 .chat-container {
-  width: 100%;
+  width: 100%; 
   height: 100%;
 }
 
@@ -103,7 +106,56 @@ body {
   z-index: 10;
 }
 
+/* MOBILE MODE — SWIPE */
 @media (max-width: 480px) {
-  #chatWindow { max-width: calc(100% - 20px); }
-  .chat-box { width: 100%; height: 60vh; }
+
+  #chatWindow {
+    max-width: calc(100% - 20px);
+  }
+
+  #chatArea {
+    display: flex;
+    overflow-x: auto;
+    gap: 12px;
+    padding: 12px;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
+  }
+
+  .chat-box {
+    flex: 0 0 100%;
+    width: 100%;
+    height: 70vh;
+    scroll-snap-align: center;
+  }
+
+  .nav-btn {
+    position: fixed;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 46px;
+    height: 46px;
+    background: rgba(255,255,255,0.45);
+    backdrop-filter: blur(6px);
+    border: 1px solid rgba(255,255,255,0.5);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 26px;
+    color: #333;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    cursor: pointer;
+    z-index: 999;
+    transition: 0.25s ease;
+  }
+
+  .nav-btn:hover {
+    background: rgba(255,255,255,0.7);
+    transform: translateY(-50%) scale(1.05);
+  }
+
+  #prevBtn { left: 12px; }
+  #nextBtn { right: 12px; }
 }
