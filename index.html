@@ -3,21 +3,25 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Chatango Multi Room x Shoujo</title>
-<link rel="stylesheet" href="style.css">
+<title>Chatango Multi Room x Shoujo Chat</title>
+
+<link rel="stylesheet" href="style.css" />
 </head>
 
 <body>
-
+  
 <div id="chatWindow">
   <div id="chatManagerRow">
     <span class="manager-icon">🗪</span>
-    <input type="text" id="chatInput" placeholder="Chatango Room">
+    <input type="text" id="chatInput" placeholder="nama-room Chatango">
     <button id="addBtn" onclick="addChat()">+</button>
   </div>
 </div>
 
 <div id="chatArea"></div>
+
+<button id="prevBtn" class="nav-btn" onclick="prevChat()">❮</button>
+<button id="nextBtn" class="nav-btn" onclick="nextChat()">❯</button>
 
 <script src="script.js"></script>
 </body>
