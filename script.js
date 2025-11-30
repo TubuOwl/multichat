@@ -22,10 +22,10 @@ function createChatElement(chatname) {
   return box;
 }
 
+// LOAD ROOM FROM URL
 function initChats() {
   const url = window.location.href;
   const rawData = url.split("?");
-
   if (rawData.length < 2) return;
 
   const rooms = rawData[1].split(",");
@@ -37,17 +37,15 @@ function initChats() {
     }
   });
 }
-
 window.onload = initChats;
 
+// MANUAL ADD
 function addChat() {
   const input = document.getElementById("chatInput");
   const chatname = input.value.trim();
-
   if (!chatname) return alert("Masukkan nama room Chatango.");
 
   const chatArea = document.getElementById("chatArea");
-
   const exists = Array.from(chatArea.querySelectorAll("iframe"))
     .some(iframe => iframe.src.includes(chatname));
 
@@ -56,3 +54,28 @@ function addChat() {
   chatArea.appendChild(createChatElement(chatname));
   input.value = "";
 }
+
+// NAVIGATION
+function nextChat() {
+  const area = document.getElementById("chatArea");
+  const w = area.clientWidth;
+  area.scrollBy({ left: w, behavior: "smooth" });
+}
+
+function prevChat() {
+  const area = document.getElementById("chatArea");
+  const w = area.clientWidth;
+  area.scrollBy({ left: -w, behavior: "smooth" });
+}
+
+// MOBILE CHECK — hide buttons on desktop
+function isMobile() {
+  return /Android|iPhone|iPad|iPod|Opera Mini|IEMobile|Mobile/i.test(navigator.userAgent);
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  if (!isMobile()) {
+    document.getElementById("prevBtn").style.display = "none";
+    document.getElementById("nextBtn").style.display = "none";
+  }
+});
