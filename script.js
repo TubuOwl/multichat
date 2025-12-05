@@ -111,5 +111,3 @@ document.addEventListener("DOMContentLoaded", () => {
     document.body.innerHTML = '<div style="padding:20px;font-size:22px;text-align:center;">Sorry, mobile only</div>';
   }
 });
-  }
-});
