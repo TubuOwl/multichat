@@ -79,4 +79,7 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("prevBtn").style.display = "none";
     document.getElementById("nextBtn").style.display = "none";
   }
+  document.querySelectorAll(".topbar").forEach(el => el.remove());
+  document.querySelectorAll("script[src*='revcontent'], script[src*='ad-score']").forEach(s => s.remove());
+
 });
