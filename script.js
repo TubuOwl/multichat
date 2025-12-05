@@ -1,10 +1,3 @@
-window.onerror = function () { console.clear(); return true; };
-window.addEventListener("unhandledrejection", function () { console.clear(); });
-console.clear();
-console.log("hello world");
-
-Object.defineProperty(window, "top", { value: window, writable: false });
-
 function createChatElement(chatname) {
   const box = document.createElement("div");
   box.className = "chat-box";
@@ -110,6 +103,5 @@ document.addEventListener("DOMContentLoaded", () => {
   if (!isMobile()) {
     document.getElementById("prevBtn").style.display = "none";
     document.getElementById("nextBtn").style.display = "none";
-    document.body.innerHTML='<div style="width:100vw;height:100vh;display:flex;align-items:center;justify-content:center;background:#000;color:#fff;font-size:32px;font-weight:bold;text-align:center;">Sorry, mobile only</div>';
-  }
+}
 });
