@@ -81,8 +81,11 @@ function removeTopbar() {
 
 document.addEventListener("DOMContentLoaded", () => {
   if (!isMobile()) {
-    document.getElementById("prevBtn").style.display = "none";
-    document.getElementById("nextBtn").style.display = "none";
+    const prevBtn = document.getElementById("prevBtn");
+    const nextBtn = document.getElementById("nextBtn");
+
+    if (prevBtn) prevBtn.style.display = "none";
+    if (nextBtn) nextBtn.style.display = "none";
   }
   removeTopbar();
 });
