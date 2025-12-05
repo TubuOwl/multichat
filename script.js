@@ -79,10 +79,5 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("prevBtn").style.display = "none";
     document.getElementById("nextBtn").style.display = "none";
   }
-
-setInterval(() => {
-  const tb = document.querySelector(".topbar");
-  if (tb) tb.remove();
-}, 300);
 });
 
