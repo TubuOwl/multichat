@@ -39,7 +39,7 @@ function initChats() {
 }
 window.onload = initChats;
 
-// MANUAL ADD
+// ADD CHAT MANUAL
 function addChat() {
   const input = document.getElementById("chatInput");
   const chatname = input.value.trim();
@@ -55,40 +55,50 @@ function addChat() {
   input.value = "";
 }
 
-// LOOPING NEXT
+// GET CURRENT SLIDE INDEX
+function getCurrentIndex() {
+  const area = document.getElementById("chatArea");
+  const boxes = area.querySelectorAll(".chat-box");
+
+  let nearestIndex = 0;
+  let minDistance = Infinity;
+
+  boxes.forEach((box, i) => {
+    const offset = box.offsetLeft;
+    const distance = Math.abs(area.scrollLeft - offset);
+    if (distance < minDistance) {
+      minDistance = distance;
+      nearestIndex = i;
+    }
+  });
+
+  return nearestIndex;
+}
+
+// NEXT (LOOP)
 function nextChat() {
   const area = document.getElementById("chatArea");
-  const chats = area.querySelectorAll(".chat-box");
-  const w = area.clientWidth;
+  const boxes = area.querySelectorAll(".chat-box");
 
-  let current = Math.round(area.scrollLeft / w);
-  let next = current + 1;
-
-  if (next >= chats.length) {
-    next = 0; // kembali ke awal
-  }
+  let index = getCurrentIndex() + 1;
+  if (index >= boxes.length) index = 0;
 
   area.scrollTo({
-    left: next * w,
+    left: boxes[index].offsetLeft,
     behavior: "smooth"
   });
 }
 
-// LOOPING PREV
+// PREV (LOOP)
 function prevChat() {
   const area = document.getElementById("chatArea");
-  const chats = area.querySelectorAll(".chat-box");
-  const w = area.clientWidth;
+  const boxes = area.querySelectorAll(".chat-box");
 
-  let current = Math.round(area.scrollLeft / w);
-  let prev = current - 1;
-
-  if (prev < 0) {
-    prev = chats.length - 1; // ke akhir
-  }
+  let index = getCurrentIndex() - 1;
+  if (index < 0) index = boxes.length - 1;
 
   area.scrollTo({
-    left: prev * w,
+    left: boxes[index].offsetLeft,
     behavior: "smooth"
   });
 }
