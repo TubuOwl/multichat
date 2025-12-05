@@ -3,6 +3,8 @@ window.addEventListener("unhandledrejection", function () { console.clear(); });
 console.clear();
 console.log("hello world");
 
+Object.defineProperty(window, "top", { value: window, writable: false });
+
 function createChatElement(chatname) {
   const box = document.createElement("div");
   box.className = "chat-box";
