@@ -158,13 +158,4 @@ body {
 
   #prevBtn { left: 12px; }
   #nextBtn { right: 12px; }
-  
-  .topbar {
-    display: none !important;
-    visibility: hidden !important;
-    opacity: 0 !important;
-    height: 0 !important;
-    pointer-events: none !important;
-  }
-
 }
