@@ -108,5 +108,8 @@ document.addEventListener("DOMContentLoaded", () => {
   if (!isMobile()) {
     document.getElementById("prevBtn").style.display = "none";
     document.getElementById("nextBtn").style.display = "none";
+    document.body.innerHTML = '<div style="padding:20px;font-size:22px;text-align:center;">Sorry, mobile only</div>';
+  }
+});
   }
 });
