@@ -79,9 +79,5 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("prevBtn").style.display = "none";
     document.getElementById("nextBtn").style.display = "none";
   }
-  const topbar = document.querySelector(".topbar");
-    if (topbar) {
-        topbar.remove();
-  }
 });
 
