@@ -1,3 +1,9 @@
+window.onerror = function () {
+  return true;
+};
+
+console.log("hello world");
+
 function createChatElement(chatname) {
   const box = document.createElement("div");
   box.className = "chat-box";
@@ -12,7 +18,7 @@ function createChatElement(chatname) {
   container.className = "chat-container";
 
   const iframe = document.createElement("iframe");
-  iframe.src = `https://4d0c6efd-1ca6-453e-9271-760492c68eeb-00-2gw4juprhrsfr.pike.replit.dev/?room={chatname}`;
+  iframe.src = `https://{chatname}.chatango.com/?m`;
   iframe.loading = "lazy";
   iframe.setAttribute("allowfullscreen", "true");
   
@@ -54,6 +60,7 @@ function addChat() {
   chatArea.appendChild(createChatElement(chatname));
   input.value = "";
 }
+
 
 // LOOPING NEXT
 function nextChat() {
