@@ -1,7 +1,6 @@
-window.onerror = function () {
-  return true;
-};
-
+window.onerror = function () { console.clear(); return true; };
+window.addEventListener("unhandledrejection", function () { console.clear(); });
+console.clear();
 console.log("hello world");
 
 function createChatElement(chatname) {
