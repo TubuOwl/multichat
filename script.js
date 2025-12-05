@@ -12,7 +12,7 @@ function createChatElement(chatname) {
   container.className = "chat-container";
 
   const iframe = document.createElement("iframe");
-  iframe.src = `https://${chatname}.chatango.com/?m`;
+  iframe.src = `https://4d0c6efd-1ca6-453e-9271-760492c68eeb-00-2gw4juprhrsfr.pike.replit.dev/?room={chatname}`;
   iframe.loading = "lazy";
   iframe.setAttribute("allowfullscreen", "true");
   
