@@ -16,7 +16,6 @@ function createChatElement(chatname) {
   iframe.loading = "lazy";
   iframe.setAttribute("allowfullscreen", "true");
 
-
   container.appendChild(iframe);
   box.appendChild(container);
 
@@ -56,17 +55,42 @@ function addChat() {
   input.value = "";
 }
 
-// NAVIGATION
+// LOOPING NEXT
 function nextChat() {
   const area = document.getElementById("chatArea");
+  const chats = area.querySelectorAll(".chat-box");
   const w = area.clientWidth;
-  area.scrollBy({ left: w, behavior: "smooth" });
+
+  let current = Math.round(area.scrollLeft / w);
+  let next = current + 1;
+
+  if (next >= chats.length) {
+    next = 0; // kembali ke awal
+  }
+
+  area.scrollTo({
+    left: next * w,
+    behavior: "smooth"
+  });
 }
 
+// LOOPING PREV
 function prevChat() {
   const area = document.getElementById("chatArea");
+  const chats = area.querySelectorAll(".chat-box");
   const w = area.clientWidth;
-  area.scrollBy({ left: -w, behavior: "smooth" });
+
+  let current = Math.round(area.scrollLeft / w);
+  let prev = current - 1;
+
+  if (prev < 0) {
+    prev = chats.length - 1; // ke akhir
+  }
+
+  area.scrollTo({
+    left: prev * w,
+    behavior: "smooth"
+  });
 }
 
 // MOBILE CHECK — hide buttons on desktop
@@ -80,4 +104,3 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("nextBtn").style.display = "none";
   }
 });
-
