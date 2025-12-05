@@ -73,9 +73,16 @@ function isMobile() {
   return /Android|iPhone|iPad|iPod|Opera Mini|IEMobile|Mobile/i.test(navigator.userAgent);
 }
 
+// REMOVE TOPBAR
+function removeTopbar() {
+  const topbar = document.querySelector(".topbar");
+  if (topbar) topbar.remove();
+}
+
 document.addEventListener("DOMContentLoaded", () => {
   if (!isMobile()) {
     document.getElementById("prevBtn").style.display = "none";
     document.getElementById("nextBtn").style.display = "none";
   }
+  removeTopbar();
 });
