@@ -18,7 +18,7 @@ function createChatElement(chatname) {
   container.className = "chat-container";
 
   const iframe = document.createElement("iframe");
-  iframe.src = `https://{chatname}.chatango.com/?m`;
+  iframe.src = `https://${chatname}.chatango.com/?m`;
   iframe.loading = "lazy";
   iframe.setAttribute("allowfullscreen", "true");
   
