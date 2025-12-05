@@ -39,7 +39,7 @@ function initChats() {
 }
 window.onload = initChats;
 
-// ADD CHAT MANUAL
+// MANUAL ADD
 function addChat() {
   const input = document.getElementById("chatInput");
   const chatname = input.value.trim();
@@ -55,55 +55,45 @@ function addChat() {
   input.value = "";
 }
 
-// GET CURRENT SLIDE INDEX
-function getCurrentIndex() {
-  const area = document.getElementById("chatArea");
-  const boxes = area.querySelectorAll(".chat-box");
-
-  let nearestIndex = 0;
-  let minDistance = Infinity;
-
-  boxes.forEach((box, i) => {
-    const offset = box.offsetLeft;
-    const distance = Math.abs(area.scrollLeft - offset);
-    if (distance < minDistance) {
-      minDistance = distance;
-      nearestIndex = i;
-    }
-  });
-
-  return nearestIndex;
-}
-
-// NEXT (LOOP)
+// LOOPING NEXT
 function nextChat() {
   const area = document.getElementById("chatArea");
-  const boxes = area.querySelectorAll(".chat-box");
+  const chats = area.querySelectorAll(".chat-box");
+  const w = area.clientWidth;
 
-  let index = getCurrentIndex() + 1;
-  if (index >= boxes.length) index = 0;
+  let current = Math.round(area.scrollLeft / w);
+  let next = current + 1;
+
+  if (next >= chats.length) {
+    next = 0; 
+  }
 
   area.scrollTo({
-    left: boxes[index].offsetLeft,
+    left: next * w,
     behavior: "smooth"
   });
 }
 
-// PREV (LOOP)
+// LOOPING PREV
 function prevChat() {
   const area = document.getElementById("chatArea");
-  const boxes = area.querySelectorAll(".chat-box");
+  const chats = area.querySelectorAll(".chat-box");
+  const w = area.clientWidth;
 
-  let index = getCurrentIndex() - 1;
-  if (index < 0) index = boxes.length - 1;
+  let current = Math.round(area.scrollLeft / w);
+  let prev = current - 1;
+
+  if (prev < 0) {
+    prev = chats.length - 1; 
+  }
 
   area.scrollTo({
-    left: boxes[index].offsetLeft,
+    left: prev * w,
     behavior: "smooth"
   });
 }
 
-// MOBILE CHECK — hide buttons on desktop
+// MOBILE CHECK
 function isMobile() {
   return /Android|iPhone|iPad|iPod|Opera Mini|IEMobile|Mobile/i.test(navigator.userAgent);
 }
