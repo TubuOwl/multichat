@@ -82,19 +82,13 @@ body {
 
 .chat-container {
   width: 100%;
-  height: 100vh;
-  overflow: hidden;
-  position: relative;
+  height: 100%;
 }
 
 .chat-container iframe {
   width: 100%;
-  height: calc(100% + 60px);
-  border: none !important;
-
-  position: absolute;
-  top: -60px; 
-  left: 0;
+  height: 100%;
+  border: none;
 }
 
 .close-btn {
