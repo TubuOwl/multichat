@@ -12,49 +12,15 @@ function createChatElement(chatname) {
   container.className = "chat-container";
 
   const iframe = document.createElement("iframe");
+  iframe.src = `https://${chatname}.chatango.com/?m`;
   iframe.loading = "lazy";
-  iframe.allowFullscreen = true;
-  iframe.style.border = "0";
-
-  if (chatname.toLowerCase() === "hentaipoi") {
-    iframe.srcdoc = `
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="utf-8">
-<style>
-html,body{
-  margin:0;
-  width:100%;
-  height:100%;
-  overflow:hidden;
-}
-</style>
-</head>
-<body>
-<script
-  id="cid0020000427844363334"
-  data-cfasync="false"
-  async
-  src="//st.chatango.com/js/gz/emb.js"
-  style="width:100%;height:100%;">
-{"handle":"hentaipoi","arch":"js","styles":{"a":"ffffff","b":100,"e":"ffffff","h":"ffffff","l":"cccccc","m":"dadada","q":"ffffff","r":100,"sbc":"bbbbbb","fwtickm":1}}
-</script>
-</body>
-</html>
-}
-</script>`;
-  } 
-  else {
-    iframe.src = `https://${chatname}.chatango.com/?m`;
-  }
-
+  iframe.setAttribute("allowfullscreen", "true");
+  
   container.appendChild(iframe);
   box.appendChild(container);
+
   return box;
 }
-
-
 
 // LOAD ROOM FROM URL
 function initChats() {
