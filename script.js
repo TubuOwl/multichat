@@ -42,7 +42,6 @@ html,body{
 </script>
 </body>
 </html>
-'>
 }
 </script>`;
   } 
