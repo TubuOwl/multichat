@@ -19,15 +19,6 @@ function createChatElement(chatname) {
   // KHUSUS hentaipoi → pakai emb.js
   if (chatname.toLowerCase() === "hentaipoi") {
     iframe.srcdoc = `
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="utf-8">
-<style>
-html,body{margin:0;width:100%;height:100%;background:#000}
-</style>
-</head>
-<body>
 <script id="cid0020000427844363334"
   data-cfasync="false"
   async
@@ -49,9 +40,7 @@ html,body{margin:0;width:100%;height:100%;background:#000}
     "fwtickm":1
   }
 }
-</script>
-</body>
-</html>`;
+</script>`;
   } 
   // ROOM LAIN → iframe biasa
   else {
