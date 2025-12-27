@@ -12,15 +12,46 @@ function createChatElement(chatname) {
   container.className = "chat-container";
 
   const iframe = document.createElement("iframe");
-  iframe.src = `https://${chatname}.chatango.com/?m`;
   iframe.loading = "lazy";
-  iframe.setAttribute("allowfullscreen", "true");
-  
+  iframe.allowFullscreen = true;
+  iframe.style.border = "0";
+
+  iframe.srcdoc = `
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+  html,body{margin:0;height:100%;background:#000}
+</style>
+</head>
+<body>
+<script src="//st.chatango.com/js/gz/emb.js" data-cfasync="false">
+{
+  "handle":"${chatname}",
+  "arch":"js",
+  "styles":{
+    "a":"ffffff",
+    "b":100,
+    "e":"ffffff",
+    "h":"ffffff",
+    "l":"cccccc",
+    "m":"dadada",
+    "q":"ffffff",
+    "r":100,
+    "sbc":"bbbbbb",
+    "fwtickm":1
+  }
+}
+</script>
+</body>
+</html>`;
+
   container.appendChild(iframe);
   box.appendChild(container);
-
   return box;
 }
+
 
 // LOAD ROOM FROM URL
 function initChats() {
