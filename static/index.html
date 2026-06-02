@@ -299,7 +299,6 @@ body {
 var ws = null;
 var wsConnected = false;
 var currentVideoId = "";
-var ytPlayer = null; // YouTube IFrame API player
 
 // Detect WebSocket server URL (same host, ws protocol)
 var WS_URL = (location.protocol === "https:" ? "wss://" : "ws://") + location.host + "/ws";
@@ -382,82 +381,42 @@ function loadVideoFromServer(videoId, title, thumbnail, startTime, autoplay) {
   currentVideoId = videoId;
 
   // Update now playing bar
-  var np = document.getElementById("nowPlaying");
-  np.style.display = "flex";
+  document.getElementById("nowPlaying").style.display = "flex";
   document.getElementById("nowPlayingTitle").textContent = title || videoId;
   document.getElementById("nowPlayingThumb").src = thumbnail || "https://i.ytimg.com/vi/" + videoId + "/mqdefault.jpg";
 
   // Tampilkan player
   document.getElementById("ytResults").style.display = "none";
   document.getElementById("ytStatus").style.display = "none";
-  var playerWrap = document.getElementById("ytPlayerWrap");
-  playerWrap.style.display = "flex";
+  document.getElementById("ytPlayerWrap").style.display = "flex";
 
-  // Load via IFrame API jika sudah siap, atau pakai embed biasa
-  if (ytPlayer && ytPlayer.loadVideoById) {
-    ytPlayer.loadVideoById({ videoId: videoId, startSeconds: startTime || 0 });
-    if (!autoplay) ytPlayer.pauseVideo();
-  } else {
-    // Fallback: embed iframe biasa
-    var autoplayParam = autoplay ? 1 : 0;
-    document.getElementById("ytFrame").src =
-      "https://www.youtube.com/embed/" + videoId +
-      "?autoplay=" + autoplayParam +
-      "&start=" + Math.floor(startTime || 0) +
-      "&enablejsapi=1&origin=" + location.origin;
-  }
+  // Selalu pakai iframe embed biasa
+  var autoplayParam = autoplay ? 1 : 0;
+  document.getElementById("ytFrame").src =
+    "https://www.youtube.com/embed/" + videoId +
+    "?autoplay=" + autoplayParam +
+    "&start=" + Math.floor(startTime || 0) +
+    "&rel=0";
+
+  // Track waktu lokal
+  videoStartTime = startTime || 0;
+  videoStartedAt = Date.now();
+  videoPlaying = !!autoplay;
 }
 
-/* ══════════════════════════════
-   YOUTUBE IFrame API
-══════════════════════════════ */
-// Load YouTube IFrame API
-var tag = document.createElement('script');
-tag.src = "https://www.youtube.com/iframe_api";
-document.head.appendChild(tag);
+// Heartbeat: kirim estimasi current_time tiap 5 detik
+var videoStartedAt = 0;   // Date.now() saat video mulai
+var videoStartTime = 0;   // detik offset awal video
+var videoPlaying = false;
 
-function onYouTubeIframeAPIReady() {
-  // API siap, player akan dibuat saat video pertama dipilih
+function getCurrentTimeSec() {
+  if (!videoPlaying) return videoStartTime;
+  return videoStartTime + (Date.now() - videoStartedAt) / 1000;
 }
 
-function createYTPlayer(videoId, startTime) {
-  // Ganti iframe dengan div untuk YT player
-  var frame = document.getElementById("ytFrame");
-  frame.id = "ytPlayerDiv";
-  frame.removeAttribute("src");
-
-  ytPlayer = new YT.Player("ytPlayerDiv", {
-    videoId: videoId,
-    playerVars: {
-      autoplay: 1,
-      start: Math.floor(startTime || 0),
-      controls: 1,
-      rel: 0
-    },
-    events: {
-      onStateChange: onPlayerStateChange
-    }
-  });
-}
-
-var lastSentState = -1;
-var isSeeking = false;
-
-function onPlayerStateChange(event) {
-  // YT.PlayerState: PLAYING=1, PAUSED=2, ENDED=0
-  if (event.data === YT.PlayerState.PLAYING && lastSentState !== 1) {
-    lastSentState = 1;
-    wsSend({ type: "play", current_time: ytPlayer.getCurrentTime() });
-  } else if (event.data === YT.PlayerState.PAUSED && lastSentState !== 2) {
-    lastSentState = 2;
-    wsSend({ type: "pause", current_time: ytPlayer.getCurrentTime() });
-  }
-}
-
-// Heartbeat: update current_time di server tiap 5 detik
 setInterval(function() {
-  if (ytPlayer && ytPlayer.getCurrentTime && wsConnected) {
-    wsSend({ type: "heartbeat", current_time: ytPlayer.getCurrentTime() });
+  if (videoPlaying && wsConnected) {
+    wsSend({ type: "heartbeat", current_time: getCurrentTimeSec() });
   }
 }, 5000);
 
@@ -541,25 +500,20 @@ function loadVideoLocal(videoId, title, thumbnail, startTime) {
   currentVideoId = videoId;
   document.getElementById("ytResults").style.display = "none";
   document.getElementById("ytStatus").style.display = "none";
-  var playerWrap = document.getElementById("ytPlayerWrap");
-  playerWrap.style.display = "flex";
+  document.getElementById("ytPlayerWrap").style.display = "flex";
 
-  if (typeof YT !== "undefined" && YT.Player) {
-    if (ytPlayer && ytPlayer.loadVideoById) {
-      ytPlayer.loadVideoById({ videoId: videoId, startSeconds: startTime || 0 });
-    } else {
-      createYTPlayer(videoId, startTime || 0);
-    }
-  } else {
-    // Fallback iframe
-    document.getElementById("ytFrame").src =
-      "https://www.youtube.com/embed/" + videoId + "?autoplay=1&start=" + Math.floor(startTime || 0) + "&rel=0";
-  }
+  document.getElementById("ytFrame").src =
+    "https://www.youtube.com/embed/" + videoId +
+    "?autoplay=1&start=" + Math.floor(startTime || 0) + "&rel=0";
+
+  videoStartTime = startTime || 0;
+  videoStartedAt = Date.now();
+  videoPlaying = true;
 }
 
 function showResults() {
-  if (ytPlayer && ytPlayer.pauseVideo) ytPlayer.pauseVideo();
-  else document.getElementById("ytFrame").src = "";
+  document.getElementById("ytFrame").src = "";
+  videoPlaying = false;
   document.getElementById("ytPlayerWrap").style.display = "none";
   document.getElementById("ytResults").style.display = "flex";
 }
