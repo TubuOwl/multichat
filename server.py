@@ -4,6 +4,8 @@ from fastapi.responses import FileResponse
 import json
 import os
 
+import time
+
 app = FastAPI()
 
 # ── Global YouTube State ─────────────────────────────────────────────
@@ -15,13 +17,17 @@ yt_state = {
     "thumbnail": ""
 }
 
-# ── Client registry: ws -> {name, color} ────────────────────────────
+# ── Client registry: ws -> {name, color, joined_at} ─────────────────
 clients: dict[WebSocket, dict] = {}
 
 COLORS = ["#ff6b9d","#c084fc","#60a5fa","#34d399","#fbbf24","#f87171","#a78bfa","#38bdf8"]
 
 def get_viewer_list():
-    return [{"name": v["name"], "color": v["color"]} for v in clients.values() if v.get("name")]
+    now_ms = int(time.time() * 1000)
+    return [
+        {"name": v["name"], "color": v["color"], "joined_at": v["joined_at"]}
+        for v in clients.values() if v.get("name")
+    ]
 
 async def broadcast(data: dict, exclude: WebSocket = None):
     msg = json.dumps(data)
@@ -43,7 +49,7 @@ async def broadcast_viewer_list():
 async def websocket_endpoint(ws: WebSocket):
     await ws.accept()
     color = COLORS[len(clients) % len(COLORS)]
-    clients[ws] = {"name": "", "color": color}
+    clients[ws] = {"name": "", "color": color, "joined_at": int(time.time() * 1000)}
 
     # Kirim state + viewer list ke client baru
     await ws.send_text(json.dumps({
@@ -64,6 +70,17 @@ async def websocket_endpoint(ws: WebSocket):
                 name = msg.get("name", "").strip()[:20]
                 clients[ws]["name"] = name
                 await broadcast_viewer_list()
+
+            elif t == "bubble":
+                text = msg.get("text", "").strip()
+                # Clamp 10 kata
+                words = text.split()
+                if len(words) > 10:
+                    text = " ".join(words[:10])
+                if text:
+                    name = clients[ws].get("name", "")
+                    color = clients[ws].get("color", "#fff")
+                    await broadcast({"type": "bubble", "text": text, "name": name, "color": color}, exclude=ws)
 
             elif t == "reaction":
                 emoji = msg.get("emoji", "")
