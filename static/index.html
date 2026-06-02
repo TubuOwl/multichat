@@ -184,43 +184,86 @@ body {
 /* ── REACTION BAR (di bawah player) ── */
 #reactionBar {
   display: none;
-  gap: 4px; padding: 5px 8px;
+  gap: 2px; padding: 4px 8px;
   background: rgba(255,255,255,0.06);
   border-top: 1px solid rgba(255,255,255,0.08);
-  flex-wrap: wrap;
+  align-items: center;
 }
 .react-btn {
-  font-size: 18px; background: none; border: none;
-  cursor: pointer; padding: 2px 4px; border-radius: 6px;
+  font-size: 16px; background: none; border: none;
+  cursor: pointer; padding: 3px 5px; border-radius: 6px;
   transition: transform 0.15s, background 0.15s;
-  line-height: 1;
+  line-height: 1; position: relative;
 }
-.react-btn:hover { background: rgba(255,255,255,0.15); transform: scale(1.3); }
+.react-btn:hover { background: rgba(255,255,255,0.15); transform: scale(1.25); }
+.react-btn.cooldown { opacity: 0.35; pointer-events: none; }
+/* cooldown progress ring */
+.react-btn::after {
+  content: ''; position: absolute; inset: 0;
+  border-radius: 6px; background: rgba(0,0,0,0);
+}
 
-/* ── VIEWER LIST PANEL ── */
+/* bubble chat input row */
+#bubbleRow {
+  display: none;
+  gap: 4px; padding: 4px 8px;
+  background: rgba(255,255,255,0.04);
+  border-top: 1px solid rgba(255,255,255,0.06);
+  align-items: center;
+}
+#bubbleInput {
+  flex: 1; padding: 4px 8px; border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.2);
+  background: rgba(255,255,255,0.1); color: #fff; font-size: 11px;
+  outline: none;
+}
+#bubbleInput::placeholder { color: #777; }
+#bubbleInput:focus { border-color: rgba(255,255,255,0.4); }
+#bubbleSendBtn {
+  padding: 4px 10px; border-radius: 12px; border: none;
+  background: rgba(255,107,157,0.8); color: #fff;
+  font-size: 11px; cursor: pointer; white-space: nowrap; flex-shrink: 0;
+}
+#bubbleSendBtn:hover { background: rgba(255,107,157,1); }
+#bubbleWordCount { color: #666; font-size: 9px; flex-shrink: 0; }
+
+/* ── VIEWER LIST PANEL — floating di bawah badge ── */
 #viewerPanel {
   display: none;
+  position: absolute;
+  top: 100%;
+  right: 0;
+  z-index: 100;
   flex-direction: column;
-  background: rgba(0,0,0,0.82);
-  border-top: 1px solid rgba(255,255,255,0.1);
-  max-height: 120px; overflow-y: auto;
-  padding: 6px 10px; gap: 4px;
+  background: rgba(15,15,25,0.96);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 10px;
+  min-width: 180px; max-width: 220px;
+  max-height: 200px; overflow-y: auto;
+  padding: 8px 10px; gap: 5px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.6);
 }
 #viewerPanel::-webkit-scrollbar { width: 3px; }
 #viewerPanel::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); }
 .viewer-item {
-  display: flex; align-items: center; gap: 6px;
+  display: flex; align-items: center; gap: 7px;
   font-size: 11px; color: #ddd;
 }
 .viewer-dot {
-  width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
+  width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0;
+}
+.viewer-time { color: #555; font-size: 9px; margin-left: auto; white-space: nowrap; }
+
+/* wrapper untuk badge + panel */
+#viewerBadgeWrap {
+  position: relative;
 }
 #viewerBadge {
   background: rgba(255,60,60,0.85);
   color: #fff; font-size: 10px; font-weight: bold;
   padding: 2px 7px; border-radius: 20px;
   white-space: nowrap; cursor: pointer;
-  user-select: none;
+  user-select: none; display: block;
 }
 #viewerBadge:hover { background: rgba(255,60,60,1); }
 
@@ -259,6 +302,37 @@ body {
   cursor: pointer;
 }
 #nameSubmitBtn:hover { opacity: 0.9; }
+
+/* ── FLOATING BUBBLE TEKS ── */
+.float-bubble {
+  position: absolute;
+  pointer-events: none;
+  display: flex; flex-direction: column; align-items: flex-start; gap: 2px;
+  animation: floatBubble 4s ease-out forwards;
+  max-width: 180px;
+}
+.float-bubble .bubble-name {
+  font-size: 9px; font-weight: bold;
+  padding: 0 6px; margin-bottom: 1px;
+}
+.float-bubble .bubble-text {
+  background: rgba(30,30,40,0.88);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 14px 14px 14px 4px;
+  padding: 5px 10px;
+  font-size: 12px; color: #fff;
+  backdrop-filter: blur(4px);
+  word-break: break-word;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+  white-space: pre-wrap;
+  max-width: 180px;
+}
+@keyframes floatBubble {
+  0%   { opacity: 0; transform: translateY(0) scale(0.8); }
+  10%  { opacity: 1; transform: translateY(-10px) scale(1); }
+  75%  { opacity: 1; transform: translateY(-80px); }
+  100% { opacity: 0; transform: translateY(-110px); }
+}
 
 /* ── FLOATING REACTIONS ── */
 #reactionOverlay {
@@ -380,12 +454,13 @@ body {
 <div id="ytWindow" style="display:flex;">
   <div id="ytTitleBar">
     <span>▶ YouTube Sync</span>
-    <div id="viewerBadge" onclick="toggleViewerPanel()">👁 0 viewers</div>
+    <div id="viewerBadgeWrap">
+      <div id="viewerBadge" onclick="toggleViewerPanel()">👁 0 viewers</div>
+      <!-- Viewer List Panel floating di bawah badge -->
+      <div id="viewerPanel"></div>
+    </div>
     <button id="ytCloseBtn" onclick="hideYT()">×</button>
   </div>
-
-  <!-- Viewer List Panel (toggle) -->
-  <div id="viewerPanel"></div>
 
   <!-- Now Playing Bar -->
   <div id="nowPlaying">
@@ -411,8 +486,12 @@ body {
       <button class="react-btn" onclick="sendReaction('😮')">😮</button>
       <button class="react-btn" onclick="sendReaction('👏')">👏</button>
       <button class="react-btn" onclick="sendReaction('💀')">💀</button>
-      <button class="react-btn" onclick="sendReaction('🎵')">🎵</button>
-      <button class="react-btn" onclick="sendReaction('✨')">✨</button>
+    </div>
+    <!-- Bubble Chat Row -->
+    <div id="bubbleRow">
+      <input type="text" id="bubbleInput" placeholder="Tulis pesan... (maks 10 kata)" maxlength="80">
+      <span id="bubbleWordCount">0/10</span>
+      <button id="bubbleSendBtn" onclick="sendBubble()">💬</button>
     </div>
   </div>
 </div>
@@ -484,11 +563,19 @@ function handleServerMsg(msg) {
 
   if (msg.type === "sync") {
     if (msg.videoId) loadVideoFromServer(msg.videoId, msg.title, msg.thumbnail, msg.current_time, msg.is_playing);
-    if (msg.viewers) renderViewerList(msg.viewers, msg.count);
+    if (msg.viewers) {
+      lastViewerData = { viewers: msg.viewers, count: msg.count };
+      renderViewerList(msg.viewers, msg.count);
+    }
   }
 
   if (msg.type === "viewer_list") {
+    lastViewerData = { viewers: msg.viewers, count: msg.count };
     renderViewerList(msg.viewers, msg.count);
+  }
+
+  if (msg.type === "bubble") {
+    spawnBubble(msg.text, msg.name, msg.color);
   }
 
   if (msg.type === "load") {
@@ -532,18 +619,40 @@ function renderViewerList(viewers, count) {
   var panel = document.getElementById("viewerPanel");
   panel.innerHTML = "";
   if (viewers.length === 0) {
-    panel.innerHTML = '<div class="viewer-item" style="color:#666;font-size:10px;">Belum ada yang set nama</div>';
+    panel.innerHTML = '<div class="viewer-item" style="color:#555;font-size:10px;padding:2px 0;">Belum ada yang set nama</div>';
     return;
   }
+  var now = Date.now();
   viewers.forEach(function(v) {
     var item = document.createElement("div");
     item.className = "viewer-item";
+    var timeStr = v.joined_at ? fmtDuration(now - v.joined_at) : "";
     item.innerHTML =
       '<div class="viewer-dot" style="background:' + v.color + '"></div>' +
-      '<span>' + v.name + '</span>';
+      '<span>' + v.name + '</span>' +
+      (timeStr ? '<span class="viewer-time">' + timeStr + '</span>' : '');
     panel.appendChild(item);
   });
 }
+
+function fmtDuration(ms) {
+  var s = Math.floor(ms / 1000);
+  var h = Math.floor(s / 3600);
+  var m = Math.floor((s % 3600) / 60);
+  var sec = s % 60;
+  if (h > 0) return h + "h " + m + "m " + sec + "s";
+  if (m > 0) return m + "m " + sec + "s";
+  return sec + "s";
+}
+
+// Update waktu online tiap detik kalau panel terbuka
+setInterval(function() {
+  if (document.getElementById("viewerPanel").style.display === "flex") {
+    // Re-render dengan data terakhir
+    if (lastViewerData) renderViewerList(lastViewerData.viewers, lastViewerData.count);
+  }
+}, 1000);
+var lastViewerData = null;
 
 function toggleViewerPanel() {
   var panel = document.getElementById("viewerPanel");
@@ -564,27 +673,80 @@ function submitName() {
   document.getElementById("nameModal").classList.remove("show");
 }
 
-/* ── Reactions ── */
+/* ── Reactions (anti-spam: 3s cooldown per emoji) ── */
+var reactionCooldowns = {};
+
 function sendReaction(emoji) {
+  var now = Date.now();
+  if (reactionCooldowns[emoji] && now - reactionCooldowns[emoji] < 3000) return;
+  reactionCooldowns[emoji] = now;
+
+  // visual cooldown pada tombol
+  var btns = document.querySelectorAll(".react-btn");
+  btns.forEach(function(b) {
+    if (b.textContent.trim() === emoji) {
+      b.classList.add("cooldown");
+      setTimeout(function() { b.classList.remove("cooldown"); }, 3000);
+    }
+  });
+
   wsSend({ type: "reaction", emoji: emoji });
-  spawnReaction(emoji, myName, myColor); // tampilkan juga di diri sendiri
+  spawnReaction(emoji, myName, myColor);
 }
 
 function spawnReaction(emoji, name, color) {
   var overlay = document.getElementById("reactionOverlay");
   var el = document.createElement("div");
   el.className = "float-reaction";
-
-  // Random horizontal position
-  var x = 10 + Math.random() * 80;
+  var x = 10 + Math.random() * 75;
   el.style.left = x + "%";
-
   el.innerHTML =
     '<span style="filter:drop-shadow(0 2px 4px rgba(0,0,0,0.5))">' + emoji + '</span>' +
     (name ? '<div class="react-name" style="color:' + color + '">' + name + '</div>' : '');
-
   overlay.appendChild(el);
   setTimeout(function() { el.remove(); }, 2600);
+}
+
+/* ── Bubble Teks ── */
+var bubbleCooldown = false;
+
+function sendBubble() {
+  if (bubbleCooldown) return;
+  var input = document.getElementById("bubbleInput");
+  var text = input.value.trim();
+  if (!text) return;
+
+  var words = text.split(/\s+/).filter(Boolean);
+  if (words.length > 10) {
+    text = words.slice(0, 10).join(" ");
+  }
+
+  wsSend({ type: "bubble", text: text });
+  spawnBubble(text, myName, myColor);
+  input.value = "";
+  document.getElementById("bubbleWordCount").textContent = "0/10";
+
+  // cooldown 3 detik biar tidak spam
+  bubbleCooldown = true;
+  document.getElementById("bubbleSendBtn").style.opacity = "0.4";
+  setTimeout(function() {
+    bubbleCooldown = false;
+    document.getElementById("bubbleSendBtn").style.opacity = "1";
+  }, 3000);
+}
+
+function spawnBubble(text, name, color) {
+  var overlay = document.getElementById("reactionOverlay");
+  var el = document.createElement("div");
+  el.className = "float-bubble";
+  var x = 5 + Math.random() * 60;
+  el.style.left = x + "%";
+  el.style.bottom = (70 + Math.random() * 60) + "px";
+  el.innerHTML =
+    (name ? '<div class="bubble-name" style="color:' + color + '">' + name + '</div>' : '') +
+    '<div class="bubble-text">' + text.replace(/</g,"&lt;") + '</div>';
+  overlay.appendChild(el);
+  setTimeout(function() { el.remove(); }, 4200);
 }
 
 function loadVideoFromServer(videoId, title, thumbnail, startTime, autoplay) {
@@ -600,8 +762,7 @@ function loadVideoFromServer(videoId, title, thumbnail, startTime, autoplay) {
   document.getElementById("ytStatus").style.display = "none";
   document.getElementById("ytPlayerWrap").style.display = "flex";
   document.getElementById("reactionBar").style.display = "flex";
-
-  // Selalu pakai iframe embed biasa
+  document.getElementById("bubbleRow").style.display = "flex";
   var autoplayParam = autoplay ? 1 : 0;
   document.getElementById("ytFrame").src =
     "https://www.youtube.com/embed/" + videoId +
@@ -713,6 +874,7 @@ function loadVideoLocal(videoId, title, thumbnail, startTime) {
   document.getElementById("ytStatus").style.display = "none";
   document.getElementById("ytPlayerWrap").style.display = "flex";
   document.getElementById("reactionBar").style.display = "flex";
+  document.getElementById("bubbleRow").style.display = "flex";
 
   document.getElementById("ytFrame").src =
     "https://www.youtube.com/embed/" + videoId +
@@ -839,6 +1001,20 @@ document.addEventListener("DOMContentLoaded", function() {
   document.getElementById("chatInput").addEventListener("keydown", function(e){ if (e.key==="Enter") addChat(); });
   document.getElementById("ytInput").addEventListener("keydown", function(e){ if (e.key==="Enter") searchYT(); });
   document.getElementById("nameInput").addEventListener("keydown", function(e){ if (e.key==="Enter") submitName(); });
+  document.getElementById("bubbleInput").addEventListener("keydown", function(e){ if (e.key==="Enter") sendBubble(); });
+  document.getElementById("bubbleInput").addEventListener("input", function() {
+    var words = this.value.trim().split(/\s+/).filter(Boolean).length;
+    var el = document.getElementById("bubbleWordCount");
+    el.textContent = words + "/10";
+    el.style.color = words >= 10 ? "#ff6b6b" : "#555";
+  });
+  // Tutup viewer panel saat klik di luar
+  document.addEventListener("click", function(e) {
+    var wrap = document.getElementById("viewerBadgeWrap");
+    if (wrap && !wrap.contains(e.target)) {
+      document.getElementById("viewerPanel").style.display = "none";
+    }
+  });
 });
 
 function nextChat() {
