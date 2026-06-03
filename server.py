@@ -40,16 +40,22 @@ COLORS = ["#ff6b9d","#c084fc","#60a5fa","#34d399","#fbbf24","#f87171","#a78bfa",
 
 def get_viewer_list():
     return [{"name": v["name"], "color": v["color"], "joined_at": v["joined_at"]}
-            for v in clients.values() if v.get("name")]
+            for ws, v in clients.items()
+            if v.get("name") and ws.client_state.value == 1]
 
 async def broadcast(data: dict, exclude: WebSocket = None):
     msg = json.dumps(data)
     dead = []
     for ws in clients:
         if ws == exclude: continue
-        try: await ws.send_text(msg)
-        except: dead.append(ws)
-    for ws in dead: clients.pop(ws, None)
+        try:
+            await ws.send_text(msg)
+        except:
+            dead.append(ws)
+    for ws in dead:
+        clients.pop(ws, None)
+    if dead:
+        await broadcast_viewers()
 
 async def broadcast_bytes(data: bytes, exclude: WebSocket = None):
     dead = []
