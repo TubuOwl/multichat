@@ -45,7 +45,7 @@ body {
 /* ── YT WINDOW ── */
 #ytWindow {
   position: fixed; top: 70px; left: 14px;
-  width: 340px; height: 360px;
+  width: 340px; height: 420px;
   border: 2px solid rgba(255,255,255,0.5); border-radius: 12px;
   background: rgba(0,0,0,0.85); backdrop-filter: blur(8px);
   z-index: 999; display: none; box-shadow: 0 6px 24px rgba(0,0,0,0.5);
@@ -250,7 +250,7 @@ body {
 @keyframes floatBubble {
   0%   { opacity: 0; transform: translateY(0) scale(0.8); }
   10%  { opacity: 1; transform: translateY(-10px) scale(1); }
-  85%  { opacity: 1; transform: translateY(-80px); }
+  75%  { opacity: 1; transform: translateY(-80px); }
   100% { opacity: 0; transform: translateY(-110px); }
 }
 
@@ -258,7 +258,7 @@ body {
 .float-voice {
   position: absolute; pointer-events: auto;
   display: flex; flex-direction: column; align-items: flex-start; gap: 2px;
-  animation: floatBubble 10s ease-out forwards;
+  animation: floatBubble 0.3s ease-out forwards;
   animation-fill-mode: both;
 }
 .float-voice .voice-bubble {
@@ -464,6 +464,11 @@ function wsSend(data) {
 }
 
 function handleServerMsg(msg) {
+  if (msg.type === "ping") {
+    wsSend({ type: "pong" });
+    return;
+  }
+
   if (msg.your_color) myColor = msg.your_color;
 
   if (msg.count !== undefined) {
@@ -624,7 +629,7 @@ function spawnBubble(text, name, color) {
     (name ? '<div class="bubble-name" style="color:' + color + '">' + name + '</div>' : '') +
     '<div class="bubble-text">' + renderBubbleContent(text) + '</div>';
   overlay.appendChild(el);
-  setTimeout(function(){ el.remove(); }, 10200);
+  setTimeout(function(){ el.remove(); }, 4200);
 }
 
 /* ── Voice Note ── */
