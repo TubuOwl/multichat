@@ -8,156 +8,91 @@
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
 body {
-  width: 100%;
-  min-height: 100vh;
+  width: 100%; min-height: 100vh;
   font-family: Arial, sans-serif;
   background-image: url("https://png.pngtree.com/background/20230616/original/pngtree-anime-tree-picture-image_3629955.jpg");
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  background-attachment: scroll;
+  background-size: cover; background-position: center;
+  background-repeat: no-repeat; background-attachment: scroll;
 }
 
 /* ── TOOLBAR ── */
 #toolbar {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  gap: 8px;
+  width: 100%; display: flex; align-items: center; gap: 8px;
   padding: 10px 14px;
-  background: rgba(255,255,255,0.25);
-  backdrop-filter: blur(6px);
-  border-bottom: 1px solid rgba(255,255,255,0.3);
-  flex-wrap: wrap;
+  background: rgba(255,255,255,0.25); backdrop-filter: blur(6px);
+  border-bottom: 1px solid rgba(255,255,255,0.3); flex-wrap: wrap;
 }
-
 .tool-icon-btn {
-  width: 38px; height: 38px;
-  border-radius: 8px;
+  width: 38px; height: 38px; border-radius: 8px;
   border: 1px solid rgba(255,255,255,0.5);
-  background: rgba(255,255,255,0.35);
-  font-size: 18px;
-  cursor: pointer;
+  background: rgba(255,255,255,0.35); font-size: 18px; cursor: pointer;
   display: flex; align-items: center; justify-content: center;
-  backdrop-filter: blur(2px);
-  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
-  transition: background 0.2s;
-  flex-shrink: 0;
+  backdrop-filter: blur(2px); box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+  transition: background 0.2s; flex-shrink: 0;
 }
 .tool-icon-btn:hover { background: rgba(255,255,255,0.6); }
-
 #chatInput {
-  flex: 1; min-width: 120px;
-  padding: 7px 10px; font-size: 13px;
-  border-radius: 6px;
-  border: 1px solid rgba(255,255,255,0.6);
-  background: rgba(255,255,255,0.45);
-  color: #000;
+  flex: 1; min-width: 120px; padding: 7px 10px; font-size: 13px;
+  border-radius: 6px; border: 1px solid rgba(255,255,255,0.6);
+  background: rgba(255,255,255,0.45); color: #000;
 }
 #addBtn {
-  width: 34px; height: 34px;
-  font-size: 20px; font-weight: bold;
-  border-radius: 6px; border: none;
-  background: rgba(0,150,255,0.8);
+  width: 34px; height: 34px; font-size: 20px; font-weight: bold;
+  border-radius: 6px; border: none; background: rgba(0,150,255,0.8);
   color: white; cursor: pointer; flex-shrink: 0;
 }
 
 /* ── YT WINDOW ── */
 #ytWindow {
-  position: fixed;
-  top: 70px; left: 14px;
-  width: 340px; height: 360px;
-  border: 2px solid rgba(255,255,255,0.5);
-  border-radius: 12px;
-  background: rgba(0,0,0,0.85);
-  backdrop-filter: blur(8px);
-  z-index: 999;
-  display: none;
-  box-shadow: 0 6px 24px rgba(0,0,0,0.5);
-  overflow: hidden;
-  flex-direction: column;
+  position: fixed; top: 70px; left: 14px;
+  width: 340px; height: 420px;
+  border: 2px solid rgba(255,255,255,0.5); border-radius: 12px;
+  background: rgba(0,0,0,0.85); backdrop-filter: blur(8px);
+  z-index: 999; display: none; box-shadow: 0 6px 24px rgba(0,0,0,0.5);
+  overflow: hidden; flex-direction: column;
 }
-
 #ytTitleBar {
   display: flex; align-items: center; justify-content: space-between;
-  padding: 6px 10px;
-  background: rgba(255,255,255,0.1);
+  padding: 6px 10px; background: rgba(255,255,255,0.1);
   border-bottom: 1px solid rgba(255,255,255,0.15);
-  cursor: move; user-select: none;
-  gap: 8px;
+  cursor: move; user-select: none; gap: 8px;
 }
 #ytTitleBar span { color: #fff; font-size: 12px; font-weight: bold; }
-
-/* viewer badge */
-#viewerBadge {
-  background: rgba(255,60,60,0.85);
-  color: #fff; font-size: 10px; font-weight: bold;
-  padding: 2px 7px; border-radius: 20px;
-  white-space: nowrap;
-}
-
-/* now playing bar */
-#nowPlaying {
-  display: none;
-  align-items: center; gap: 6px;
-  padding: 5px 10px;
-  background: rgba(255,0,0,0.12);
-  border-bottom: 1px solid rgba(255,255,255,0.08);
-}
-#nowPlayingThumb {
-  width: 36px; height: 22px;
-  object-fit: cover; border-radius: 3px; flex-shrink: 0;
-}
-#nowPlayingTitle {
-  color: #fff; font-size: 10px;
-  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-  flex: 1;
-}
-#nowPlayingDot {
-  width: 7px; height: 7px;
-  border-radius: 50%; background: #ff4444;
-  animation: pulse 1.2s infinite;
-  flex-shrink: 0;
-}
-@keyframes pulse {
-  0%,100% { opacity:1; transform:scale(1); }
-  50% { opacity:0.4; transform:scale(0.7); }
-}
-
 #ytCloseBtn {
   background: #ff4444; border: none; border-radius: 50%;
   width: 18px; height: 18px; color: #fff; font-size: 13px;
   cursor: pointer; line-height: 1;
-  display: flex; align-items: center; justify-content: center;
-  flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
 }
 
-#ytSearchRow {
-  display: flex; gap: 6px; padding: 8px 10px;
-  background: rgba(255,255,255,0.07);
+/* now playing bar */
+#nowPlaying {
+  display: none; align-items: center; gap: 6px; padding: 5px 10px;
+  background: rgba(255,0,0,0.12); border-bottom: 1px solid rgba(255,255,255,0.08);
 }
+#nowPlayingThumb { width: 36px; height: 22px; object-fit: cover; border-radius: 3px; flex-shrink: 0; }
+#nowPlayingTitle { color: #fff; font-size: 10px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1; }
+#nowPlayingDot {
+  width: 7px; height: 7px; border-radius: 50%; background: #ff4444;
+  animation: pulse 1.2s infinite; flex-shrink: 0;
+}
+@keyframes pulse { 0%,100% { opacity:1; transform:scale(1); } 50% { opacity:0.4; transform:scale(0.7); } }
+
+#ytSearchRow { display: flex; gap: 6px; padding: 8px 10px; background: rgba(255,255,255,0.07); }
 #ytInput {
   flex: 1; padding: 5px 8px; border-radius: 6px;
   border: 1px solid rgba(255,255,255,0.3);
   background: rgba(255,255,255,0.15); color: #fff; font-size: 12px;
 }
 #ytInput::placeholder { color: #aaa; }
-#ytSearchBtn {
-  padding: 5px 10px; border-radius: 6px; border: none;
-  background: #ff0000; color: #fff; font-size: 12px; cursor: pointer;
-}
+#ytSearchBtn { padding: 5px 10px; border-radius: 6px; border: none; background: #ff0000; color: #fff; font-size: 12px; cursor: pointer; }
 
-#ytResults {
-  flex: 1; overflow-y: auto; padding: 6px 8px;
-  display: flex; flex-direction: column; gap: 6px;
-}
+#ytResults { flex: 1; overflow-y: auto; padding: 6px 8px; display: flex; flex-direction: column; gap: 6px; }
 #ytResults::-webkit-scrollbar { width: 4px; }
 #ytResults::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 2px; }
-
 .yt-item {
   display: flex; gap: 8px; align-items: center;
-  background: rgba(255,255,255,0.08);
-  border-radius: 6px; padding: 5px 7px;
+  background: rgba(255,255,255,0.08); border-radius: 6px; padding: 5px 7px;
   cursor: pointer; transition: background 0.15s;
 }
 .yt-item:hover { background: rgba(255,255,255,0.18); }
@@ -166,25 +101,19 @@ body {
 .yt-item-title { color: #fff; font-size: 11px; font-weight: bold; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .yt-item-meta { color: #aaa; font-size: 10px; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-/* player embed */
 #ytPlayerWrap { display: none; flex-direction: column; flex: 1; overflow: hidden; min-height: 0; }
 #ytBackBtn {
-  padding: 4px 10px;
-  background: rgba(255,255,255,0.1); border: none;
+  padding: 4px 10px; background: rgba(255,255,255,0.1); border: none;
   border-bottom: 1px solid rgba(255,255,255,0.1);
   color: #ccc; font-size: 11px; cursor: pointer; text-align: left;
 }
 #ytBackBtn:hover { background: rgba(255,255,255,0.2); }
 #ytFrame { width: 100%; border: none; flex: 1; min-height: 0; max-height: 200px; }
+#ytStatus { color: #aaa; font-size: 11px; text-align: center; padding: 16px 10px; }
 
-#ytStatus {
-  color: #aaa; font-size: 11px; text-align: center; padding: 16px 10px;
-}
-
-/* ── REACTION BAR (di bawah player) ── */
+/* ── REACTION BAR ── */
 #reactionBar {
-  display: none;
-  gap: 2px; padding: 4px 8px;
+  display: none; gap: 2px; padding: 4px 8px;
   background: rgba(255,255,255,0.06);
   border-top: 1px solid rgba(255,255,255,0.08);
   align-items: center;
@@ -192,30 +121,33 @@ body {
 .react-btn {
   font-size: 16px; background: none; border: none;
   cursor: pointer; padding: 3px 5px; border-radius: 6px;
-  transition: transform 0.15s, background 0.15s;
-  line-height: 1; position: relative;
+  transition: transform 0.15s, background 0.15s; line-height: 1; position: relative;
 }
 .react-btn:hover { background: rgba(255,255,255,0.15); transform: scale(1.25); }
 .react-btn.cooldown { opacity: 0.35; pointer-events: none; }
-/* cooldown progress ring */
-.react-btn::after {
-  content: ''; position: absolute; inset: 0;
-  border-radius: 6px; background: rgba(0,0,0,0);
-}
 
-/* bubble chat input row */
+/* ── VOICE NOTE BUTTON ── */
+#voiceBtn {
+  font-size: 14px; background: rgba(255,255,255,0.1); border: none;
+  cursor: pointer; padding: 3px 8px; border-radius: 6px;
+  color: #fff; transition: background 0.15s; line-height: 1;
+  margin-left: auto; white-space: nowrap; flex-shrink: 0;
+  user-select: none; -webkit-user-select: none;
+}
+#voiceBtn:hover { background: rgba(255,255,255,0.2); }
+#voiceBtn.recording { background: rgba(255,50,50,0.8); animation: recPulse 1s infinite; }
+@keyframes recPulse { 0%,100% { opacity:1; } 50% { opacity:0.6; } }
+
+/* ── BUBBLE ROW ── */
 #bubbleRow {
-  display: none;
-  gap: 4px; padding: 4px 8px;
+  display: none; gap: 4px; padding: 4px 8px;
   background: rgba(255,255,255,0.04);
-  border-top: 1px solid rgba(255,255,255,0.06);
-  align-items: center;
+  border-top: 1px solid rgba(255,255,255,0.06); align-items: center;
 }
 #bubbleInput {
   flex: 1; padding: 4px 8px; border-radius: 12px;
   border: 1px solid rgba(255,255,255,0.2);
-  background: rgba(255,255,255,0.1); color: #fff; font-size: 11px;
-  outline: none;
+  background: rgba(255,255,255,0.1); color: #fff; font-size: 11px; outline: none;
 }
 #bubbleInput::placeholder { color: #777; }
 #bubbleInput:focus { border-color: rgba(255,255,255,0.4); }
@@ -227,63 +159,38 @@ body {
 #bubbleSendBtn:hover { background: rgba(255,107,157,1); }
 #bubbleWordCount { color: #666; font-size: 9px; flex-shrink: 0; }
 
-/* ── VIEWER LIST PANEL — floating di bawah badge ── */
+/* ── VIEWER BADGE WRAP ── */
+#viewerBadgeWrap { position: relative; }
+#viewerBadge {
+  background: rgba(255,60,60,0.85); color: #fff; font-size: 10px; font-weight: bold;
+  padding: 2px 7px; border-radius: 20px; white-space: nowrap;
+  cursor: pointer; user-select: none; display: block;
+}
+#viewerBadge:hover { background: rgba(255,60,60,1); }
 #viewerPanel {
-  display: none;
-  position: absolute;
-  top: 100%;
-  right: 0;
-  z-index: 100;
-  flex-direction: column;
-  background: rgba(15,15,25,0.96);
-  border: 1px solid rgba(255,255,255,0.12);
-  border-radius: 10px;
-  min-width: 180px; max-width: 220px;
-  max-height: 200px; overflow-y: auto;
-  padding: 8px 10px; gap: 5px;
-  box-shadow: 0 6px 20px rgba(0,0,0,0.6);
+  display: none; position: absolute; top: 100%; right: 0; z-index: 100;
+  flex-direction: column; background: rgba(15,15,25,0.96);
+  border: 1px solid rgba(255,255,255,0.12); border-radius: 10px;
+  min-width: 180px; max-width: 220px; max-height: 200px; overflow-y: auto;
+  padding: 8px 10px; gap: 5px; box-shadow: 0 6px 20px rgba(0,0,0,0.6);
 }
 #viewerPanel::-webkit-scrollbar { width: 3px; }
 #viewerPanel::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); }
-.viewer-item {
-  display: flex; align-items: center; gap: 7px;
-  font-size: 11px; color: #ddd;
-}
-.viewer-dot {
-  width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0;
-}
+.viewer-item { display: flex; align-items: center; gap: 7px; font-size: 11px; color: #ddd; }
+.viewer-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
 .viewer-time { color: #555; font-size: 9px; margin-left: auto; white-space: nowrap; }
 
-/* wrapper untuk badge + panel */
-#viewerBadgeWrap {
-  position: relative;
-}
-#viewerBadge {
-  background: rgba(255,60,60,0.85);
-  color: #fff; font-size: 10px; font-weight: bold;
-  padding: 2px 7px; border-radius: 20px;
-  white-space: nowrap; cursor: pointer;
-  user-select: none; display: block;
-}
-#viewerBadge:hover { background: rgba(255,60,60,1); }
-
-/* ── SET NAME MODAL ── */
+/* ── NAME MODAL ── */
 #nameModal {
-  display: none;
-  position: fixed; inset: 0;
-  background: rgba(0,0,0,0.6);
-  backdrop-filter: blur(4px);
-  z-index: 2000;
-  align-items: center; justify-content: center;
+  display: none; position: fixed; inset: 0;
+  background: rgba(0,0,0,0.6); backdrop-filter: blur(4px);
+  z-index: 2000; align-items: center; justify-content: center;
 }
 #nameModal.show { display: flex; }
 #nameBox {
-  background: #1a1a2e;
-  border: 1px solid rgba(255,255,255,0.2);
-  border-radius: 14px;
-  padding: 24px 28px;
-  display: flex; flex-direction: column; gap: 14px;
-  width: 280px;
+  background: #1a1a2e; border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 14px; padding: 24px 28px;
+  display: flex; flex-direction: column; gap: 14px; width: 280px;
   box-shadow: 0 8px 32px rgba(0,0,0,0.5);
 }
 #nameBox h3 { color: #fff; font-size: 15px; text-align: center; }
@@ -291,48 +198,54 @@ body {
 #nameInput {
   padding: 9px 12px; border-radius: 8px;
   border: 1px solid rgba(255,255,255,0.25);
-  background: rgba(255,255,255,0.1);
-  color: #fff; font-size: 13px; outline: none;
+  background: rgba(255,255,255,0.1); color: #fff; font-size: 13px; outline: none;
 }
 #nameInput:focus { border-color: #ff6b9d; }
 #nameSubmitBtn {
   padding: 9px; border-radius: 8px; border: none;
   background: linear-gradient(135deg, #ff6b9d, #c084fc);
-  color: #fff; font-size: 13px; font-weight: bold;
-  cursor: pointer;
+  color: #fff; font-size: 13px; font-weight: bold; cursor: pointer;
 }
 #nameSubmitBtn:hover { opacity: 0.9; }
 
-/* ── FLOATING BUBBLE TEKS ── */
+/* ── FLOATING OVERLAY ── */
+#reactionOverlay {
+  position: fixed; inset: 0; pointer-events: none; z-index: 1500; overflow: hidden;
+}
+
+/* floating reaction emoji */
+.float-reaction {
+  position: absolute; bottom: 80px; font-size: 28px;
+  animation: floatUp 2.5s ease-out forwards; pointer-events: none;
+  display: flex; flex-direction: column; align-items: center; gap: 2px;
+}
+.float-reaction .react-name {
+  font-size: 9px; color: #fff; background: rgba(0,0,0,0.5);
+  padding: 1px 5px; border-radius: 10px; white-space: nowrap;
+}
+@keyframes floatUp {
+  0%   { opacity: 1; transform: translateY(0) scale(1); }
+  80%  { opacity: 0.8; }
+  100% { opacity: 0; transform: translateY(-220px) scale(0.7); }
+}
+
+/* floating bubble teks */
 .float-bubble {
-  position: absolute;
-  pointer-events: none;
+  position: absolute; pointer-events: none;
   display: flex; flex-direction: column; align-items: flex-start; gap: 2px;
-  animation: floatBubble 4s ease-out forwards;
-  max-width: 180px;
+  animation: floatBubble 4s ease-out forwards; max-width: 180px;
 }
-.float-bubble .bubble-name {
-  font-size: 9px; font-weight: bold;
-  padding: 0 6px; margin-bottom: 1px;
-}
+.float-bubble .bubble-name { font-size: 9px; font-weight: bold; padding: 0 6px; margin-bottom: 1px; }
 .float-bubble .bubble-text {
-  background: rgba(30,30,40,0.88);
-  border: 1px solid rgba(255,255,255,0.15);
-  border-radius: 14px 14px 14px 4px;
-  padding: 5px 10px;
-  font-size: 12px; color: #fff;
-  backdrop-filter: blur(4px);
-  word-break: break-word;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.4);
-  white-space: pre-wrap;
-  max-width: 180px;
+  background: rgba(30,30,40,0.88); border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 14px 14px 14px 4px; padding: 5px 10px;
+  font-size: 12px; color: #fff; backdrop-filter: blur(4px);
+  word-break: break-word; box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+  white-space: pre-wrap; max-width: 180px;
 }
 .float-bubble .bubble-text img {
-  max-width: 140px;
-  max-height: 120px;
-  border-radius: 8px;
-  display: block;
-  margin-top: 4px;
+  max-width: 140px; max-height: 120px; border-radius: 8px;
+  display: block; margin-top: 4px;
 }
 @keyframes floatBubble {
   0%   { opacity: 0; transform: translateY(0) scale(0.8); }
@@ -341,52 +254,36 @@ body {
   100% { opacity: 0; transform: translateY(-110px); }
 }
 
-/* ── FLOATING REACTIONS ── */
-#reactionOverlay {
-  position: fixed; inset: 0;
-  pointer-events: none; z-index: 1500;
-  overflow: hidden;
+/* floating voice note */
+.float-voice {
+  position: absolute; pointer-events: auto;
+  display: flex; flex-direction: column; align-items: flex-start; gap: 2px;
+  animation: floatBubble 0.3s ease-out forwards;
+  animation-fill-mode: both;
 }
-.float-reaction {
-  position: absolute;
-  bottom: 80px;
-  font-size: 28px;
-  animation: floatUp 2.5s ease-out forwards;
-  pointer-events: none;
-  display: flex; flex-direction: column; align-items: center; gap: 2px;
+.float-voice .voice-bubble {
+  background: rgba(30,30,40,0.92); border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 14px 14px 14px 4px; padding: 7px 10px;
+  backdrop-filter: blur(4px); box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+  display: flex; flex-direction: column; gap: 4px;
 }
-.float-reaction .react-name {
-  font-size: 9px; color: #fff;
-  background: rgba(0,0,0,0.5);
-  padding: 1px 5px; border-radius: 10px;
-  white-space: nowrap;
-}
-@keyframes floatUp {
-  0%   { opacity: 1; transform: translateY(0) scale(1); }
-  80%  { opacity: 0.8; }
-  100% { opacity: 0; transform: translateY(-220px) scale(0.7); }
+.float-voice .vn-name { font-size: 9px; font-weight: bold; }
+.float-voice audio { width: 160px; height: 30px; outline: none; }
+@keyframes floatVoice {
+  0% { opacity:0; transform: translateY(10px) scale(0.9); }
+  100% { opacity:1; transform: translateY(0) scale(1); }
 }
 
-/* ── MACHA TYPING DOTS ── */
-.macha-typing {
-  display: inline-block;
-  font-size: 18px;
-  letter-spacing: 2px;
-  animation: machaTyping 1s infinite;
-}
-@keyframes machaTyping {
-  0%,100% { opacity: 0.2; }
-  50%      { opacity: 1; }
-}
+/* ── MACHA TYPING ── */
+.macha-typing { display: inline-block; font-size: 18px; letter-spacing: 2px; animation: machaTyping 1s infinite; }
+@keyframes machaTyping { 0%,100% { opacity: 0.2; } 50% { opacity: 1; } }
 
-/* ws status pill */
+/* ws status */
 #wsStatus {
   position: fixed; bottom: 12px; right: 12px;
   font-size: 10px; padding: 4px 10px; border-radius: 20px;
-  background: rgba(0,0,0,0.55); color: #aaa;
-  backdrop-filter: blur(4px);
-  z-index: 1000; pointer-events: none;
-  transition: color 0.3s;
+  background: rgba(0,0,0,0.55); color: #aaa; backdrop-filter: blur(4px);
+  z-index: 1000; pointer-events: none; transition: color 0.3s;
 }
 #wsStatus.connected { color: #4cff91; }
 #wsStatus.disconnected { color: #ff5555; }
@@ -395,14 +292,11 @@ body {
 #chatArea {
   width: 100%; display: grid;
   grid-template-columns: repeat(auto-fill, minmax(250px,1fr));
-  gap: 12px; padding: 12px 12px 40px;
-  justify-items: center;
+  gap: 12px; padding: 12px 12px 40px; justify-items: center;
 }
-
 .chat-box {
   position: relative; width: 250px; height: 350px;
-  background: rgba(255,255,255,0.95);
-  border-radius: 8px; overflow: hidden;
+  background: rgba(255,255,255,0.95); border-radius: 8px; overflow: hidden;
   box-shadow: 0 3px 8px rgba(0,0,0,0.3);
 }
 .chat-container { width: 100%; height: 100%; position: relative; overflow: hidden; }
@@ -420,13 +314,8 @@ body {
 
 /* ── NAV BUTTONS (mobile) ── */
 .nav-btn { display: none; }
-
 @media (max-width: 480px) {
-  #chatArea {
-    display: flex; overflow-x: auto; gap: 0; padding: 12px 0 40px;
-    scroll-snap-type: x mandatory;
-    -webkit-overflow-scrolling: touch; scroll-behavior: smooth;
-  }
+  #chatArea { display: flex; overflow-x: auto; gap: 0; padding: 12px 0 40px; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; scroll-behavior: smooth; }
   .chat-box { flex: 0 0 100vw; width: 100vw; height: 70vh; border-radius: 0; scroll-snap-align: center; }
   #ytWindow { width: calc(100vw - 28px); left: 14px; right: 14px; }
   .nav-btn {
@@ -445,7 +334,7 @@ body {
 </head>
 <body>
 
-<!-- SET NAME MODAL -->
+<!-- NAME MODAL -->
 <div id="nameModal">
   <div id="nameBox">
     <h3>👤 Siapa namamu?</h3>
@@ -455,7 +344,7 @@ body {
   </div>
 </div>
 
-<!-- FLOATING REACTION OVERLAY -->
+<!-- FLOATING OVERLAY (reaction, bubble, voice) -->
 <div id="reactionOverlay"></div>
 
 <!-- WS STATUS -->
@@ -464,7 +353,7 @@ body {
 <!-- TOOLBAR -->
 <div id="toolbar">
   <button class="tool-icon-btn" onclick="toggleYT()" title="YouTube Sync">▶️</button>
-  <span style="font-size:26px;color:white;text-shadow:0 0 6px black;">𝓜</span>
+  <span style="font-size:26px;color:white;text-shadow:0 0 6px black;">🗪</span>
   <input type="text" id="chatInput" placeholder="nama-room Chatango">
   <button id="addBtn" onclick="addChat()">+</button>
 </div>
@@ -475,13 +364,11 @@ body {
     <span>▶ YouTube Sync</span>
     <div id="viewerBadgeWrap">
       <div id="viewerBadge" onclick="toggleViewerPanel()">👁 0 viewers</div>
-      <!-- Viewer List Panel floating di bawah badge -->
       <div id="viewerPanel"></div>
     </div>
     <button id="ytCloseBtn" onclick="hideYT()">×</button>
   </div>
 
-  <!-- Now Playing Bar -->
   <div id="nowPlaying">
     <div id="nowPlayingDot"></div>
     <img id="nowPlayingThumb" src="" alt="">
@@ -497,7 +384,7 @@ body {
   <div id="ytPlayerWrap" style="display:none;">
     <button id="ytBackBtn" onclick="showResults()">← Kembali ke hasil</button>
     <iframe id="ytFrame" allowfullscreen allow="autoplay; encrypted-media"></iframe>
-    <!-- Reaction Bar -->
+    <!-- Reaction + Voice Note Bar -->
     <div id="reactionBar">
       <button class="react-btn" onclick="sendReaction('❤️')">❤️</button>
       <button class="react-btn" onclick="sendReaction('😂')">😂</button>
@@ -505,6 +392,11 @@ body {
       <button class="react-btn" onclick="sendReaction('😮')">😮</button>
       <button class="react-btn" onclick="sendReaction('👏')">👏</button>
       <button class="react-btn" onclick="sendReaction('💀')">💀</button>
+      <button id="voiceBtn"
+        onmousedown="startRecord()" onmouseup="stopRecord()"
+        ontouchstart="startRecord(event)" ontouchend="stopRecord(event)">
+        🎤 Tahan
+      </button>
     </div>
     <!-- Bubble Chat Row -->
     <div id="bubbleRow">
@@ -518,21 +410,22 @@ body {
 <!-- CHAT AREA -->
 <div id="chatArea"></div>
 
-<!-- SWIPE BUTTONS (mobile) -->
+<!-- SWIPE (mobile) -->
 <button id="prevBtn" class="nav-btn" onclick="prevChat()">❮</button>
 <button id="nextBtn" class="nav-btn" onclick="nextChat()">❯</button>
 
 <script>
 /* ══════════════════════════════
-   WEBSOCKET SYNC
+   WEBSOCKET
 ══════════════════════════════ */
 var ws = null;
 var wsConnected = false;
 var currentVideoId = "";
 var myName = "";
 var myColor = "#fff";
+var pendingVoiceMeta = null;
+var lastViewerData = null;
 
-// Detect WebSocket server URL
 var WS_URL = (location.protocol === "https:" ? "wss://" : "ws://") + location.host + "/ws";
 
 function connectWS() {
@@ -543,101 +436,86 @@ function connectWS() {
     wsConnected = true;
     statusEl.textContent = "⬤ Connected";
     statusEl.className = "connected";
-    // Kirim nama jika sudah ada
     if (myName) wsSend({ type: "set_name", name: myName });
   };
-
   ws.onclose = function() {
     wsConnected = false;
     statusEl.textContent = "⬤ Disconnected";
     statusEl.className = "disconnected";
     setTimeout(connectWS, 2500);
   };
-
   ws.onerror = function() { ws.close(); };
 
   ws.onmessage = function(e) {
+    // Binary = audio blob voice note
+    if (e.data instanceof Blob) {
+      if (pendingVoiceMeta) {
+        spawnVoiceBubble(e.data, pendingVoiceMeta.name, pendingVoiceMeta.color, false);
+        pendingVoiceMeta = null;
+      }
+      return;
+    }
     handleServerMsg(JSON.parse(e.data));
   };
 }
 
 function wsSend(data) {
-  if (ws && ws.readyState === WebSocket.OPEN) {
-    ws.send(JSON.stringify(data));
-  }
+  if (ws && ws.readyState === WebSocket.OPEN) ws.send(JSON.stringify(data));
 }
 
 function handleServerMsg(msg) {
-  // Update viewer count & list
+  if (msg.your_color) myColor = msg.your_color;
+
   if (msg.count !== undefined) {
     var c = msg.count;
     document.getElementById("viewerBadge").textContent = "👁 " + c + " viewer" + (c !== 1 ? "s" : "");
   }
   if (msg.viewers !== undefined && Array.isArray(msg.viewers)) {
+    lastViewerData = { viewers: msg.viewers, count: msg.count };
     renderViewerList(msg.viewers, msg.count || msg.viewers.length);
   }
 
-  // Simpan warna kita sendiri
-  if (msg.your_color) myColor = msg.your_color;
-
   if (msg.type === "sync") {
     if (msg.videoId) loadVideoFromServer(msg.videoId, msg.title, msg.thumbnail, msg.current_time, msg.is_playing);
-    if (msg.viewers) {
-      lastViewerData = { viewers: msg.viewers, count: msg.count };
-      renderViewerList(msg.viewers, msg.count);
-    }
   }
-
   if (msg.type === "viewer_list") {
     lastViewerData = { viewers: msg.viewers, count: msg.count };
     renderViewerList(msg.viewers, msg.count);
   }
-
-  if (msg.type === "bubble") {
-    spawnBubble(msg.text, msg.name, msg.color);
-  }
-
   if (msg.type === "load") {
     loadVideoFromServer(msg.videoId, msg.title, msg.thumbnail, 0, true);
     var by = msg.by ? " oleh " + msg.by : "";
     showNotif("🎵 Memutar" + by + ": " + (msg.title || msg.videoId));
   }
+  if (msg.type === "reaction") spawnReaction(msg.emoji, msg.name, msg.color);
+  if (msg.type === "bubble") spawnBubble(msg.text, msg.name, msg.color);
+  if (msg.type === "voice_note_incoming") pendingVoiceMeta = { name: msg.name, color: msg.color };
 
-  if (msg.type === "reaction") {
-    spawnReaction(msg.emoji, msg.name, msg.color);
-  }
-
-  // play/pause/seek — iframe tidak bisa dikontrol cross-origin, jadi reload dengan timestamp
   if (msg.type === "play" || msg.type === "seek") {
     if (currentVideoId) {
       document.getElementById("ytFrame").src =
         "https://www.youtube.com/embed/" + currentVideoId +
         "?autoplay=1&start=" + Math.floor(msg.current_time || 0) + "&rel=0";
-      videoStartTime = msg.current_time || 0;
-      videoStartedAt = Date.now();
-      videoPlaying = true;
+      videoStartTime = msg.current_time || 0; videoStartedAt = Date.now(); videoPlaying = true;
     }
   }
-
   if (msg.type === "pause") {
     if (currentVideoId) {
       document.getElementById("ytFrame").src =
         "https://www.youtube.com/embed/" + currentVideoId +
         "?autoplay=0&start=" + Math.floor(msg.current_time || 0) + "&rel=0";
-      videoPlaying = false;
-      videoStartTime = msg.current_time || 0;
+      videoPlaying = false; videoStartTime = msg.current_time || 0;
     }
   }
 }
 
 /* ── Viewer List ── */
 function renderViewerList(viewers, count) {
-  var badge = document.getElementById("viewerBadge");
-  badge.textContent = "👁 " + (count || viewers.length) + " viewer" + ((count || viewers.length) !== 1 ? "s" : "");
-
+  document.getElementById("viewerBadge").textContent =
+    "👁 " + (count || viewers.length) + " viewer" + ((count || viewers.length) !== 1 ? "s" : "");
   var panel = document.getElementById("viewerPanel");
   panel.innerHTML = "";
-  if (viewers.length === 0) {
+  if (!viewers.length) {
     panel.innerHTML = '<div class="viewer-item" style="color:#555;font-size:10px;padding:2px 0;">Belum ada yang set nama</div>';
     return;
   }
@@ -653,37 +531,26 @@ function renderViewerList(viewers, count) {
     panel.appendChild(item);
   });
 }
-
 function fmtDuration(ms) {
-  var s = Math.floor(ms / 1000);
-  var h = Math.floor(s / 3600);
-  var m = Math.floor((s % 3600) / 60);
-  var sec = s % 60;
-  if (h > 0) return h + "h " + m + "m " + sec + "s";
-  if (m > 0) return m + "m " + sec + "s";
-  return sec + "s";
+  var s = Math.floor(ms / 1000), h = Math.floor(s/3600), m = Math.floor((s%3600)/60), sec = s%60;
+  if (h > 0) return h+"h "+m+"m "+sec+"s";
+  if (m > 0) return m+"m "+sec+"s";
+  return sec+"s";
 }
-
-// Update waktu online tiap detik kalau panel terbuka
 setInterval(function() {
-  if (document.getElementById("viewerPanel").style.display === "flex") {
-    // Re-render dengan data terakhir
-    if (lastViewerData) renderViewerList(lastViewerData.viewers, lastViewerData.count);
-  }
+  if (document.getElementById("viewerPanel").style.display === "flex" && lastViewerData)
+    renderViewerList(lastViewerData.viewers, lastViewerData.count);
 }, 1000);
-var lastViewerData = null;
-
 function toggleViewerPanel() {
-  var panel = document.getElementById("viewerPanel");
-  panel.style.display = panel.style.display === "flex" ? "none" : "flex";
+  var p = document.getElementById("viewerPanel");
+  p.style.display = p.style.display === "flex" ? "none" : "flex";
 }
 
-/* ── Set Name Modal ── */
+/* ── Name Modal ── */
 function showNameModal() {
   document.getElementById("nameModal").classList.add("show");
-  setTimeout(function() { document.getElementById("nameInput").focus(); }, 100);
+  setTimeout(function(){ document.getElementById("nameInput").focus(); }, 100);
 }
-
 function submitName() {
   var val = document.getElementById("nameInput").value.trim();
   if (!val) return;
@@ -692,221 +559,164 @@ function submitName() {
   document.getElementById("nameModal").classList.remove("show");
 }
 
-/* ── Reactions (anti-spam: 3s cooldown per emoji) ── */
+/* ── Reactions ── */
 var reactionCooldowns = {};
-
 function sendReaction(emoji) {
   var now = Date.now();
   if (reactionCooldowns[emoji] && now - reactionCooldowns[emoji] < 3000) return;
   reactionCooldowns[emoji] = now;
-
-  // visual cooldown pada tombol
-  var btns = document.querySelectorAll(".react-btn");
-  btns.forEach(function(b) {
+  document.querySelectorAll(".react-btn").forEach(function(b) {
     if (b.textContent.trim() === emoji) {
       b.classList.add("cooldown");
-      setTimeout(function() { b.classList.remove("cooldown"); }, 3000);
+      setTimeout(function(){ b.classList.remove("cooldown"); }, 3000);
     }
   });
-
   wsSend({ type: "reaction", emoji: emoji });
   spawnReaction(emoji, myName, myColor);
 }
-
 function spawnReaction(emoji, name, color) {
   var overlay = document.getElementById("reactionOverlay");
   var el = document.createElement("div");
   el.className = "float-reaction";
-  var x = 10 + Math.random() * 75;
-  el.style.left = x + "%";
-  el.innerHTML =
-    '<span style="filter:drop-shadow(0 2px 4px rgba(0,0,0,0.5))">' + emoji + '</span>' +
+  el.style.left = (10 + Math.random() * 75) + "%";
+  el.innerHTML = '<span style="filter:drop-shadow(0 2px 4px rgba(0,0,0,0.5))">' + emoji + '</span>' +
     (name ? '<div class="react-name" style="color:' + color + '">' + name + '</div>' : '');
   overlay.appendChild(el);
-  setTimeout(function() { el.remove(); }, 2600);
+  setTimeout(function(){ el.remove(); }, 2600);
 }
 
 /* ── Bubble Teks ── */
 var bubbleCooldown = false;
-
+function renderBubbleContent(text) {
+  var imageExts = /\.(gif|jpg|jpeg|png|webp)(\?.*)?$/i;
+  var urlRegex = /(https?:\/\/[^\s]+)/g;
+  var trimmed = text.trim();
+  if (imageExts.test(trimmed) && !trimmed.includes(" ")) {
+    return '<img src="' + trimmed + '" onerror="this.style.display=\'none\'">';
+  }
+  return text.replace(/</g,"&lt;").replace(/(https?:\/\/[^\s]+)/g, function(url) {
+    if (imageExts.test(url)) return '<br><img src="' + url + '" onerror="this.style.display=\'none\'">';
+    return '<a href="' + url + '" target="_blank" style="color:#adf">' + url + '</a>';
+  });
+}
 function sendBubble() {
   if (bubbleCooldown) return;
   var input = document.getElementById("bubbleInput");
   var text = input.value.trim();
   if (!text) return;
-
   var words = text.split(/\s+/).filter(Boolean);
-  if (words.length > 10) {
-    text = words.slice(0, 10).join(" ");
-  }
-
+  if (words.length > 10) text = words.slice(0,10).join(" ");
   wsSend({ type: "bubble", text: text });
   spawnBubble(text, myName, myColor);
   input.value = "";
   document.getElementById("bubbleWordCount").textContent = "0/10";
-
-  // cooldown 3 detik biar tidak spam
   bubbleCooldown = true;
   document.getElementById("bubbleSendBtn").style.opacity = "0.4";
-  setTimeout(function() {
-    bubbleCooldown = false;
-    document.getElementById("bubbleSendBtn").style.opacity = "1";
-  }, 3000);
-}
-function renderBubbleContent(text) {
-  var imageExts = /\.(gif|jpg|jpeg|png|webp)(\?.*)?$/i;
-  var urlRegex = /(https?:\/\/[^\s]+)/g;
-  
-  // Kalau seluruh teks adalah URL gambar — tampilkan sebagai gambar saja
-  var trimmed = text.trim();
-  if (urlRegex.test(trimmed) && imageExts.test(trimmed) && !trimmed.includes(" ")) {
-    return '<img src="' + trimmed + '" onerror="this.style.display=\'none\'">';
-  }
-
-  // Kalau ada URL gambar di tengah teks — pisah teks dan gambar
-  urlRegex.lastIndex = 0;
-  var result = text.replace(/</g, "&lt;");
-  result = result.replace(/(https?:\/\/[^\s]+)/g, function(url) {
-    if (imageExts.test(url)) {
-      return '<br><img src="' + url + '" onerror="this.style.display=\'none\'">';
-    }
-    return '<a href="' + url + '" target="_blank" style="color:#adf">' + url + '</a>';
-  });
-  return result;
+  setTimeout(function(){ bubbleCooldown = false; document.getElementById("bubbleSendBtn").style.opacity = "1"; }, 3000);
 }
 function spawnBubble(text, name, color) {
   var overlay = document.getElementById("reactionOverlay");
   var el = document.createElement("div");
   el.className = "float-bubble";
-  var x = 5 + Math.random() * 60;
-  el.style.left = x + "%";
+  el.style.left = (5 + Math.random() * 60) + "%";
   el.style.bottom = (70 + Math.random() * 60) + "px";
   el.innerHTML =
     (name ? '<div class="bubble-name" style="color:' + color + '">' + name + '</div>' : '') +
     '<div class="bubble-text">' + renderBubbleContent(text) + '</div>';
   overlay.appendChild(el);
-  setTimeout(function() { el.remove(); }, 4200);
+  setTimeout(function(){ el.remove(); }, 4200);
 }
+
+/* ── Voice Note ── */
+var mediaRecorder = null;
+var audioChunks = [];
+var isRecording = false;
+
+async function startRecord(e) {
+  if (e) e.preventDefault();
+  if (isRecording) return;
+  if (!myName) { showNameModal(); return; }
+  try {
+    var stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    audioChunks = [];
+    mediaRecorder = new MediaRecorder(stream);
+    mediaRecorder.ondataavailable = function(ev) { if (ev.data.size > 0) audioChunks.push(ev.data); };
+    mediaRecorder.onstop = async function() {
+      var blob = new Blob(audioChunks, { type: "audio/webm" });
+      // Kirim metadata dulu, lalu binary
+      wsSend({ type: "voice_note_incoming", name: myName, color: myColor });
+      if (ws && ws.readyState === WebSocket.OPEN) ws.send(blob);
+      // Tampilkan di diri sendiri
+      spawnVoiceBubble(blob, myName, myColor, true);
+      stream.getTracks().forEach(function(t){ t.stop(); });
+    };
+    mediaRecorder.start();
+    isRecording = true;
+    var btn = document.getElementById("voiceBtn");
+    btn.textContent = "⏺ Rekam";
+    btn.classList.add("recording");
+  } catch(err) {
+    alert("Izin mikrofon ditolak.");
+  }
+}
+function stopRecord(e) {
+  if (e) e.preventDefault();
+  if (!isRecording || !mediaRecorder) return;
+  mediaRecorder.stop();
+  isRecording = false;
+  var btn = document.getElementById("voiceBtn");
+  btn.textContent = "🎤 Tahan";
+  btn.classList.remove("recording");
+}
+function spawnVoiceBubble(blobOrUrl, name, color, isSelf) {
+  var overlay = document.getElementById("reactionOverlay");
+  var el = document.createElement("div");
+  el.className = "float-voice";
+  // Posisi sama dengan area emoji reaction
+  el.style.left = (10 + Math.random() * 75) + "%";
+  el.style.bottom = (70 + Math.random() * 60) + "px";
+  var url = typeof blobOrUrl === "string" ? blobOrUrl : URL.createObjectURL(blobOrUrl);
+  el.innerHTML =
+    '<div class="voice-bubble">' +
+      '<span class="vn-name" style="color:' + color + '">' + (isSelf ? (name || "Kamu") : name) + ' 🎤</span>' +
+      '<audio controls src="' + url + '"></audio>' +
+    '</div>';
+  // Pointer events aktif agar audio bisa dikontrol
+  el.style.pointerEvents = "auto";
+  overlay.appendChild(el);
+  // Voice note tidak auto-hilang — ada tombol close kecil
+  var closeVn = document.createElement("button");
+  closeVn.textContent = "×";
+  closeVn.style.cssText = "position:absolute;top:-6px;right:-6px;width:16px;height:16px;border-radius:50%;border:none;background:#ff4444;color:#fff;font-size:10px;cursor:pointer;line-height:1;display:flex;align-items:center;justify-content:center;";
+  closeVn.onclick = function(){ el.remove(); };
+  el.style.position = "absolute";
+  el.appendChild(closeVn);
+}
+
+/* ── Video ── */
+var videoStartedAt = 0, videoStartTime = 0, videoPlaying = false;
+function getCurrentTimeSec() {
+  return videoPlaying ? videoStartTime + (Date.now() - videoStartedAt) / 1000 : videoStartTime;
+}
+setInterval(function() {
+  if (videoPlaying && wsConnected) wsSend({ type: "heartbeat", current_time: getCurrentTimeSec() });
+}, 5000);
 
 function loadVideoFromServer(videoId, title, thumbnail, startTime, autoplay) {
   currentVideoId = videoId;
-
-  // Update now playing bar
   document.getElementById("nowPlaying").style.display = "flex";
   document.getElementById("nowPlayingTitle").textContent = title || videoId;
   document.getElementById("nowPlayingThumb").src = thumbnail || "https://i.ytimg.com/vi/" + videoId + "/mqdefault.jpg";
-
-  // Tampilkan player
   document.getElementById("ytResults").style.display = "none";
   document.getElementById("ytStatus").style.display = "none";
   document.getElementById("ytPlayerWrap").style.display = "flex";
   document.getElementById("reactionBar").style.display = "flex";
   document.getElementById("bubbleRow").style.display = "flex";
-  var autoplayParam = autoplay ? 1 : 0;
   document.getElementById("ytFrame").src =
     "https://www.youtube.com/embed/" + videoId +
-    "?autoplay=" + autoplayParam +
-    "&start=" + Math.floor(startTime || 0) +
-    "&rel=0";
-
-  // Track waktu lokal
-  videoStartTime = startTime || 0;
-  videoStartedAt = Date.now();
-  videoPlaying = !!autoplay;
+    "?autoplay=" + (autoplay?1:0) + "&start=" + Math.floor(startTime||0) + "&rel=0";
+  videoStartTime = startTime || 0; videoStartedAt = Date.now(); videoPlaying = !!autoplay;
 }
-
-// Heartbeat: kirim estimasi current_time tiap 5 detik
-var videoStartedAt = 0;   // Date.now() saat video mulai
-var videoStartTime = 0;   // detik offset awal video
-var videoPlaying = false;
-
-function getCurrentTimeSec() {
-  if (!videoPlaying) return videoStartTime;
-  return videoStartTime + (Date.now() - videoStartedAt) / 1000;
-}
-
-setInterval(function() {
-  if (videoPlaying && wsConnected) {
-    wsSend({ type: "heartbeat", current_time: getCurrentTimeSec() });
-  }
-}, 5000);
-
-/* ══════════════════════════════
-   YOUTUBE SEARCH
-══════════════════════════════ */
-var lastResults = [];
-
-function toggleYT() {
-  var w = document.getElementById("ytWindow");
-  w.style.display = w.style.display === "flex" ? "none" : "flex";
-}
-function hideYT() {
-  document.getElementById("ytWindow").style.display = "none";
-}
-
-async function searchYT() {
-  var q = document.getElementById("ytInput").value.trim();
-  if (!q) return alert("Masukkan kata kunci pencarian.");
-
-  var status  = document.getElementById("ytStatus");
-  var results = document.getElementById("ytResults");
-  var player  = document.getElementById("ytPlayerWrap");
-
-  status.textContent = "Mencari...";
-  results.innerHTML = "";
-  results.style.display = "none";
-  player.style.display  = "none";
-  status.style.display  = "block";
-
-  try {
-    var url = "https://youtube-alpha-ruddy.vercel.app/youtube/search?video=" + encodeURIComponent(q);
-    var res = await fetch(url);
-    var data = await res.json();
-    var items = data?.result || data?.results || data?.data || [];
-
-    if (!Array.isArray(items) || items.length === 0) {
-      status.textContent = "Tidak ada hasil ditemukan."; return;
-    }
-    lastResults = items;
-    status.style.display = "none";
-    results.style.display = "flex";
-
-    items.slice(0, 10).forEach(function(item) {
-      var videoId = item.videoId || item.id || item.video_id || "";
-      if (!videoId) return;
-      var thumb = item.thumbnail || "https://i.ytimg.com/vi/" + videoId + "/mqdefault.jpg";
-
-      var div = document.createElement("div");
-      div.className = "yt-item";
-      div.innerHTML =
-        '<img src="' + thumb + '" onerror="this.src=\'https://i.ytimg.com/vi/' + videoId + '/mqdefault.jpg\'" />' +
-        '<div class="yt-item-info">' +
-          '<div class="yt-item-title">' + (item.title || "Tanpa judul") + '</div>' +
-          '<div class="yt-item-meta">' + (item.authorName || item.channel || "") + ' · ' + (item.duration || item.durationH || "") + '</div>' +
-        '</div>';
-
-      div.onclick = function() { selectVideo(videoId, item.title || "", thumb); };
-      results.appendChild(div);
-    });
-  } catch(err) {
-    status.textContent = "Gagal memuat hasil. Coba lagi.";
-    status.style.display = "block";
-  }
-}
-
-function selectVideo(videoId, title, thumbnail) {
-  // Broadcast ke semua user
-  wsSend({ type: "load", videoId: videoId, title: title, thumbnail: thumbnail });
-
-  // Tampilkan di diri sendiri
-  loadVideoLocal(videoId, title, thumbnail, 0);
-
-  // Update now playing
-  document.getElementById("nowPlaying").style.display = "flex";
-  document.getElementById("nowPlayingTitle").textContent = title || videoId;
-  document.getElementById("nowPlayingThumb").src = thumbnail;
-}
-
 function loadVideoLocal(videoId, title, thumbnail, startTime) {
   currentVideoId = videoId;
   document.getElementById("ytResults").style.display = "none";
@@ -914,74 +724,89 @@ function loadVideoLocal(videoId, title, thumbnail, startTime) {
   document.getElementById("ytPlayerWrap").style.display = "flex";
   document.getElementById("reactionBar").style.display = "flex";
   document.getElementById("bubbleRow").style.display = "flex";
-
   document.getElementById("ytFrame").src =
-    "https://www.youtube.com/embed/" + videoId +
-    "?autoplay=1&start=" + Math.floor(startTime || 0) + "&rel=0";
-
-  videoStartTime = startTime || 0;
-  videoStartedAt = Date.now();
-  videoPlaying = true;
+    "https://www.youtube.com/embed/" + videoId + "?autoplay=1&start=" + Math.floor(startTime||0) + "&rel=0";
+  videoStartTime = startTime||0; videoStartedAt = Date.now(); videoPlaying = true;
 }
 
+/* ── YouTube Search ── */
+var lastResults = [];
+function toggleYT() { var w = document.getElementById("ytWindow"); w.style.display = w.style.display === "flex" ? "none" : "flex"; }
+function hideYT() { document.getElementById("ytWindow").style.display = "none"; }
+
+async function searchYT() {
+  var q = document.getElementById("ytInput").value.trim();
+  if (!q) return alert("Masukkan kata kunci pencarian.");
+  var status = document.getElementById("ytStatus");
+  var results = document.getElementById("ytResults");
+  var player = document.getElementById("ytPlayerWrap");
+  status.textContent = "Mencari..."; results.innerHTML = "";
+  results.style.display = "none"; player.style.display = "none"; status.style.display = "block";
+  try {
+    var res = await fetch("https://youtube-alpha-ruddy.vercel.app/youtube/search?video=" + encodeURIComponent(q));
+    var data = await res.json();
+    var items = data?.result || data?.results || data?.data || [];
+    if (!Array.isArray(items) || !items.length) { status.textContent = "Tidak ada hasil."; return; }
+    lastResults = items; status.style.display = "none"; results.style.display = "flex";
+    items.slice(0,10).forEach(function(item) {
+      var videoId = item.videoId || item.id || item.video_id || "";
+      if (!videoId) return;
+      var thumb = item.thumbnail || "https://i.ytimg.com/vi/" + videoId + "/mqdefault.jpg";
+      var div = document.createElement("div");
+      div.className = "yt-item";
+      div.innerHTML = '<img src="'+thumb+'" onerror="this.src=\'https://i.ytimg.com/vi/'+videoId+'/mqdefault.jpg\'">'+
+        '<div class="yt-item-info"><div class="yt-item-title">'+(item.title||"Tanpa judul")+'</div>'+
+        '<div class="yt-item-meta">'+(item.authorName||item.channel||"")+' · '+(item.duration||item.durationH||"")+'</div></div>';
+      div.onclick = function(){ selectVideo(videoId, item.title||"", thumb); };
+      results.appendChild(div);
+    });
+  } catch(err) { status.textContent = "Gagal memuat hasil. Coba lagi."; status.style.display = "block"; }
+}
+function selectVideo(videoId, title, thumbnail) {
+  wsSend({ type: "load", videoId: videoId, title: title, thumbnail: thumbnail });
+  loadVideoLocal(videoId, title, thumbnail, 0);
+  document.getElementById("nowPlaying").style.display = "flex";
+  document.getElementById("nowPlayingTitle").textContent = title || videoId;
+  document.getElementById("nowPlayingThumb").src = thumbnail;
+}
 function showResults() {
-  document.getElementById("ytFrame").src = "";
-  videoPlaying = false;
+  document.getElementById("ytFrame").src = ""; videoPlaying = false;
   document.getElementById("ytPlayerWrap").style.display = "none";
   document.getElementById("ytResults").style.display = "flex";
 }
 
-/* ══════════════════════════════
-   NOTIFIKASI
-══════════════════════════════ */
+/* ── Notif ── */
 function showNotif(text) {
   var n = document.createElement("div");
   n.style.cssText = "position:fixed;top:60px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.75);color:#fff;padding:8px 16px;border-radius:20px;font-size:12px;z-index:9999;pointer-events:none;backdrop-filter:blur(6px);transition:opacity 0.5s;";
-  n.textContent = text;
-  document.body.appendChild(n);
-  setTimeout(function() { n.style.opacity = "0"; setTimeout(function() { n.remove(); }, 500); }, 3000);
+  n.textContent = text; document.body.appendChild(n);
+  setTimeout(function(){ n.style.opacity="0"; setTimeout(function(){ n.remove(); },500); }, 3000);
 }
 
 /* ══════════════════════════════
-   CHATANGO
+   CHATANGO & MACHA
 ══════════════════════════════ */
 var cidIndex = 0;
-function fetchCid() {
-  var base = (cidIndex++).toString();
-  while (base.length < 10) base = "0" + base;
-  return "cid" + base;
-}
+function fetchCid() { var b=(cidIndex++).toString(); while(b.length<10)b="0"+b; return "cid"+b; }
 
 function fixContainer(container) {
   container.querySelectorAll('*').forEach(function(el) {
     var pos = window.getComputedStyle(el).position;
-    if (pos === 'fixed' || pos === 'absolute') {
+    if (pos==='fixed'||pos==='absolute') {
       el.style.setProperty('position','relative','important');
-      el.style.setProperty('top','auto','important');
-      el.style.setProperty('left','auto','important');
-      el.style.setProperty('right','auto','important');
-      el.style.setProperty('bottom','auto','important');
-      el.style.setProperty('width','100%','important');
-      el.style.setProperty('height','100%','important');
-      el.style.setProperty('z-index','auto','important');
-      el.style.setProperty('transform','none','important');
+      el.style.setProperty('top','auto','important'); el.style.setProperty('left','auto','important');
+      el.style.setProperty('right','auto','important'); el.style.setProperty('bottom','auto','important');
+      el.style.setProperty('width','100%','important'); el.style.setProperty('height','100%','important');
+      el.style.setProperty('z-index','auto','important'); el.style.setProperty('transform','none','important');
     }
   });
 }
 
 function createMachaChat() {
   var box = document.createElement("div");
-  box.className = "chat-box";
-  box.dataset.room = "macha";
+  box.className = "chat-box"; box.dataset.room = "macha";
   box.style.cssText = "display:flex;flex-direction:column;background:#fff;";
-
-  var close = document.createElement("button");
-  close.className = "close-btn";
-  close.innerHTML = "×";
-  close.onclick = function(){ box.remove(); };
-  box.appendChild(close);
-
-  box.innerHTML += `
+  box.innerHTML = `
     <div style="display:flex;align-items:center;gap:8px;padding:8px 12px;background:#eee;border-bottom:2px solid #ddd;flex-shrink:0;">
       <img src="https://i.imgur.com/21CjTu1.gif" style="width:32px;height:32px;border-radius:50%;object-fit:cover;">
       <span style="font-weight:bold;font-size:13px;">Macha</span>
@@ -992,218 +817,126 @@ function createMachaChat() {
       <input class="macha-input" type="text" placeholder="Ngobrol sama Macha..." maxlength="200"
         style="flex:1;padding:8px 10px;border:none;border-radius:4px;background:#ddd;font-size:13px;outline:none;">
       <button class="macha-send" style="padding:8px 14px;background:#579ffb;color:#fff;border:none;border-radius:4px;font-weight:bold;cursor:pointer;font-size:13px;">Kirim</button>
-    </div>
-  `;
-
-  // Ambil elemen setelah innerHTML
-  var chatEl = box.querySelector(".macha-chat");
-  var input   = box.querySelector(".macha-input");
-  var sendBtn = box.querySelector(".macha-send");
-
-  // Tutup close btn yang lama (sudah di-replace innerHTML)
-  close = document.createElement("button");
-  close.className = "close-btn";
-  close.innerHTML = "×";
-  close.onclick = function(){ box.remove(); };
+    </div>`;
+  var close = document.createElement("button");
+  close.className = "close-btn"; close.innerHTML = "×"; close.onclick = function(){ box.remove(); };
   box.appendChild(close);
-
-  function machaTime() {
-    var d = new Date();
-    return ("0"+d.getHours()).slice(-2)+":"+("0"+d.getMinutes()).slice(-2);
-  }
-
+  var chatEl = box.querySelector(".macha-chat");
+  var input = box.querySelector(".macha-input");
+  var sendBtn = box.querySelector(".macha-send");
+  function machaTime() { var d=new Date(); return ("0"+d.getHours()).slice(-2)+":"+("0"+d.getMinutes()).slice(-2); }
   function appendMsg(side, text, typing) {
-    var isLeft = side === "left";
+    var isLeft = side==="left";
     var div = document.createElement("div");
-    div.style.cssText = "display:flex;align-items:flex-end;gap:8px;" + (isLeft ? "" : "flex-direction:row-reverse;");
+    div.style.cssText = "display:flex;align-items:flex-end;gap:8px;" + (isLeft?"":"flex-direction:row-reverse;");
     var avatar = isLeft
       ? '<img src="https://i.imgur.com/21CjTu1.gif" style="width:36px;height:36px;border-radius:50%;object-fit:cover;flex-shrink:0;">'
       : '<div style="width:36px;height:36px;border-radius:50%;background:#ddd;flex-shrink:0;background-image:url(https://image.flaticon.com/icons/svg/145/145867.svg);background-size:cover;"></div>';
-    var bubbleColor = isLeft ? "#ececec" : "#579ffb";
-    var textColor   = isLeft ? "#000" : "#fff";
-    var borderR     = isLeft ? "15px 15px 15px 0" : "15px 15px 0 15px";
-    var name        = isLeft ? "Macha" : (myName || "Kamu");
-    div.innerHTML = avatar + `
-      <div style="max-width:75%;padding:10px 12px;border-radius:${borderR};background:${bubbleColor};color:${textColor};">
-        <div style="display:flex;justify-content:space-between;gap:10px;margin-bottom:5px;">
-          <span style="font-weight:bold;font-size:11px;">${name}</span>
-          <span style="font-size:10px;opacity:0.6;">${machaTime()}</span>
-        </div>
-        <div class="macha-msg-text" style="font-size:13px;line-height:1.4;">${typing ? '<span class="macha-typing">•••</span>' : text}</div>
-      </div>`;
-    chatEl.appendChild(div);
-    chatEl.scrollTop = chatEl.scrollHeight;
-    return div;
+    var bc=isLeft?"#ececec":"#579ffb", tc=isLeft?"#000":"#fff", br=isLeft?"15px 15px 15px 0":"15px 15px 0 15px";
+    var name=isLeft?"Macha":(myName||"Kamu");
+    div.innerHTML=avatar+`<div style="max-width:75%;padding:10px 12px;border-radius:${br};background:${bc};color:${tc};">
+      <div style="display:flex;justify-content:space-between;gap:10px;margin-bottom:5px;">
+        <span style="font-weight:bold;font-size:11px;">${name}</span>
+        <span style="font-size:10px;opacity:0.6;">${machaTime()}</span>
+      </div>
+      <div class="macha-msg-text" style="font-size:13px;line-height:1.4;">${typing?'<span class="macha-typing">•••</span>':text}</div>
+    </div>`;
+    chatEl.appendChild(div); chatEl.scrollTop=chatEl.scrollHeight; return div;
   }
-
-  // Pesan pembuka
-  setTimeout(function() {
-    appendMsg("left", "Hm, ada apa? Jangan harap aku baik-baik ya.");
-  }, 400);
-
+  setTimeout(function(){ appendMsg("left","Hm, ada apa? Jangan harap aku baik-baik ya."); }, 400);
   async function sendMsg() {
-    var text = input.value.trim();
-    if (!text) return;
-    input.value = "";
-    appendMsg("right", text);
-    var typingEl = appendMsg("left", "", true);
+    var text=input.value.trim(); if(!text) return;
+    input.value=""; appendMsg("right",text);
+    var typingEl=appendMsg("left","",true);
     try {
-      var res = await fetch("/chat/macha", {
-        method: "POST",
-        headers: {"Content-Type":"application/json"},
-        body: JSON.stringify({message: text})
-      });
-      var data = await res.json();
-      var msgText = typingEl.querySelector(".macha-msg-text");
-      msgText.textContent = data.text || "...";
-    } catch(e) {
-      typingEl.querySelector(".macha-msg-text").textContent = "Error! Hmph.";
-    }
-    chatEl.scrollTop = chatEl.scrollHeight;
+      var res=await fetch("/chat/macha",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({message:text})});
+      var data=await res.json();
+      typingEl.querySelector(".macha-msg-text").textContent=data.text||"...";
+    } catch(e){ typingEl.querySelector(".macha-msg-text").textContent="Error! Hmph."; }
+    chatEl.scrollTop=chatEl.scrollHeight;
   }
-
-  sendBtn.onclick = sendMsg;
-  input.addEventListener("keydown", function(e){ if(e.key==="Enter") sendMsg(); });
-
+  sendBtn.onclick=sendMsg;
+  input.addEventListener("keydown",function(e){ if(e.key==="Enter") sendMsg(); });
   return box;
 }
 
 function createChatElement(chatname) {
-  // Kalau nama "macha" → buka chatbox khusus
-  if (chatname.toLowerCase() === "macha") return createMachaChat();
-
-  var box = document.createElement("div");
-  box.className = "chat-box";
-  box.dataset.room = chatname;
-
-  var close = document.createElement("button");
-  close.className = "close-btn";
-  close.innerHTML = "×";
-  close.onclick = function(){ box.remove(); };
-  box.appendChild(close);
-
-  var container = document.createElement("div");
-  container.className = "chat-container";
-  box.appendChild(container);
-
-  var scr = document.createElement("script");
-  scr.setAttribute("id", fetchCid());
-  scr.setAttribute("data-cfasync","false");
-  scr.async = true;
-  scr.src = "//st.chatango.com/js/gz/emb.js";
-  scr.text = JSON.stringify({
-    handle: chatname,
-    arch: "js",
-    styles: {
-      a:"ffffff", b:100, c:"000000", d:"000000",
-      e:"ffffff", g:"000000", h:"ffffff", j:"000000",
-      k:"888888", l:"E0E0E0", m:"ffffff", n:"ffffff",
-      p:10, q:"ffffff", w:1, ab:1, surl:0
-    }
-  });
+  if (chatname.toLowerCase()==="macha") return createMachaChat();
+  var box=document.createElement("div"); box.className="chat-box"; box.dataset.room=chatname;
+  var close=document.createElement("button"); close.className="close-btn"; close.innerHTML="×";
+  close.onclick=function(){ box.remove(); }; box.appendChild(close);
+  var container=document.createElement("div"); container.className="chat-container"; box.appendChild(container);
+  var scr=document.createElement("script");
+  scr.setAttribute("id",fetchCid()); scr.setAttribute("data-cfasync","false"); scr.async=true;
+  scr.src="//st.chatango.com/js/gz/emb.js";
+  scr.text=JSON.stringify({handle:chatname,arch:"js",styles:{a:"ffffff",b:100,c:"000000",d:"000000",e:"ffffff",g:"000000",h:"ffffff",j:"000000",k:"888888",l:"E0E0E0",m:"ffffff",n:"ffffff",p:10,q:"ffffff",w:1,ab:1,surl:0}});
   container.appendChild(scr);
-
-  setTimeout(function(){ fixContainer(container); }, 800);
-  setTimeout(function(){ fixContainer(container); }, 2500);
-  setTimeout(function(){ fixContainer(container); }, 5000);
-  var obs = new MutationObserver(function(){ fixContainer(container); });
-  obs.observe(container, { childList:true, subtree:true, attributes:true });
-
+  setTimeout(function(){ fixContainer(container); },800);
+  setTimeout(function(){ fixContainer(container); },2500);
+  setTimeout(function(){ fixContainer(container); },5000);
+  new MutationObserver(function(){ fixContainer(container); }).observe(container,{childList:true,subtree:true,attributes:true});
   return box;
 }
 
 function initChats() {
-  var raw = window.location.href.split("?");
-  if (raw.length < 2) return;
-  raw[1].split(",").forEach(function(room) {
-    var name = room.replace(/[^a-zA-Z0-9-]/g,"");
-    if (name) document.getElementById("chatArea").appendChild(createChatElement(name));
+  var raw=window.location.href.split("?"); if(raw.length<2) return;
+  raw[1].split(",").forEach(function(room){
+    var name=room.replace(/[^a-zA-Z0-9-]/g,"");
+    if(name) document.getElementById("chatArea").appendChild(createChatElement(name));
   });
 }
 
-window.onload = function() {
-  initChats();
-  connectWS();
-  setTimeout(showNameModal, 800);
-};
+window.onload=function(){ initChats(); connectWS(); setTimeout(showNameModal,800); };
 
 function addChat() {
-  var input = document.getElementById("chatInput");
-  var name = input.value.trim().replace(/[^a-zA-Z0-9-]/g,"");
-  if (!name) return alert("Masukkan nama room.");
-  var exists = Array.from(document.querySelectorAll(".chat-box")).some(function(b){ return b.dataset.room === name.toLowerCase(); });
-  if (exists) return alert("Chatroom sudah ada.");
+  var input=document.getElementById("chatInput");
+  var name=input.value.trim().replace(/[^a-zA-Z0-9-]/g,"");
+  if(!name) return alert("Masukkan nama room.");
+  var exists=Array.from(document.querySelectorAll(".chat-box")).some(function(b){ return b.dataset.room===name.toLowerCase(); });
+  if(exists) return alert("Chatroom sudah ada.");
   document.getElementById("chatArea").appendChild(createChatElement(name));
-  input.value = "";
+  input.value="";
 }
 
-document.addEventListener("DOMContentLoaded", function() {
-  document.getElementById("chatInput").addEventListener("keydown", function(e){ if (e.key==="Enter") addChat(); });
-  document.getElementById("ytInput").addEventListener("keydown", function(e){ if (e.key==="Enter") searchYT(); });
-  document.getElementById("nameInput").addEventListener("keydown", function(e){ if (e.key==="Enter") submitName(); });
-  document.getElementById("bubbleInput").addEventListener("keydown", function(e){ if (e.key==="Enter") sendBubble(); });
-  document.getElementById("bubbleInput").addEventListener("input", function() {
-    var words = this.value.trim().split(/\s+/).filter(Boolean).length;
-    var el = document.getElementById("bubbleWordCount");
-    el.textContent = words + "/10";
-    el.style.color = words >= 10 ? "#ff6b6b" : "#555";
+document.addEventListener("DOMContentLoaded",function(){
+  document.getElementById("chatInput").addEventListener("keydown",function(e){ if(e.key==="Enter") addChat(); });
+  document.getElementById("ytInput").addEventListener("keydown",function(e){ if(e.key==="Enter") searchYT(); });
+  document.getElementById("nameInput").addEventListener("keydown",function(e){ if(e.key==="Enter") submitName(); });
+  document.getElementById("bubbleInput").addEventListener("keydown",function(e){ if(e.key==="Enter") sendBubble(); });
+  document.getElementById("bubbleInput").addEventListener("input",function(){
+    var w=this.value.trim().split(/\s+/).filter(Boolean).length;
+    var el=document.getElementById("bubbleWordCount");
+    el.textContent=w+"/10"; el.style.color=w>=10?"#ff6b6b":"#555";
   });
-  // Tutup viewer panel saat klik di luar
-  document.addEventListener("click", function(e) {
-    var wrap = document.getElementById("viewerBadgeWrap");
-    if (wrap && !wrap.contains(e.target)) {
-      document.getElementById("viewerPanel").style.display = "none";
-    }
+  document.addEventListener("click",function(e){
+    var wrap=document.getElementById("viewerBadgeWrap");
+    if(wrap&&!wrap.contains(e.target)) document.getElementById("viewerPanel").style.display="none";
   });
 });
 
 function nextChat() {
-  var area = document.getElementById("chatArea");
-  var chats = area.querySelectorAll(".chat-box");
-  var w = area.clientWidth;
-  var cur = Math.round(area.scrollLeft / w);
-  var next = (cur + 1) >= chats.length ? 0 : cur + 1;
-  area.scrollTo({ left: next * w, behavior:"smooth" });
+  var area=document.getElementById("chatArea"),chats=area.querySelectorAll(".chat-box"),w=area.clientWidth;
+  var cur=Math.round(area.scrollLeft/w),next=(cur+1)>=chats.length?0:cur+1;
+  area.scrollTo({left:next*w,behavior:"smooth"});
 }
 function prevChat() {
-  var area = document.getElementById("chatArea");
-  var chats = area.querySelectorAll(".chat-box");
-  var w = area.clientWidth;
-  var cur = Math.round(area.scrollLeft / w);
-  var prev = (cur - 1) < 0 ? chats.length - 1 : cur - 1;
-  area.scrollTo({ left: prev * w, behavior:"smooth" });
+  var area=document.getElementById("chatArea"),chats=area.querySelectorAll(".chat-box"),w=area.clientWidth;
+  var cur=Math.round(area.scrollLeft/w),prev=(cur-1)<0?chats.length-1:cur-1;
+  area.scrollTo({left:prev*w,behavior:"smooth"});
 }
 
 /* ── Draggable YT Window ── */
 (function(){
-  var el = null, startX, startY, origX, origY;
-  document.addEventListener("DOMContentLoaded", function(){
-    el = document.getElementById("ytWindow");
-    var bar = document.getElementById("ytTitleBar");
-    bar.addEventListener("mousedown", dragStart);
-    bar.addEventListener("touchstart", dragStart, { passive:true });
+  var el=null,startX,startY,origX,origY;
+  document.addEventListener("DOMContentLoaded",function(){
+    el=document.getElementById("ytWindow");
+    var bar=document.getElementById("ytTitleBar");
+    bar.addEventListener("mousedown",dragStart);
+    bar.addEventListener("touchstart",dragStart,{passive:true});
   });
-  function dragStart(e) {
-    var touch = e.touches ? e.touches[0] : e;
-    startX = touch.clientX; startY = touch.clientY;
-    var rect = el.getBoundingClientRect();
-    origX = rect.left; origY = rect.top;
-    document.addEventListener("mousemove", dragMove);
-    document.addEventListener("touchmove", dragMove, { passive:true });
-    document.addEventListener("mouseup", dragEnd);
-    document.addEventListener("touchend", dragEnd);
-  }
-  function dragMove(e) {
-    var touch = e.touches ? e.touches[0] : e;
-    el.style.left = Math.max(0, origX + touch.clientX - startX) + "px";
-    el.style.top  = Math.max(0, origY + touch.clientY - startY) + "px";
-  }
-  function dragEnd() {
-    document.removeEventListener("mousemove", dragMove);
-    document.removeEventListener("touchmove", dragMove);
-    document.removeEventListener("mouseup", dragEnd);
-    document.removeEventListener("touchend", dragEnd);
-  }
+  function dragStart(e){ var t=e.touches?e.touches[0]:e; startX=t.clientX;startY=t.clientY; var r=el.getBoundingClientRect();origX=r.left;origY=r.top; document.addEventListener("mousemove",dragMove);document.addEventListener("touchmove",dragMove,{passive:true});document.addEventListener("mouseup",dragEnd);document.addEventListener("touchend",dragEnd); }
+  function dragMove(e){ var t=e.touches?e.touches[0]:e; el.style.left=Math.max(0,origX+t.clientX-startX)+"px";el.style.top=Math.max(0,origY+t.clientY-startY)+"px"; }
+  function dragEnd(){ document.removeEventListener("mousemove",dragMove);document.removeEventListener("touchmove",dragMove);document.removeEventListener("mouseup",dragEnd);document.removeEventListener("touchend",dragEnd); }
 })();
 </script>
 </body></html>
