@@ -327,6 +327,13 @@ body {
   white-space: pre-wrap;
   max-width: 180px;
 }
+.float-bubble .bubble-text img {
+  max-width: 140px;
+  max-height: 120px;
+  border-radius: 8px;
+  display: block;
+  margin-top: 4px;
+}
 @keyframes floatBubble {
   0%   { opacity: 0; transform: translateY(0) scale(0.8); }
   10%  { opacity: 1; transform: translateY(-10px) scale(1); }
@@ -746,7 +753,27 @@ function sendBubble() {
     document.getElementById("bubbleSendBtn").style.opacity = "1";
   }, 3000);
 }
+function renderBubbleContent(text) {
+  var imageExts = /\.(gif|jpg|jpeg|png|webp)(\?.*)?$/i;
+  var urlRegex = /(https?:\/\/[^\s]+)/g;
+  
+  // Kalau seluruh teks adalah URL gambar — tampilkan sebagai gambar saja
+  var trimmed = text.trim();
+  if (urlRegex.test(trimmed) && imageExts.test(trimmed) && !trimmed.includes(" ")) {
+    return '<img src="' + trimmed + '" onerror="this.style.display=\'none\'">';
+  }
 
+  // Kalau ada URL gambar di tengah teks — pisah teks dan gambar
+  urlRegex.lastIndex = 0;
+  var result = text.replace(/</g, "&lt;");
+  result = result.replace(/(https?:\/\/[^\s]+)/g, function(url) {
+    if (imageExts.test(url)) {
+      return '<br><img src="' + url + '" onerror="this.style.display=\'none\'">';
+    }
+    return '<a href="' + url + '" target="_blank" style="color:#adf">' + url + '</a>';
+  });
+  return result;
+}
 function spawnBubble(text, name, color) {
   var overlay = document.getElementById("reactionOverlay");
   var el = document.createElement("div");
@@ -756,7 +783,7 @@ function spawnBubble(text, name, color) {
   el.style.bottom = (70 + Math.random() * 60) + "px";
   el.innerHTML =
     (name ? '<div class="bubble-name" style="color:' + color + '">' + name + '</div>' : '') +
-    '<div class="bubble-text">' + text.replace(/</g,"&lt;") + '</div>';
+    '<div class="bubble-text">' + renderBubbleContent(text) + '</div>';
   overlay.appendChild(el);
   setTimeout(function() { el.remove(); }, 4200);
 }
