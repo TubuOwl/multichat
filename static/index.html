@@ -389,6 +389,7 @@ body {
       <button class="react-btn" onclick="sendReaction('❤️')">❤️</button>
       <button class="react-btn" onclick="sendReaction('😂')">😂</button>
       <button class="react-btn" onclick="sendReaction('🥹')">🥹</button>
+      <button class="react-btn" onclick="sendReaction('😮')">😮</button>
       <button class="react-btn" onclick="sendReaction('🔥')">🔥</button>
       <button class="react-btn" onclick="sendReaction('👏')">👏</button>
       <button class="react-btn" onclick="sendReaction('💀')">💀</button>
@@ -397,7 +398,7 @@ body {
       <button id="voiceBtn"
         onmousedown="startRecord()" onmouseup="stopRecord()"
         ontouchstart="startRecord(event)" ontouchend="stopRecord(event)">
-        🎤 Tahan
+        🎤
       </button>
     </div>
     <!-- Bubble Chat Row -->
@@ -663,7 +664,7 @@ async function startRecord(e) {
     recordStart = Date.now();
     isRecording = true;
     var btn = document.getElementById("voiceBtn");
-    btn.textContent = "⏺ Rekam";
+    btn.textContent = "⏺";
     btn.classList.add("recording");
   } catch(err) {
     alert("Izin mikrofon ditolak.");
