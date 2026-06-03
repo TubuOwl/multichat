@@ -353,7 +353,7 @@ body {
 <!-- TOOLBAR -->
 <div id="toolbar">
   <button class="tool-icon-btn" onclick="toggleYT()" title="YouTube Sync">▶️</button>
-  <span style="font-size:26px;color:white;text-shadow:0 0 6px black;">🗪</span>
+  <span style="font-size:26px;color:white;text-shadow:0 0 6px black;">𑣲𝓂</span>
   <input type="text" id="chatInput" placeholder="nama-room Chatango">
   <button id="addBtn" onclick="addChat()">+</button>
 </div>
@@ -361,7 +361,7 @@ body {
 <!-- YT FLOATING WINDOW -->
 <div id="ytWindow" style="display:flex;">
   <div id="ytTitleBar">
-    <span>▶ YouTube Sync</span>
+    <span>▶ YouTube Shoujo</span>
     <div id="viewerBadgeWrap">
       <div id="viewerBadge" onclick="toggleViewerPanel()">👁 0 viewers</div>
       <div id="viewerPanel"></div>
@@ -393,12 +393,10 @@ body {
       <button class="react-btn" onclick="sendReaction('🔥')">🔥</button>
       <button class="react-btn" onclick="sendReaction('👏')">👏</button>
       <button class="react-btn" onclick="sendReaction('💀')">💀</button>
-      <button class="react-btn" onclick="sendReaction('👍🏻')">👍🏻</button>
-      <button class="react-btn" onclick="sendReaction('👎🏻')">👎🏻</button>
       <button id="voiceBtn"
         onmousedown="startRecord()" onmouseup="stopRecord()"
         ontouchstart="startRecord(event)" ontouchend="stopRecord(event)">
-        🎤
+        🎤 Tahan
       </button>
     </div>
     <!-- Bubble Chat Row -->
@@ -664,7 +662,7 @@ async function startRecord(e) {
     recordStart = Date.now();
     isRecording = true;
     var btn = document.getElementById("voiceBtn");
-    btn.textContent = "⏺";
+    btn.textContent = "⏺ Rekam";
     btn.classList.add("recording");
   } catch(err) {
     alert("Izin mikrofon ditolak.");
