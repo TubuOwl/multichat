@@ -652,8 +652,6 @@ async function startRecord(e) {
       spawnVoiceBubble(blob, myName, myColor, true, duration);
       stream.getTracks().forEach(function(t){ t.stop(); });
     };
-    document.getElementById("ytFrame").style.opacity = "0.5"; // visual indicator
-    document.getElementById("ytFrame").setAttribute("muted", true);
     mediaRecorder.start();
     recordStart = Date.now();
     isRecording = true;
