@@ -80,9 +80,8 @@ async def websocket_endpoint(ws: WebSocket):
                 audio = msg_data["bytes"]
                 name = clients[ws].get("name", "")
                 color = clients[ws].get("color", "#fff")
-                # Kirim metadata dulu ke semua listener
-                await broadcast({"type": "voice_note_incoming", "name": name, "color": color}, exclude=ws)
-                # Lalu kirim binary audio
+                duration = clients[ws].get("last_vn_duration", 0)
+                await broadcast({"type": "voice_note_incoming", "name": name, "color": color, "duration": duration}, exclude=ws)
                 await broadcast_bytes(audio, exclude=ws)
                 continue
 
@@ -95,6 +94,10 @@ async def websocket_endpoint(ws: WebSocket):
             if t == "set_name":
                 clients[ws]["name"] = msg.get("name", "").strip()[:20]
                 await broadcast_viewers()
+
+            elif t == "voice_note_incoming":
+                # Simpan duration untuk diteruskan saat binary tiba
+                clients[ws]["last_vn_duration"] = msg.get("duration", 0)
 
             elif t == "bubble":
                 text = " ".join(msg.get("text","").strip().split()[:10])
