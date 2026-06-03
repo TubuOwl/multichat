@@ -250,7 +250,7 @@ body {
 @keyframes floatBubble {
   0%   { opacity: 0; transform: translateY(0) scale(0.8); }
   10%  { opacity: 1; transform: translateY(-10px) scale(1); }
-  75%  { opacity: 1; transform: translateY(-80px); }
+  85%  { opacity: 1; transform: translateY(-80px); }
   100% { opacity: 0; transform: translateY(-110px); }
 }
 
@@ -258,7 +258,7 @@ body {
 .float-voice {
   position: absolute; pointer-events: auto;
   display: flex; flex-direction: column; align-items: flex-start; gap: 2px;
-  animation: floatBubble 0.3s ease-out forwards;
+  animation: floatBubble 10s ease-out forwards;
   animation-fill-mode: both;
 }
 .float-voice .voice-bubble {
@@ -632,7 +632,7 @@ function spawnBubble(text, name, color) {
     (name ? '<div class="bubble-name" style="color:' + color + '">' + name + '</div>' : '') +
     '<div class="bubble-text">' + renderBubbleContent(text) + '</div>';
   overlay.appendChild(el);
-  setTimeout(function(){ el.remove(); }, 4200);
+  setTimeout(function(){ el.remove(); }, 10200);
 }
 
 /* ── Voice Note ── */
