@@ -45,7 +45,7 @@ body {
 /* ── YT WINDOW ── */
 #ytWindow {
   position: fixed; top: 70px; left: 14px;
-  width: 340px; height: 420px;
+  width: 340px; height: 360px;
   border: 2px solid rgba(255,255,255,0.5); border-radius: 12px;
   background: rgba(0,0,0,0.85); backdrop-filter: blur(8px);
   z-index: 999; display: none; box-shadow: 0 6px 24px rgba(0,0,0,0.5);
@@ -450,7 +450,7 @@ function connectWS() {
     // Binary = audio blob voice note
     if (e.data instanceof Blob) {
       if (pendingVoiceMeta) {
-        spawnVoiceBubble(e.data, pendingVoiceMeta.name, pendingVoiceMeta.color, false);
+        spawnVoiceBubble(e.data, pendingVoiceMeta.name, pendingVoiceMeta.color, false, pendingVoiceMeta.duration);
         pendingVoiceMeta = null;
       }
       return;
@@ -489,7 +489,7 @@ function handleServerMsg(msg) {
   }
   if (msg.type === "reaction") spawnReaction(msg.emoji, msg.name, msg.color);
   if (msg.type === "bubble") spawnBubble(msg.text, msg.name, msg.color);
-  if (msg.type === "voice_note_incoming") pendingVoiceMeta = { name: msg.name, color: msg.color };
+  if (msg.type === "voice_note_incoming") pendingVoiceMeta = { name: msg.name, color: msg.color, duration: msg.duration };
 
   if (msg.type === "play" || msg.type === "seek") {
     if (currentVideoId) {
@@ -631,6 +631,7 @@ function spawnBubble(text, name, color) {
 var mediaRecorder = null;
 var audioChunks = [];
 var isRecording = false;
+var recordStart = 0;
 
 async function startRecord(e) {
   if (e) e.preventDefault();
@@ -642,15 +643,17 @@ async function startRecord(e) {
     mediaRecorder = new MediaRecorder(stream);
     mediaRecorder.ondataavailable = function(ev) { if (ev.data.size > 0) audioChunks.push(ev.data); };
     mediaRecorder.onstop = async function() {
+      var duration = Date.now() - recordStart;
       var blob = new Blob(audioChunks, { type: "audio/webm" });
-      // Kirim metadata dulu, lalu binary
-      wsSend({ type: "voice_note_incoming", name: myName, color: myColor });
+      // Kirim metadata (termasuk duration) dulu, lalu binary
+      wsSend({ type: "voice_note_incoming", name: myName, color: myColor, duration: duration });
       if (ws && ws.readyState === WebSocket.OPEN) ws.send(blob);
       // Tampilkan di diri sendiri
-      spawnVoiceBubble(blob, myName, myColor, true);
+      spawnVoiceBubble(blob, myName, myColor, true, duration);
       stream.getTracks().forEach(function(t){ t.stop(); });
     };
     mediaRecorder.start();
+    recordStart = Date.now();
     isRecording = true;
     var btn = document.getElementById("voiceBtn");
     btn.textContent = "⏺ Rekam";
@@ -668,29 +671,34 @@ function stopRecord(e) {
   btn.textContent = "🎤 Tahan";
   btn.classList.remove("recording");
 }
-function spawnVoiceBubble(blobOrUrl, name, color, isSelf) {
+function spawnVoiceBubble(blobOrUrl, name, color, isSelf, duration) {
   var overlay = document.getElementById("reactionOverlay");
   var el = document.createElement("div");
   el.className = "float-voice";
-  // Posisi sama dengan area emoji reaction
   el.style.left = (10 + Math.random() * 75) + "%";
   el.style.bottom = (70 + Math.random() * 60) + "px";
   var url = typeof blobOrUrl === "string" ? blobOrUrl : URL.createObjectURL(blobOrUrl);
+  var vnId = "vn-" + Date.now();
   el.innerHTML =
     '<div class="voice-bubble">' +
       '<span class="vn-name" style="color:' + color + '">' + (isSelf ? (name || "Kamu") : name) + ' 🎤</span>' +
-      '<audio controls src="' + url + '"></audio>' +
+      '<audio id="' + vnId + '" controls autoplay src="' + url + '"></audio>' +
     '</div>';
-  // Pointer events aktif agar audio bisa dikontrol
   el.style.pointerEvents = "auto";
-  overlay.appendChild(el);
-  // Voice note tidak auto-hilang — ada tombol close kecil
+
+  // Tombol close
   var closeVn = document.createElement("button");
   closeVn.textContent = "×";
   closeVn.style.cssText = "position:absolute;top:-6px;right:-6px;width:16px;height:16px;border-radius:50%;border:none;background:#ff4444;color:#fff;font-size:10px;cursor:pointer;line-height:1;display:flex;align-items:center;justify-content:center;";
   closeVn.onclick = function(){ el.remove(); };
   el.style.position = "absolute";
   el.appendChild(closeVn);
+  overlay.appendChild(el);
+
+  // Auto-hilang setelah 2x durasi rekaman (min 4 detik)
+  var hideAfter = duration ? duration * 2 : 8000;
+  hideAfter = Math.max(hideAfter, 4000);
+  setTimeout(function(){ el.remove(); }, hideAfter);
 }
 
 /* ── Video ── */
