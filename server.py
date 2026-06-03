@@ -1,12 +1,47 @@
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect, Request
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, JSONResponse
 import json
 import os
-
 import time
+import requests as http_requests
+from dotenv import load_dotenv
+
+load_dotenv()
 
 app = FastAPI()
+
+GROQ_API_KEY = os.environ.get("GROQ_API_KEY", "")
+GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions"
+MACHA_SYSTEM = "Nama kamu adalah Macha. Balas kurang dari 30 kata, kepribadian tsundere, pakai bahasa Indonesia gaul dan kasual. Jangan tanya 'ada yang bisa dibantu' atau sejenisnya, langsung jawab aja dengan gaya tsundere. Enggak perlu sopan."
+GROQ_HEADERS = {
+    "Content-Type": "application/json",
+    "Authorization": f"Bearer {GROQ_API_KEY}"
+}
+
+@app.post("/chat/macha")
+async def chat_macha(request: Request):
+    body = await request.json()
+    prompt = body.get("message", "").strip()
+    if not prompt:
+        return JSONResponse({"text": "..."})
+    payload = {
+        "model": "llama-3.3-70b-versatile",
+        "messages": [
+            {"role": "system", "content": MACHA_SYSTEM},
+            {"role": "user", "content": prompt}
+        ],
+        "temperature": 0.8,
+        "max_tokens": 200,
+        "stream": False
+    }
+    try:
+        res = http_requests.post(GROQ_API_URL, json=payload, headers=GROQ_HEADERS, timeout=15)
+        res.raise_for_status()
+        text = res.json()["choices"][0]["message"]["content"].strip()
+        return JSONResponse({"text": text})
+    except Exception as e:
+        return JSONResponse({"text": f"Hmph, error: {e}"}, status_code=500)
 
 # ── Global YouTube State ─────────────────────────────────────────────
 yt_state = {
