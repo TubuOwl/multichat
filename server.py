@@ -35,6 +35,34 @@ async def chat_macha(request: Request):
     except Exception as e:
         return JSONResponse({"text": f"Hmph, error: {e}"}, status_code=500)
 
+@app.get("/tenor")
+async def tenor_search(q: str, page: int = 0):
+    import re, random
+    keyword = q.strip().replace(" ", "-")
+    url = f"https://tenor.com/id/search/{keyword}"
+    headers = {"User-Agent": "Mozilla/5.0"}
+    try:
+        res = http_requests.get(url, headers=headers, timeout=8)
+        html = res.text
+    except Exception as e:
+        return JSONResponse({"results": [], "error": str(e)})
+
+    # Ambil semua URL gif/png/jpg
+    results = re.findall(r'https://media\.tenor\.com/[^\s"\']+\.(?:gif|png|jpg)', html)
+    results = list(dict.fromkeys(results))  # dedupe, jaga urutan
+
+    # Pagination 5 per page
+    start = page * 5
+    chunk = results[start:start + 5]
+
+    return JSONResponse({
+        "results": chunk,
+        "page": page,
+        "has_next": len(results) > start + 5,
+        "has_prev": page > 0,
+        "total": len(results)
+    })
+
 # ── YouTube State ─────────────────────────────────────────────────────
 yt_state = {
     "videoId": "", "title": "", "is_playing": False,
