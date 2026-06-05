@@ -45,7 +45,7 @@ body {
 /* ── YT WINDOW ── */
 #ytWindow {
   position: fixed; top: 70px; left: 14px;
-  width: 340px; height: 360px;
+  width: 340px; height: 420px;
   border: 2px solid rgba(255,255,255,0.5); border-radius: 12px;
   background: rgba(0,0,0,0.85); backdrop-filter: blur(8px);
   z-index: 999; display: none; box-shadow: 0 6px 24px rgba(0,0,0,0.5);
@@ -250,7 +250,7 @@ body {
 @keyframes floatBubble {
   0%   { opacity: 0; transform: translateY(0) scale(0.8); }
   10%  { opacity: 1; transform: translateY(-10px) scale(1); }
-  85%  { opacity: 1; transform: translateY(-80px); }
+  75%  { opacity: 1; transform: translateY(-80px); }
   100% { opacity: 0; transform: translateY(-110px); }
 }
 
@@ -258,7 +258,7 @@ body {
 .float-voice {
   position: absolute; pointer-events: auto;
   display: flex; flex-direction: column; align-items: flex-start; gap: 2px;
-  animation: floatBubble 10s ease-out forwards;
+  animation: floatBubble 0.3s ease-out forwards;
   animation-fill-mode: both;
 }
 .float-voice .voice-bubble {
@@ -347,15 +347,15 @@ body {
 <!-- FLOATING OVERLAY (reaction, bubble, voice) -->
 <div id="reactionOverlay"></div>
 
+<!-- GIF PANEL -->
 <div id="gifPanel" style="display:none;position:fixed;bottom:60px;left:14px;width:300px;background:rgba(15,15,25,0.96);border:1px solid rgba(255,255,255,0.15);border-radius:12px;padding:10px;z-index:1200;box-shadow:0 6px 24px rgba(0,0,0,0.5);">
   <div style="display:flex;gap:6px;margin-bottom:8px;">
-    <input id="gifInput" type="text" placeholder="Cari GIF/sticker..."
-      style="flex:1;padding:6px 10px;border-radius:8px;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.1);color:#fff;font-size:12px;outline:none;">
+    <input id="gifInput" type="text" placeholder="Cari GIF/sticker..." style="flex:1;padding:6px 10px;border-radius:8px;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.1);color:#fff;font-size:12px;outline:none;">
     <button onclick="searchGif(0)" style="padding:6px 10px;border-radius:8px;border:none;background:#ff6b9d;color:#fff;font-size:12px;cursor:pointer;">Cari</button>
     <button onclick="toggleGif()" style="padding:6px 8px;border-radius:8px;border:none;background:rgba(255,255,255,0.1);color:#fff;font-size:12px;cursor:pointer;">×</button>
   </div>
   <div id="gifResults" style="display:grid;grid-template-columns:1fr 1fr;gap:6px;max-height:240px;overflow-y:auto;"></div>
-  <div id="gifNav" style="display:flex;justify-content:space-between;margin-top:8px;display:none;">
+  <div id="gifNav" style="display:none;justify-content:space-between;margin-top:8px;">
     <button id="gifPrev" onclick="searchGif(gifPage-1)" style="padding:4px 12px;border-radius:8px;border:none;background:rgba(255,255,255,0.1);color:#fff;font-size:11px;cursor:pointer;">← Prev</button>
     <span id="gifPageInfo" style="color:#888;font-size:10px;align-self:center;"></span>
     <button id="gifNext" onclick="searchGif(gifPage+1)" style="padding:4px 12px;border-radius:8px;border:none;background:rgba(255,255,255,0.1);color:#fff;font-size:11px;cursor:pointer;">Next →</button>
@@ -368,8 +368,8 @@ body {
 <!-- TOOLBAR -->
 <div id="toolbar">
   <button class="tool-icon-btn" onclick="toggleYT()" title="YouTube Sync">▶️</button>
-  <button class="tool-icon-btn" onclick="toggleGif()" title="GIF Search">🎬</button> 
-  <span style="font-size:26px;color:white;text-shadow:0 0 6px black;">𑣲𝓂</span>
+  <button class="tool-icon-btn" onclick="toggleGif()" title="GIF Search">🎬</button>
+  <span style="font-size:26px;color:white;text-shadow:0 0 6px black;">🗪</span>
   <input type="text" id="chatInput" placeholder="nama-room Chatango">
   <button id="addBtn" onclick="addChat()">+</button>
 </div>
@@ -377,7 +377,7 @@ body {
 <!-- YT FLOATING WINDOW -->
 <div id="ytWindow" style="display:flex;">
   <div id="ytTitleBar">
-    <span>▶ YouTube Shoujo</span>
+    <span>▶ YouTube Sync</span>
     <div id="viewerBadgeWrap">
       <div id="viewerBadge" onclick="toggleViewerPanel()">👁 0 viewers</div>
       <div id="viewerPanel"></div>
@@ -404,9 +404,8 @@ body {
     <div id="reactionBar">
       <button class="react-btn" onclick="sendReaction('❤️')">❤️</button>
       <button class="react-btn" onclick="sendReaction('😂')">😂</button>
-      <button class="react-btn" onclick="sendReaction('🥹')">🥹</button>
-      <button class="react-btn" onclick="sendReaction('😮')">😮</button>
       <button class="react-btn" onclick="sendReaction('🔥')">🔥</button>
+      <button class="react-btn" onclick="sendReaction('😮')">😮</button>
       <button class="react-btn" onclick="sendReaction('👏')">👏</button>
       <button class="react-btn" onclick="sendReaction('💀')">💀</button>
       <button id="voiceBtn"
@@ -646,7 +645,7 @@ function spawnBubble(text, name, color) {
     (name ? '<div class="bubble-name" style="color:' + color + '">' + name + '</div>' : '') +
     '<div class="bubble-text">' + renderBubbleContent(text) + '</div>';
   overlay.appendChild(el);
-  setTimeout(function(){ el.remove(); }, 10200);
+  setTimeout(function(){ el.remove(); }, 4200);
 }
 
 /* ── Voice Note ── */
@@ -938,6 +937,7 @@ document.addEventListener("DOMContentLoaded",function(){
     var el=document.getElementById("bubbleWordCount");
     el.textContent=w+"/10"; el.style.color=w>=10?"#ff6b6b":"#555";
   });
+  document.getElementById("gifInput").addEventListener("keydown",function(e){ if(e.key==="Enter") searchGif(0); });
   document.addEventListener("click",function(e){
     var wrap=document.getElementById("viewerBadgeWrap");
     if(wrap&&!wrap.contains(e.target)) document.getElementById("viewerPanel").style.display="none";
@@ -958,19 +958,18 @@ function prevChat() {
 /* ── Draggable YT Window ── */
 (function(){
   var el=null,startX,startY,origX,origY;
-  document.addEventListener("DOMContentLoaded", function() {
-    document.getElementById("chatInput").addEventListener(...)
-    document.getElementById("ytInput").addEventListener(...)
-    document.getElementById("nameInput").addEventListener(...)
-    document.getElementById("bubbleInput").addEventListener(...)
-    document.getElementById("gifInput").addEventListener("keydown", function(e) {
-      if (e.key === "Enter") searchGif(0);
-    });
+  document.addEventListener("DOMContentLoaded",function(){
+    el=document.getElementById("ytWindow");
+    var bar=document.getElementById("ytTitleBar");
+    bar.addEventListener("mousedown",dragStart);
+    bar.addEventListener("touchstart",dragStart,{passive:true});
   });
   function dragStart(e){ var t=e.touches?e.touches[0]:e; startX=t.clientX;startY=t.clientY; var r=el.getBoundingClientRect();origX=r.left;origY=r.top; document.addEventListener("mousemove",dragMove);document.addEventListener("touchmove",dragMove,{passive:true});document.addEventListener("mouseup",dragEnd);document.addEventListener("touchend",dragEnd); }
   function dragMove(e){ var t=e.touches?e.touches[0]:e; el.style.left=Math.max(0,origX+t.clientX-startX)+"px";el.style.top=Math.max(0,origY+t.clientY-startY)+"px"; }
   function dragEnd(){ document.removeEventListener("mousemove",dragMove);document.removeEventListener("touchmove",dragMove);document.removeEventListener("mouseup",dragEnd);document.removeEventListener("touchend",dragEnd); }
 })();
+
+/* ── GIF Search ── */
 var gifPage = 0;
 var gifQuery = "";
 
@@ -987,20 +986,16 @@ async function searchGif(page) {
   if (!q) return;
   gifQuery = q;
   gifPage = page || 0;
-
   var results = document.getElementById("gifResults");
   results.innerHTML = '<div style="color:#666;font-size:11px;text-align:center;padding:20px;grid-column:span 2;">Mencari...</div>';
-
   try {
     var res = await fetch("/tenor?q=" + encodeURIComponent(q) + "&page=" + gifPage);
     var data = await res.json();
-
     results.innerHTML = "";
     if (!data.results || !data.results.length) {
       results.innerHTML = '<div style="color:#666;font-size:11px;text-align:center;padding:20px;grid-column:span 2;">Tidak ada hasil.</div>';
       return;
     }
-
     data.results.forEach(function(url) {
       var img = document.createElement("img");
       img.src = url;
@@ -1009,24 +1004,20 @@ async function searchGif(page) {
       img.onerror = function() { this.parentNode && this.parentNode.remove(); };
       results.appendChild(img);
     });
-
-    // Nav
     var nav = document.getElementById("gifNav");
     nav.style.display = "flex";
     document.getElementById("gifPrev").style.display = data.has_prev ? "block" : "none";
     document.getElementById("gifNext").style.display = data.has_next ? "block" : "none";
     document.getElementById("gifPageInfo").textContent = "Hal. " + (gifPage + 1);
-
   } catch(e) {
     results.innerHTML = '<div style="color:#f87171;font-size:11px;text-align:center;padding:20px;grid-column:span 2;">Gagal memuat.</div>';
   }
 }
 
 function sendGifBubble(url) {
-  // Kirim sebagai bubble biasa — renderBubbleContent sudah handle URL gambar
   wsSend({ type: "bubble", text: url });
   spawnBubble(url, myName, myColor);
-  toggleGif(); // tutup panel setelah pilih
+  toggleGif();
 }
 </script>
 </body></html>
