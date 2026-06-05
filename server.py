@@ -258,7 +258,7 @@ async def websocket_endpoint(ws: WebSocket):
                 pass
 
             elif t == "set_name":
-                new_name = msg.get("name", "").strip()[:20]
+                new_name = re.sub(r'[^a-zA-Z0-9]', '', msg.get("name", ""))[:20]
                 if new_name.lower() in banned_names:
                     await kick_spammer(ws, "Nama ini dibanned.")
                     break
