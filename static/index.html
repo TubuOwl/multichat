@@ -339,7 +339,7 @@ body {
   <div id="nameBox">
     <h3>👤 Siapa namamu?</h3>
     <p>Biar teman-teman tahu kamu online</p>
-    <input type="text" id="nameInput" placeholder="Nama kamu..." maxlength="20">
+    <input type="text" id="nameInput" placeholder="Nama kamu... " maxlength="20" pattern="[a-zA-Z0-9]*">
     <button id="nameSubmitBtn" onclick="submitName()">Masuk →</button>
   </div>
 </div>
@@ -589,6 +589,7 @@ function showNameModal() {
 }
 function submitName() {
   var val = document.getElementById("nameInput").value.trim();
+  val = val.replace(/[^a-zA-Z0-9]/g, "");
   if (!val) return;
   myName = val;
   wsSend({ type: "set_name", name: myName });
