@@ -347,12 +347,28 @@ body {
 <!-- FLOATING OVERLAY (reaction, bubble, voice) -->
 <div id="reactionOverlay"></div>
 
+<div id="gifPanel" style="display:none;position:fixed;bottom:60px;left:14px;width:300px;background:rgba(15,15,25,0.96);border:1px solid rgba(255,255,255,0.15);border-radius:12px;padding:10px;z-index:1200;box-shadow:0 6px 24px rgba(0,0,0,0.5);">
+  <div style="display:flex;gap:6px;margin-bottom:8px;">
+    <input id="gifInput" type="text" placeholder="Cari GIF/sticker..."
+      style="flex:1;padding:6px 10px;border-radius:8px;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.1);color:#fff;font-size:12px;outline:none;">
+    <button onclick="searchGif(0)" style="padding:6px 10px;border-radius:8px;border:none;background:#ff6b9d;color:#fff;font-size:12px;cursor:pointer;">Cari</button>
+    <button onclick="toggleGif()" style="padding:6px 8px;border-radius:8px;border:none;background:rgba(255,255,255,0.1);color:#fff;font-size:12px;cursor:pointer;">×</button>
+  </div>
+  <div id="gifResults" style="display:grid;grid-template-columns:1fr 1fr;gap:6px;max-height:240px;overflow-y:auto;"></div>
+  <div id="gifNav" style="display:flex;justify-content:space-between;margin-top:8px;display:none;">
+    <button id="gifPrev" onclick="searchGif(gifPage-1)" style="padding:4px 12px;border-radius:8px;border:none;background:rgba(255,255,255,0.1);color:#fff;font-size:11px;cursor:pointer;">← Prev</button>
+    <span id="gifPageInfo" style="color:#888;font-size:10px;align-self:center;"></span>
+    <button id="gifNext" onclick="searchGif(gifPage+1)" style="padding:4px 12px;border-radius:8px;border:none;background:rgba(255,255,255,0.1);color:#fff;font-size:11px;cursor:pointer;">Next →</button>
+  </div>
+</div>
+
 <!-- WS STATUS -->
 <div id="wsStatus" class="disconnected">⬤ Disconnected</div>
 
 <!-- TOOLBAR -->
 <div id="toolbar">
   <button class="tool-icon-btn" onclick="toggleYT()" title="YouTube Sync">▶️</button>
+  <button class="tool-icon-btn" onclick="toggleGif()" title="GIF Search">🎬</button> 
   <span style="font-size:26px;color:white;text-shadow:0 0 6px black;">𑣲𝓂</span>
   <input type="text" id="chatInput" placeholder="nama-room Chatango">
   <button id="addBtn" onclick="addChat()">+</button>
@@ -942,15 +958,75 @@ function prevChat() {
 /* ── Draggable YT Window ── */
 (function(){
   var el=null,startX,startY,origX,origY;
-  document.addEventListener("DOMContentLoaded",function(){
-    el=document.getElementById("ytWindow");
-    var bar=document.getElementById("ytTitleBar");
-    bar.addEventListener("mousedown",dragStart);
-    bar.addEventListener("touchstart",dragStart,{passive:true});
+  document.addEventListener("DOMContentLoaded", function() {
+    document.getElementById("chatInput").addEventListener(...)
+    document.getElementById("ytInput").addEventListener(...)
+    document.getElementById("nameInput").addEventListener(...)
+    document.getElementById("bubbleInput").addEventListener(...)
+    document.getElementById("gifInput").addEventListener("keydown", function(e) {
+      if (e.key === "Enter") searchGif(0);
+    });
   });
   function dragStart(e){ var t=e.touches?e.touches[0]:e; startX=t.clientX;startY=t.clientY; var r=el.getBoundingClientRect();origX=r.left;origY=r.top; document.addEventListener("mousemove",dragMove);document.addEventListener("touchmove",dragMove,{passive:true});document.addEventListener("mouseup",dragEnd);document.addEventListener("touchend",dragEnd); }
   function dragMove(e){ var t=e.touches?e.touches[0]:e; el.style.left=Math.max(0,origX+t.clientX-startX)+"px";el.style.top=Math.max(0,origY+t.clientY-startY)+"px"; }
   function dragEnd(){ document.removeEventListener("mousemove",dragMove);document.removeEventListener("touchmove",dragMove);document.removeEventListener("mouseup",dragEnd);document.removeEventListener("touchend",dragEnd); }
 })();
+var gifPage = 0;
+var gifQuery = "";
+
+function toggleGif() {
+  var p = document.getElementById("gifPanel");
+  p.style.display = p.style.display === "none" ? "block" : "none";
+  if (p.style.display === "block") {
+    setTimeout(function(){ document.getElementById("gifInput").focus(); }, 100);
+  }
+}
+
+async function searchGif(page) {
+  var q = document.getElementById("gifInput").value.trim();
+  if (!q) return;
+  gifQuery = q;
+  gifPage = page || 0;
+
+  var results = document.getElementById("gifResults");
+  results.innerHTML = '<div style="color:#666;font-size:11px;text-align:center;padding:20px;grid-column:span 2;">Mencari...</div>';
+
+  try {
+    var res = await fetch("/tenor?q=" + encodeURIComponent(q) + "&page=" + gifPage);
+    var data = await res.json();
+
+    results.innerHTML = "";
+    if (!data.results || !data.results.length) {
+      results.innerHTML = '<div style="color:#666;font-size:11px;text-align:center;padding:20px;grid-column:span 2;">Tidak ada hasil.</div>';
+      return;
+    }
+
+    data.results.forEach(function(url) {
+      var img = document.createElement("img");
+      img.src = url;
+      img.style.cssText = "width:100%;border-radius:6px;cursor:pointer;object-fit:cover;max-height:100px;";
+      img.onclick = function() { sendGifBubble(url); };
+      img.onerror = function() { this.parentNode && this.parentNode.remove(); };
+      results.appendChild(img);
+    });
+
+    // Nav
+    var nav = document.getElementById("gifNav");
+    nav.style.display = "flex";
+    document.getElementById("gifPrev").style.display = data.has_prev ? "block" : "none";
+    document.getElementById("gifNext").style.display = data.has_next ? "block" : "none";
+    document.getElementById("gifPageInfo").textContent = "Hal. " + (gifPage + 1);
+
+  } catch(e) {
+    results.innerHTML = '<div style="color:#f87171;font-size:11px;text-align:center;padding:20px;grid-column:span 2;">Gagal memuat.</div>';
+  }
+}
+
+function sendGifBubble(url) {
+  // Kirim sebagai bubble biasa — renderBubbleContent sudah handle URL gambar
+  wsSend({ type: "bubble", text: url });
+  spawnBubble(url, myName, myColor);
+  toggleGif(); // tutup panel setelah pilih
+}
 </script>
 </body></html>
