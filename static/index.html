@@ -45,7 +45,7 @@ body {
 /* ── YT WINDOW ── */
 #ytWindow {
   position: fixed; top: 70px; left: 14px;
-  width: 340px; height: 360px;
+  width: 340px; height: 420px;
   border: 2px solid rgba(255,255,255,0.5); border-radius: 12px;
   background: rgba(0,0,0,0.85); backdrop-filter: blur(8px);
   z-index: 999; display: none; box-shadow: 0 6px 24px rgba(0,0,0,0.5);
@@ -482,6 +482,21 @@ function wsSend(data) {
 function handleServerMsg(msg) {
   if (msg.type === "ping") {
     wsSend({ type: "pong" });
+    return;
+  }
+
+  if (msg.type === "warn") {
+    showNotif("⚠️ " + msg.msg);
+    return;
+  }
+
+  if (msg.type === "notif") {
+    showNotif(msg.msg);
+    return;
+  }
+
+  if (msg.type === "banned") {
+    document.body.innerHTML = '<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;background:#0f0f0f;color:#ff4444;font-size:18px;font-family:sans-serif;gap:12px;"><span style="font-size:48px;">🚫</span><span>' + (msg.msg || "Kamu dibanned dari server ini.") + '</span></div>';
     return;
   }
 
