@@ -1,9 +1,9 @@
-
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect, Request
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse, JSONResponse
-import json, os, time, asyncio
+import json, os, time, asyncio, re
 import requests as http_requests
+from collections import defaultdict
 
 app = FastAPI()
 
@@ -35,9 +35,9 @@ async def chat_macha(request: Request):
     except Exception as e:
         return JSONResponse({"text": f"Hmph, error: {e}"}, status_code=500)
 
+# ── Tenor GIF scraper ─────────────────────────────────────────────────
 @app.get("/tenor")
 async def tenor_search(q: str, page: int = 0):
-    import re, random
     keyword = q.strip().replace(" ", "-")
     url = f"https://tenor.com/id/search/{keyword}"
     headers = {"User-Agent": "Mozilla/5.0"}
@@ -46,21 +46,14 @@ async def tenor_search(q: str, page: int = 0):
         html = res.text
     except Exception as e:
         return JSONResponse({"results": [], "error": str(e)})
-
-    # Ambil semua URL gif/png/jpg
     results = re.findall(r'https://media\.tenor\.com/[^\s"\']+\.(?:gif|png|jpg)', html)
-    results = list(dict.fromkeys(results))  # dedupe, jaga urutan
-
-    # Pagination 5 per page
+    results = list(dict.fromkeys(results))
     start = page * 5
     chunk = results[start:start + 5]
-
     return JSONResponse({
-        "results": chunk,
-        "page": page,
+        "results": chunk, "page": page,
         "has_next": len(results) > start + 5,
-        "has_prev": page > 0,
-        "total": len(results)
+        "has_prev": page > 0, "total": len(results)
     })
 
 # ── YouTube State ─────────────────────────────────────────────────────
@@ -73,6 +66,45 @@ yt_state = {
 clients: dict[WebSocket, dict] = {}
 COLORS = ["#ff6b9d","#c084fc","#60a5fa","#34d399","#fbbf24","#f87171","#a78bfa","#38bdf8"]
 
+# ── Anti-spam ─────────────────────────────────────────────────────────
+# Tiap type punya limit dan window sendiri
+RATE_LIMITS = {
+    "reaction": {"limit": 2,  "window": 5},   # max 2 reaction per 5 detik
+    "bubble":   {"limit": 2,  "window": 6},   # max 2 bubble per 6 detik
+    "voice":    {"limit": 1,  "window": 15},  # max 1 voice note per 15 detik
+}
+spam_times:   dict[WebSocket, dict] = defaultdict(lambda: defaultdict(list))
+spam_strikes: dict[WebSocket, int]  = defaultdict(int)
+banned_names: set = set()
+BAN_SECRET = os.environ.get("BAN_SECRET", "adminrahasia")
+
+def check_rate_limit(ws: WebSocket, msg_type: str) -> bool:
+    """Return True kalau kena rate limit."""
+    cfg = RATE_LIMITS.get(msg_type)
+    if not cfg:
+        return False
+    now = time.time()
+    times = spam_times[ws][msg_type]
+    # Buang yang sudah lewat window
+    spam_times[ws][msg_type] = [t for t in times if now - t < cfg["window"]]
+    if len(spam_times[ws][msg_type]) >= cfg["limit"]:
+        spam_strikes[ws] += 1
+        return True
+    spam_times[ws][msg_type].append(now)
+    return False
+
+def sanitize_emoji(raw: str) -> str:
+    """Ambil 1 emoji saja, buang sisanya."""
+    chars = list(raw.strip())
+    return chars[0] if chars else ""
+
+def sanitize_text(raw: str, max_words: int = 10, max_chars: int = 200) -> str:
+    """Clamp teks ke max_words kata dan max_chars karakter."""
+    if len(raw) > max_chars:
+        return ""
+    return " ".join(raw.strip().split()[:max_words])
+
+# ── Broadcast helpers ─────────────────────────────────────────────────
 def get_viewer_list():
     return [
         {"name": v["name"], "color": v["color"], "joined_at": v["joined_at"]}
@@ -83,8 +115,7 @@ async def broadcast(data: dict, exclude: WebSocket = None):
     msg = json.dumps(data)
     dead = []
     for ws in list(clients):
-        if ws == exclude:
-            continue
+        if ws == exclude: continue
         try:
             await ws.send_text(msg)
         except:
@@ -92,14 +123,12 @@ async def broadcast(data: dict, exclude: WebSocket = None):
     for ws in dead:
         clients.pop(ws, None)
     if dead:
-        # Ada yang mati saat broadcast — update viewer list
         await _broadcast_viewers_safe()
 
 async def broadcast_bytes(data: bytes, exclude: WebSocket = None):
     dead = []
     for ws in list(clients):
-        if ws == exclude:
-            continue
+        if ws == exclude: continue
         try:
             await ws.send_bytes(data)
         except:
@@ -111,7 +140,6 @@ async def broadcast_viewers():
     await broadcast({"type": "viewer_list", "viewers": get_viewer_list(), "count": len(clients)})
 
 async def _broadcast_viewers_safe():
-    """Broadcast viewer list tanpa trigger loop rekursif."""
     msg = json.dumps({"type": "viewer_list", "viewers": get_viewer_list(), "count": len(clients)})
     for ws in list(clients):
         try:
@@ -120,10 +148,45 @@ async def _broadcast_viewers_safe():
             clients.pop(ws, None)
 
 async def remove_client(ws: WebSocket):
-    """Hapus client dan broadcast viewer list terbaru."""
     clients.pop(ws, None)
+    spam_times.pop(ws, None)
+    spam_strikes.pop(ws, None)
     await broadcast_viewers()
 
+async def kick_spammer(ws: WebSocket, reason: str = "Spam terdeteksi!"):
+    name = clients.get(ws, {}).get("name", "anon")
+    try:
+        await ws.send_text(json.dumps({"type": "banned", "msg": reason}))
+        await ws.close()
+    except: pass
+    await remove_client(ws)
+    await broadcast({"type": "notif", "msg": f"⚠️ {name} dikick: {reason}"})
+
+# ── Ban endpoints ─────────────────────────────────────────────────────
+@app.get("/ban")
+async def ban_user(name: str, secret: str):
+    if secret != BAN_SECRET:
+        return JSONResponse({"error": "Unauthorized"}, status_code=403)
+    banned_names.add(name.lower())
+    to_kick = [ws for ws, v in list(clients.items()) if v.get("name","").lower() == name.lower()]
+    for ws in to_kick:
+        await kick_spammer(ws, "Kamu dibanned oleh admin.")
+    return JSONResponse({"banned": name})
+
+@app.get("/unban")
+async def unban_user(name: str, secret: str):
+    if secret != BAN_SECRET:
+        return JSONResponse({"error": "Unauthorized"}, status_code=403)
+    banned_names.discard(name.lower())
+    return JSONResponse({"unbanned": name})
+
+@app.get("/banned")
+async def list_banned(secret: str):
+    if secret != BAN_SECRET:
+        return JSONResponse({"error": "Unauthorized"}, status_code=403)
+    return JSONResponse({"banned": list(banned_names)})
+
+# ── WebSocket ─────────────────────────────────────────────────────────
 @app.websocket("/ws")
 async def websocket_endpoint(ws: WebSocket):
     await ws.accept()
@@ -134,7 +197,6 @@ async def websocket_endpoint(ws: WebSocket):
         "last_vn_duration": 0
     }
 
-    # Kirim state saat ini ke client baru
     await ws.send_text(json.dumps({
         "type": "sync", **yt_state,
         "your_color": color,
@@ -143,12 +205,10 @@ async def websocket_endpoint(ws: WebSocket):
     }))
     await broadcast_viewers()
 
-    # ── Ping loop: deteksi disconnect dalam 10 detik ──────────────────
     async def ping_loop():
         while ws in clients:
             await asyncio.sleep(10)
-            if ws not in clients:
-                break
+            if ws not in clients: break
             try:
                 await ws.send_text(json.dumps({"type": "ping"}))
             except:
@@ -161,50 +221,82 @@ async def websocket_endpoint(ws: WebSocket):
         while True:
             msg_data = await ws.receive()
 
-            # ── Binary: audio voice note ──────────────────────────────
+            # ── Binary: voice note ────────────────────────────────────
             if "bytes" in msg_data:
+                # Cek rate limit voice
+                if check_rate_limit(ws, "voice"):
+                    if spam_strikes[ws] >= 3:
+                        await kick_spammer(ws, "Spam voice note!")
+                        break
+                    await ws.send_text(json.dumps({"type": "warn", "msg": "Pelan-pelan dong! Cooldown voice note."}))
+                    continue
                 audio = msg_data["bytes"]
-                name = clients[ws].get("name", "")
+                # Batasi ukuran audio max 2MB
+                if len(audio) > 2 * 1024 * 1024:
+                    await ws.send_text(json.dumps({"type": "warn", "msg": "Voice note terlalu panjang!"}))
+                    continue
+                name  = clients[ws].get("name", "")
                 color = clients[ws].get("color", "#fff")
                 duration = clients[ws].get("last_vn_duration", 0)
-                await broadcast({
-                    "type": "voice_note_incoming",
-                    "name": name, "color": color, "duration": duration
-                }, exclude=ws)
+                await broadcast({"type": "voice_note_incoming", "name": name, "color": color, "duration": duration}, exclude=ws)
                 await broadcast_bytes(audio, exclude=ws)
                 continue
 
-            # ── Text: JSON ────────────────────────────────────────────
             if "text" not in msg_data:
                 continue
 
             msg = json.loads(msg_data["text"])
             t = msg.get("type")
 
+            # Cek banned
+            name = clients[ws].get("name", "")
+            if name and name.lower() in banned_names:
+                await kick_spammer(ws, "Kamu dibanned.")
+                break
+
             if t == "pong":
-                pass  # client masih hidup
+                pass
 
             elif t == "set_name":
-                clients[ws]["name"] = msg.get("name", "").strip()[:20]
+                new_name = msg.get("name", "").strip()[:20]
+                if new_name.lower() in banned_names:
+                    await kick_spammer(ws, "Nama ini dibanned.")
+                    break
+                clients[ws]["name"] = new_name
                 await broadcast_viewers()
 
             elif t == "voice_note_incoming":
-                # Simpan durasi untuk diteruskan saat binary tiba
                 clients[ws]["last_vn_duration"] = msg.get("duration", 0)
 
             elif t == "bubble":
-                text = " ".join(msg.get("text", "").strip().split()[:10])
-                if text:
-                    await broadcast({
-                        "type": "bubble", "text": text,
-                        "name": clients[ws].get("name", ""),
-                        "color": clients[ws].get("color", "#fff")
-                    }, exclude=ws)
+                if check_rate_limit(ws, "bubble"):
+                    if spam_strikes[ws] >= 3:
+                        await kick_spammer(ws, "Spam bubble!")
+                        break
+                    await ws.send_text(json.dumps({"type": "warn", "msg": "Slow down! Cheese"}))
+                    continue
+                text = sanitize_text(msg.get("text", ""), max_words=10, max_chars=200)
+                if not text:
+                    continue
+                await broadcast({
+                    "type": "bubble", "text": text,
+                    "name": clients[ws].get("name", ""),
+                    "color": clients[ws].get("color", "#fff")
+                }, exclude=ws)
 
             elif t == "reaction":
+                if check_rate_limit(ws, "reaction"):
+                    if spam_strikes[ws] >= 3:
+                        await kick_spammer(ws, "Spam reaction!")
+                        break
+                    await ws.send_text(json.dumps({"type": "warn", "msg": "Slow down! Jangan spam emoji."}))
+                    continue
+                # Sanitize: ambil 1 emoji saja, buang repeat
+                emoji = sanitize_emoji(msg.get("emoji", ""))
+                if not emoji:
+                    continue
                 await broadcast({
-                    "type": "reaction",
-                    "emoji": msg.get("emoji", ""),
+                    "type": "reaction", "emoji": emoji,
                     "name": clients[ws].get("name", ""),
                     "color": clients[ws].get("color", "#fff")
                 })
@@ -230,10 +322,7 @@ async def websocket_endpoint(ws: WebSocket):
                     thumbnail=msg.get("thumbnail", ""),
                     is_playing=True, current_time=0
                 )
-                await broadcast({
-                    "type": "load", **yt_state,
-                    "by": clients[ws].get("name", "")
-                }, exclude=ws)
+                await broadcast({"type": "load", **yt_state, "by": clients[ws].get("name", "")}, exclude=ws)
 
             elif t == "heartbeat":
                 yt_state["current_time"] = msg.get("current_time", yt_state["current_time"])
