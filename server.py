@@ -79,7 +79,6 @@ banned_names: set = set()
 BAN_SECRET = os.environ.get("BAN_SECRET", "adminrahasia")
 
 def check_rate_limit(ws: WebSocket, msg_type: str) -> bool:
-    """Return True kalau kena rate limit."""
     cfg = RATE_LIMITS.get(msg_type)
     if not cfg:
         return False
@@ -269,11 +268,13 @@ async def websocket_endpoint(ws: WebSocket):
                 clients[ws]["last_vn_duration"] = msg.get("duration", 0)
 
             elif t == "bubble":
+                if not clients[ws].get("name"):
+                    continue
                 if check_rate_limit(ws, "bubble"):
                     if spam_strikes[ws] >= 3:
                         await kick_spammer(ws, "Spam bubble!")
                         break
-                    await ws.send_text(json.dumps({"type": "warn", "msg": "Slow down! Cheese"}))
+                    await ws.send_text(json.dumps({"type": "warn", "msg": "Slow down! Jangan spam bubble!"}))
                     continue
                 text = sanitize_text(msg.get("text", ""), max_words=10, max_chars=200)
                 if not text:
@@ -285,6 +286,8 @@ async def websocket_endpoint(ws: WebSocket):
                 }, exclude=ws)
 
             elif t == "reaction":
+                if not clients[ws].get("name"):
+                    continue
                 if check_rate_limit(ws, "reaction"):
                     if spam_strikes[ws] >= 3:
                         await kick_spammer(ws, "Spam reaction!")
