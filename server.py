@@ -35,6 +35,10 @@ async def chat_macha(request: Request):
     except Exception as e:
         return JSONResponse({"text": f"Hmph, error: {e}"}, status_code=500)
 
+@app.get("/favicon.ico")
+async def favicon():
+    return FileResponse("static/favicon.ico")
+
 # ── Tenor GIF scraper ─────────────────────────────────────────────────
 @app.get("/tenor")
 async def tenor_search(q: str, page: int = 0):
