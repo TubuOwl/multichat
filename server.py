@@ -360,6 +360,20 @@ async def websocket_endpoint(ws: WebSocket):
                     "by": clients[ws].get("name", "")
                 }, exclude=ws)
 
+            elif t == "iframe_url":
+                if not clients[ws].get("name"):
+                    continue
+                url   = msg.get("url", "").strip()
+                title = msg.get("title", "").strip()[:100]
+                if not url.startswith("http") or not title:
+                    continue
+                await broadcast({
+                    "type": "iframe_url",
+                    "url": url,
+                    "title": title,
+                    "by": clients[ws].get("name", "")
+                }, exclude=ws)
+
             elif t == "heartbeat":
                 yt_state["current_time"] = msg.get("current_time", yt_state["current_time"])
 
