@@ -93,9 +93,14 @@ def check_rate_limit(ws: WebSocket, msg_type: str) -> bool:
     return False
 
 def sanitize_emoji(raw: str) -> str:
-    """Ambil 1 emoji saja, buang sisanya."""
+    import unicodedata
     chars = list(raw.strip())
-    return chars[0] if chars else ""
+    if not chars:
+        return ""
+    result = chars[0]
+    if len(chars) > 1 and unicodedata.category(chars[1]) in ("Mn", "Cf"):
+        result += chars[1]
+    return result
 
 def sanitize_text(raw: str, max_words: int = 10, max_chars: int = 200) -> str:
     """Clamp teks ke max_words kata dan max_chars karakter."""
