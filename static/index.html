@@ -362,6 +362,21 @@ body {
   </div>
 </div>
 
+<!-- IFRAME URL MODAL -->
+<div id="iframeModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);backdrop-filter:blur(4px);z-index:2000;align-items:center;justify-content:center;">
+  <div style="background:#1a1a2e;border:1px solid rgba(255,255,255,0.2);border-radius:14px;padding:24px 28px;display:flex;flex-direction:column;gap:14px;width:300px;box-shadow:0 8px 32px rgba(0,0,0,0.5);">
+    <h3 style="color:#fff;font-size:15px;text-align:center;">🌐 Custom URL</h3>
+    <input type="text" id="iframeTitle" placeholder="Judul..." maxlength="50"
+      style="padding:9px 12px;border-radius:8px;border:1px solid rgba(255,255,255,0.25);background:rgba(255,255,255,0.1);color:#fff;font-size:13px;outline:none;">
+    <input type="text" id="iframeUrl" placeholder="https://..." maxlength="300"
+      style="padding:9px 12px;border-radius:8px;border:1px solid rgba(255,255,255,0.25);background:rgba(255,255,255,0.1);color:#fff;font-size:13px;outline:none;">
+    <div style="display:flex;gap:8px;">
+      <button onclick="submitIframe()" style="flex:1;padding:9px;border-radius:8px;border:none;background:linear-gradient(135deg,#ff6b9d,#c084fc);color:#fff;font-size:13px;font-weight:bold;cursor:pointer;">Tampilkan</button>
+      <button onclick="toggleIframe()" style="padding:9px 14px;border-radius:8px;border:none;background:rgba(255,255,255,0.1);color:#fff;font-size:13px;cursor:pointer;">Batal</button>
+    </div>
+  </div>
+</div>
+
 <!-- WS STATUS -->
 <div id="wsStatus" class="disconnected">⬤ Disconnected</div>
 
@@ -369,7 +384,7 @@ body {
 <div id="toolbar">
   <button class="tool-icon-btn" onclick="toggleYT()" title="YouTube Sync">▶️</button>
   <button class="tool-icon-btn" onclick="toggleGif()" title="GIF Search">🎬</button>
-  <span style="font-size:26px;color:white;text-shadow:0 0 6px black;">🗪</span>
+  <button class="tool-icon-btn" onclick="toggleIframe()" title="Custom URL">🌐</button>
   <input type="text" id="chatInput" placeholder="nama-room Chatango">
   <button id="addBtn" onclick="addChat()">+</button>
 </div>
@@ -542,6 +557,19 @@ function handleServerMsg(msg) {
         "?autoplay=0&start=" + Math.floor(msg.current_time || 0) + "&rel=0";
       videoPlaying = false; videoStartTime = msg.current_time || 0;
     }
+  }
+  if (msg.type === "iframe_url") {
+    document.getElementById("ytStatus").style.display = "none";
+    document.getElementById("ytResults").style.display = "none";
+    document.getElementById("ytPlayerWrap").style.display = "flex";
+    document.getElementById("reactionBar").style.display = "flex";
+    document.getElementById("bubbleRow").style.display = "flex";
+    document.getElementById("nowPlaying").style.display = "flex";
+    document.getElementById("nowPlayingTitle").textContent = msg.title;
+    document.getElementById("nowPlayingThumb").src = "";
+    document.getElementById("ytFrame").src = msg.url;
+    document.getElementById("ytWindow").style.display = "flex";
+    showNotif("🌐 " + msg.title);
   }
 }
 
@@ -1034,6 +1062,36 @@ function sendGifBubble(url) {
   wsSend({ type: "bubble", text: url });
   spawnBubble(url, myName, myColor);
   toggleGif();
+}
+function toggleIframe() {
+  var m = document.getElementById("iframeModal");
+  m.style.display = m.style.display === "flex" ? "none" : "flex";
+  if (m.style.display === "flex") {
+    setTimeout(function(){ document.getElementById("iframeTitle").focus(); }, 100);
+  }
+}
+
+function submitIframe() {
+  var title = document.getElementById("iframeTitle").value.trim();
+  var url   = document.getElementById("iframeUrl").value.trim();
+
+  if (!title) { alert("Judul harus diisi!"); return; }
+  if (!url || !url.startsWith("http")) { alert("URL tidak valid!"); return; }
+
+  document.getElementById("ytStatus").style.display = "none";
+  document.getElementById("ytResults").style.display = "none";
+  document.getElementById("ytPlayerWrap").style.display = "flex";
+  document.getElementById("reactionBar").style.display = "flex";
+  document.getElementById("bubbleRow").style.display = "flex";
+  document.getElementById("nowPlaying").style.display = "flex";
+  document.getElementById("nowPlayingTitle").textContent = title;
+  document.getElementById("nowPlayingThumb").src = "";
+  document.getElementById("ytFrame").src = url;
+
+  wsSend({ type: "iframe_url", url: url, title: title });
+
+  toggleIframe();
+  document.getElementById("ytWindow").style.display = "flex";
 }
 </script>
 </body></html>
