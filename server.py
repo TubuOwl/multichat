@@ -369,12 +369,16 @@ async def websocket_endpoint(ws: WebSocket):
                     continue
                 url   = msg.get("url", "").strip()
                 title = msg.get("title", "").strip()[:100]
+                thumb = msg.get("thumb", "").strip()
+                if not thumb.startswith("http"):
+                    thumb = "https://i.imgur.com/21CjTu1.gif"
                 if not url.startswith("http") or not title:
                     continue
                 await broadcast({
                     "type": "iframe_url",
                     "url": url,
                     "title": title,
+                    "thumb": thumb,
                     "by": clients[ws].get("name", "")
                 }, exclude=ws)
 
