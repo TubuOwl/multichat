@@ -316,13 +316,41 @@ async def websocket_endpoint(ws: WebSocket):
                 await broadcast({"type": "seek", "current_time": yt_state["current_time"]}, exclude=ws)
 
             elif t == "load":
+                if check_rate_limit(ws, "load"):
+                    if spam_strikes[ws] >= 3:
+                        await kick_spammer(ws, "Spam load video!")
+                        break
+                    continue
+            
+                if not clients[ws].get("name"):
+                    continue
+            
+                video_id = re.sub(r'[^a-zA-Z0-9_-]', '', msg.get("videoId", ""))[:11]
+                if len(video_id) < 5:
+                    continue
+            
+                try:
+                    oembed = http_requests.get(
+                        f"https://www.youtube.com/oembed?url=https://youtu.be/{video_id}",
+                        timeout=5
+                    )
+                    if oembed.status_code != 200:
+                        continue
+                    data = oembed.json()
+                except:
+                    continue
+            
                 yt_state.update(
-                    videoId=msg.get("videoId", ""),
-                    title=msg.get("title", ""),
-                    thumbnail=msg.get("thumbnail", ""),
-                    is_playing=True, current_time=0
+                    videoId=video_id,
+                    title=data["title"],
+                    thumbnail=data["thumbnail_url"],
+                    is_playing=True,
+                    current_time=0
                 )
-                await broadcast({"type": "load", **yt_state, "by": clients[ws].get("name", "")}, exclude=ws)
+                await broadcast({
+                    "type": "load", **yt_state,
+                    "by": clients[ws].get("name", "")
+                }, exclude=ws)
 
             elif t == "heartbeat":
                 yt_state["current_time"] = msg.get("current_time", yt_state["current_time"])
