@@ -369,6 +369,8 @@ body {
     <h3 style="color:#fff;font-size:15px;text-align:center;">🌐 Custom URL</h3>
     <input type="text" id="iframeTitle" placeholder="Judul..." maxlength="50"
       style="padding:9px 12px;border-radius:8px;border:1px solid rgba(255,255,255,0.25);background:rgba(255,255,255,0.1);color:#fff;font-size:13px;outline:none;">
+    <input type="text" id="iframeThumb" placeholder="URL thumbnail (opsional)..." maxlength="300"
+      style="padding:9px 12px;border-radius:8px;border:1px solid rgba(255,255,255,0.25);background:rgba(255,255,255,0.1);color:#fff;font-size:13px;outline:none;">
     <input type="text" id="iframeUrl" placeholder="https://..." maxlength="300"
       style="padding:9px 12px;border-radius:8px;border:1px solid rgba(255,255,255,0.25);background:rgba(255,255,255,0.1);color:#fff;font-size:13px;outline:none;">
     <div style="display:flex;gap:8px;">
@@ -567,7 +569,7 @@ function handleServerMsg(msg) {
     document.getElementById("bubbleRow").style.display = "flex";
     document.getElementById("nowPlaying").style.display = "flex";
     document.getElementById("nowPlayingTitle").textContent = msg.title;
-    document.getElementById("nowPlayingThumb").src = "";
+    document.getElementById("nowPlayingThumb").src = (msg.thumb && msg.thumb.startsWith("http")) ? msg.thumb : "";
     document.getElementById("ytFrame").src = msg.url;
     document.getElementById("ytWindow").style.display = "flex";
     showNotif("🌐 " + msg.title);
@@ -1074,6 +1076,7 @@ function toggleIframe() {
 
 function submitIframe() {
   var title = document.getElementById("iframeTitle").value.trim();
+  var thumb = document.getElementById("iframeThumb").value.trim();
   var url   = document.getElementById("iframeUrl").value.trim();
 
   if (!title) { alert("Judul harus diisi!"); return; }
@@ -1086,10 +1089,10 @@ function submitIframe() {
   document.getElementById("bubbleRow").style.display = "flex";
   document.getElementById("nowPlaying").style.display = "flex";
   document.getElementById("nowPlayingTitle").textContent = title;
-  document.getElementById("nowPlayingThumb").src = "";
+  document.getElementById("nowPlayingThumb").src = (thumb && thumb.startsWith("http")) ? thumb : "";
   document.getElementById("ytFrame").src = url;
 
-  wsSend({ type: "iframe_url", url: url, title: title });
+  wsSend({ type: "iframe_url", url: url, title: title, thumb: thumb });
 
   toggleIframe();
   document.getElementById("ytWindow").style.display = "flex";
