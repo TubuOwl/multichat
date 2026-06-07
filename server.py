@@ -60,10 +60,14 @@ async def tenor_search(q: str, page: int = 0):
         "has_prev": page > 0, "total": len(results)
     })
 
-# ── YouTube State ─────────────────────────────────────────────────────
+# ── Iframe & YouTube State ─────────────────────────────────────────────────────
 yt_state = {
     "videoId": "", "title": "", "is_playing": False,
     "current_time": 0, "thumbnail": ""
+}
+
+iframe_state = {
+    "url": "", "title": "", "thumb": "", "active": False
 }
 
 # ── Clients ───────────────────────────────────────────────────────────
@@ -211,6 +215,15 @@ async def websocket_endpoint(ws: WebSocket):
         "viewers": get_viewer_list(),
         "count": len(clients)
     }))
+
+    if iframe_state.get("active"):        
+        await ws.send_text(json.dumps({
+            "type": "iframe_url",
+            "url": iframe_state["url"],
+            "title": iframe_state["title"],
+            "thumb": iframe_state["thumb"]
+        }))
+        
     await broadcast_viewers()
 
     async def ping_loop():
@@ -359,6 +372,7 @@ async def websocket_endpoint(ws: WebSocket):
                     is_playing=True,
                     current_time=0
                 )
+                iframe_state.update(url="", title="", thumb="", active=False)
                 await broadcast({
                     "type": "load", **yt_state,
                     "by": clients[ws].get("name", "")
@@ -374,6 +388,10 @@ async def websocket_endpoint(ws: WebSocket):
                     thumb = "https://i.imgur.com/21CjTu1.gif"
                 if not url.startswith("http") or not title:
                     continue
+                    
+                iframe_state.update(url=url, title=title, thumb=thumb, active=True)
+                yt_state.update(videoId="", is_playing=False)
+                
                 await broadcast({
                     "type": "iframe_url",
                     "url": url,
