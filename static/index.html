@@ -3,6 +3,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimal-ui">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
+<link rel="icon" type="image/png" href="https://i.imgur.com/3WnhDqR.png">
 <title>Chatango Multi Room — Shoujo Chat</title>
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -278,44 +279,6 @@ body {
 .macha-typing { display: inline-block; font-size: 18px; letter-spacing: 2px; animation: machaTyping 1s infinite; }
 @keyframes machaTyping { 0%,100% { opacity: 0.2; } 50% { opacity: 1; } }
 
-/* ── LEADERBOARD PANEL ── */
-#lbPanel {
-  display: none; position: fixed; top: 70px; right: 14px;
-  width: 280px; background: rgba(15,15,25,0.96);
-  border: 1px solid rgba(255,255,255,0.15); border-radius: 12px;
-  padding: 14px; z-index: 1200; box-shadow: 0 6px 24px rgba(0,0,0,0.5);
-  flex-direction: column; gap: 8px;
-}
-#lbPanel h3 { color: #fff; font-size: 13px; text-align: center; margin-bottom: 4px; }
-.lb-row {
-  display: flex; align-items: center; gap: 8px;
-  padding: 5px 8px; border-radius: 8px;
-  background: rgba(255,255,255,0.06); font-size: 11px; color: #ddd;
-}
-.lb-rank { color: #fbbf24; font-weight: bold; width: 18px; flex-shrink: 0; }
-.lb-name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.lb-time { color: #60a5fa; font-size: 10px; flex-shrink: 0; }
-.lb-visits { color: #888; font-size: 9px; flex-shrink: 0; }
-
-/* ── ADMIN PANEL ── */
-#adminPanel {
-  display: none; position: fixed; top: 70px; right: 14px;
-  width: 300px; background: rgba(15,15,25,0.96);
-  border: 1px solid rgba(255,100,100,0.3); border-radius: 12px;
-  padding: 14px; z-index: 1200; box-shadow: 0 6px 24px rgba(0,0,0,0.5);
-  flex-direction: column; gap: 10px;
-}
-#adminPanel h3 { color: #ff6b9d; font-size: 13px; text-align: center; }
-.admin-input {
-  padding: 7px 10px; border-radius: 8px;
-  border: 1px solid rgba(255,255,255,0.2);
-  background: rgba(255,255,255,0.08); color: #fff; font-size: 12px; outline: none;
-}
-.admin-btn {
-  padding: 7px 12px; border-radius: 8px; border: none;
-  font-size: 12px; cursor: pointer; font-weight: bold;
-}
-
 /* ws status */
 #wsStatus {
   position: fixed; bottom: 12px; right: 12px;
@@ -372,50 +335,14 @@ body {
 </head>
 <body>
 
-<!-- LOGIN MODAL -->
+<!-- NAME MODAL -->
 <div id="nameModal">
   <div id="nameBox">
-    <h3>👤 Login</h3>
-    <p id="loginError" style="color:#ff6b9d;font-size:11px;text-align:center;display:none;margin-top:-8px;"></p>
-    <input type="text" id="nameInput" placeholder="Username (a-z, 0-9)" maxlength="20" pattern="[a-zA-Z0-9]*">
-    <input type="password" id="passwordInput" placeholder="Password"
-      style="padding:9px 12px;border-radius:8px;border:1px solid rgba(255,255,255,0.25);background:rgba(255,255,255,0.1);color:#fff;font-size:13px;outline:none;">
-    <button id="nameSubmitBtn" onclick="submitLogin()">Masuk →</button>
+    <h3>👤 Siapa namamu?</h3>
+    <p>Biar teman-teman tahu kamu online</p>
+    <input type="text" id="nameInput" placeholder="Nama kamu... " maxlength="20" pattern="[a-zA-Z0-9]*">
+    <button id="nameSubmitBtn" onclick="submitName()">Masuk →</button>
   </div>
-</div>
-
-<!-- LEADERBOARD PANEL -->
-<div id="lbPanel">
-  <h3>🏆 Leaderboard — Total Waktu</h3>
-  <div id="lbList"></div>
-  <button onclick="toggleLb()" style="padding:6px;border-radius:8px;border:none;background:rgba(255,255,255,0.1);color:#aaa;font-size:11px;cursor:pointer;margin-top:4px;">Tutup</button>
-</div>
-
-<!-- ADMIN PANEL -->
-<div id="adminPanel">
-  <h3>⚙️ Admin Panel</h3>
-  <div style="display:flex;gap:6px;">
-    <input type="text" class="admin-input" id="apUsername" placeholder="Username" style="flex:1;">
-    <input type="password" class="admin-input" id="apPassword" placeholder="Password" style="flex:1;">
-  </div>
-  <div style="display:flex;gap:6px;">
-    <select id="apRole" style="flex:1;padding:7px;border-radius:8px;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.08);color:#fff;font-size:12px;">
-      <option value="user">User</option>
-      <option value="admin">Admin</option>
-    </select>
-    <button class="admin-btn" onclick="adminCreateUser()" style="flex:1;background:#34d399;color:#000;">+ Buat</button>
-  </div>
-  <div style="display:flex;gap:6px;">
-    <input type="text" class="admin-input" id="apDeleteName" placeholder="Username" style="flex:1;">
-    <button class="admin-btn" onclick="adminDeleteUser()" style="background:#f87171;color:#fff;">Hapus</button>
-    <button class="admin-btn" onclick="adminKickUser()" style="background:#fbbf24;color:#000;">Kick</button>
-  </div>
-  <div style="display:flex;gap:6px;">
-    <input type="text" class="admin-input" id="apBanName" placeholder="Username" style="flex:1;">
-    <button class="admin-btn" onclick="adminBanUser()" style="background:#ff4444;color:#fff;">Ban</button>
-    <button class="admin-btn" onclick="adminUnbanUser()" style="background:#60a5fa;color:#fff;">Unban</button>
-  </div>
-  <button onclick="toggleAdmin()" style="padding:6px;border-radius:8px;border:none;background:rgba(255,255,255,0.1);color:#aaa;font-size:11px;cursor:pointer;">Tutup</button>
 </div>
 
 <!-- FLOATING OVERLAY (reaction, bubble, voice) -->
@@ -436,6 +363,23 @@ body {
   </div>
 </div>
 
+<!-- IFRAME URL MODAL -->
+<div id="iframeModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);backdrop-filter:blur(4px);z-index:2000;align-items:center;justify-content:center;">
+  <div style="background:#1a1a2e;border:1px solid rgba(255,255,255,0.2);border-radius:14px;padding:24px 28px;display:flex;flex-direction:column;gap:14px;width:300px;box-shadow:0 8px 32px rgba(0,0,0,0.5);">
+    <h3 style="color:#fff;font-size:15px;text-align:center;">🌐 Custom URL</h3>
+    <input type="text" id="iframeTitle" placeholder="Judul..." maxlength="50"
+      style="padding:9px 12px;border-radius:8px;border:1px solid rgba(255,255,255,0.25);background:rgba(255,255,255,0.1);color:#fff;font-size:13px;outline:none;">
+    <input type="text" id="iframeThumb" placeholder="URL thumbnail (opsional)..." maxlength="300"
+      style="padding:9px 12px;border-radius:8px;border:1px solid rgba(255,255,255,0.25);background:rgba(255,255,255,0.1);color:#fff;font-size:13px;outline:none;">
+    <input type="text" id="iframeUrl" placeholder="https://..." maxlength="300"
+      style="padding:9px 12px;border-radius:8px;border:1px solid rgba(255,255,255,0.25);background:rgba(255,255,255,0.1);color:#fff;font-size:13px;outline:none;">
+    <div style="display:flex;gap:8px;">
+      <button onclick="submitIframe()" style="flex:1;padding:9px;border-radius:8px;border:none;background:linear-gradient(135deg,#ff6b9d,#c084fc);color:#fff;font-size:13px;font-weight:bold;cursor:pointer;">Tampilkan</button>
+      <button onclick="toggleIframe()" style="padding:9px 14px;border-radius:8px;border:none;background:rgba(255,255,255,0.1);color:#fff;font-size:13px;cursor:pointer;">Batal</button>
+    </div>
+  </div>
+</div>
+
 <!-- WS STATUS -->
 <div id="wsStatus" class="disconnected">⬤ Disconnected</div>
 
@@ -443,8 +387,8 @@ body {
 <div id="toolbar">
   <button class="tool-icon-btn" onclick="toggleYT()" title="YouTube Sync">▶️</button>
   <button class="tool-icon-btn" onclick="toggleGif()" title="GIF Search">🎬</button>
-  <button class="tool-icon-btn" onclick="toggleLb()" title="Leaderboard">🏆</button>
-  <button class="tool-icon-btn" id="adminBtn" onclick="toggleAdmin()" title="Admin" style="display:none;">⚙️</button>
+  <button class="tool-icon-btn" onclick="toggleIframe()" title="Custom URL">🌐</button>
+
   <input type="text" id="chatInput" placeholder="nama-room Chatango">
   <button id="addBtn" onclick="addChat()">+</button>
 </div>
@@ -527,7 +471,7 @@ function connectWS() {
     wsConnected = true;
     statusEl.textContent = "⬤ Connected";
     statusEl.className = "connected";
-    if (myToken) wsSend({ type: "auth", token: myToken });
+    if (myName) wsSend({ type: "set_name", name: myName });
   };
   ws.onclose = function() {
     wsConnected = false;
@@ -555,21 +499,8 @@ function wsSend(data) {
 }
 
 function handleServerMsg(msg) {
-  if (msg.type === "auth_ok") {
-    myName = msg.username;
-    myRole = msg.role;
-    if (myRole === "admin") document.getElementById("adminBtn").style.display = "flex";
-    return;
-  }
-
-  if (msg.type === "auth_fail") {
-    showNotif("❌ " + (msg.msg || "Auth gagal"));
-    showNameModal();
-    return;
-  }
-
-  if (msg.type === "leaderboard") {
-    renderLeaderboard(msg.data);
+  if (msg.type === "ping") {
+    wsSend({ type: "pong" });
     return;
   }
 
@@ -631,6 +562,19 @@ function handleServerMsg(msg) {
       videoPlaying = false; videoStartTime = msg.current_time || 0;
     }
   }
+  if (msg.type === "iframe_url") {
+    document.getElementById("ytStatus").style.display = "none";
+    document.getElementById("ytResults").style.display = "none";
+    document.getElementById("ytPlayerWrap").style.display = "flex";
+    document.getElementById("reactionBar").style.display = "flex";
+    document.getElementById("bubbleRow").style.display = "flex";
+    document.getElementById("nowPlaying").style.display = "flex";
+    document.getElementById("nowPlayingTitle").textContent = msg.title;
+    document.getElementById("nowPlayingThumb").src = (msg.thumb && msg.thumb.startsWith("http")) ? msg.thumb : "";
+    document.getElementById("ytFrame").src = msg.url;
+    document.getElementById("ytWindow").style.display = "flex";
+    showNotif("🌐 " + msg.title);
+  }
 }
 
 /* ── Viewer List ── */
@@ -670,128 +614,18 @@ function toggleViewerPanel() {
   p.style.display = p.style.display === "flex" ? "none" : "flex";
 }
 
-/* ── Auth ── */
-var myToken = "";
-var myRole  = "";
-
+/* ── Name Modal ── */
 function showNameModal() {
   document.getElementById("nameModal").classList.add("show");
   setTimeout(function(){ document.getElementById("nameInput").focus(); }, 100);
 }
-
-async function submitLogin() {
-  var username = document.getElementById("nameInput").value.replace(/[^a-zA-Z0-9]/g,"").trim();
-  var password = document.getElementById("passwordInput").value;
-  var errEl    = document.getElementById("loginError");
-  if (!username || !password) { errEl.textContent="Username & password wajib diisi"; errEl.style.display="block"; return; }
-  try {
-    var res = await fetch("/auth/login", {
-      method: "POST", headers: {"Content-Type":"application/json"},
-      body: JSON.stringify({username: username, password: password})
-    });
-    var data = await res.json();
-    if (!res.ok) { errEl.textContent = data.error || "Login gagal"; errEl.style.display="block"; return; }
-    myToken = data.token;
-    myName  = data.username;
-    myRole  = data.role;
-    wsSend({ type: "auth", token: myToken });
-    document.getElementById("nameModal").classList.remove("show");
-    if (myRole === "admin") document.getElementById("adminBtn").style.display = "flex";
-  } catch(e) {
-    errEl.textContent = "Gagal konek server"; errEl.style.display = "block";
-  }
-}
-
-/* ── Leaderboard ── */
-function toggleLb() {
-  var p = document.getElementById("lbPanel");
-  if (p.style.display === "flex") { p.style.display = "none"; return; }
-  p.style.display = "flex";
-  wsSend({ type: "get_leaderboard" });
-}
-
-function fmtSeconds(sec) {
-  var h = Math.floor(sec/3600), m = Math.floor((sec%3600)/60), s = sec%60;
-  if (h > 0) return h+"j "+m+"m "+s+"d";
-  if (m > 0) return m+"m "+s+"d";
-  return s+"d";
-}
-
-function renderLeaderboard(data) {
-  var list = document.getElementById("lbList");
-  list.innerHTML = "";
-  if (!data.length) { list.innerHTML = '<div style="color:#555;font-size:11px;text-align:center;">Belum ada data</div>'; return; }
-  var medals = ["🥇","🥈","🥉"];
-  data.forEach(function(row, i) {
-    var div = document.createElement("div");
-    div.className = "lb-row";
-    div.innerHTML =
-      '<span class="lb-rank">' + (medals[i] || (i+1)) + '</span>' +
-      '<span class="lb-name">' + row.username + '</span>' +
-      '<span class="lb-time">' + fmtSeconds(row.total_seconds) + '</span>' +
-      '<span class="lb-visits">(' + row.visit_count + 'x)</span>';
-    list.appendChild(div);
-  });
-}
-
-/* ── Admin Panel ── */
-var ADMIN_SECRET = "";
-
-function toggleAdmin() {
-  if (!ADMIN_SECRET) {
-    ADMIN_SECRET = prompt("Masukkan BAN_SECRET:") || "";
-    if (!ADMIN_SECRET) return;
-  }
-  var p = document.getElementById("adminPanel");
-  p.style.display = p.style.display === "flex" ? "none" : "flex";
-}
-
-async function adminCreateUser() {
-  var username = document.getElementById("apUsername").value.trim();
-  var password = document.getElementById("apPassword").value.trim();
-  var role     = document.getElementById("apRole").value;
-  if (!username || !password) return alert("Username & password wajib!");
-  var res = await fetch("/admin/create-user", {
-    method: "POST", headers: {"Content-Type":"application/json"},
-    body: JSON.stringify({username: username, password: password, role: role, secret: ADMIN_SECRET})
-  });
-  var data = await res.json();
-  alert(res.ok ? "✅ User " + data.created + " dibuat" : "❌ " + data.error);
-}
-
-async function adminDeleteUser() {
-  var username = document.getElementById("apDeleteName").value.trim();
-  if (!username) return alert("Masukkan username!");
-  if (!confirm("Hapus user " + username + "?")) return;
-  var res = await fetch("/admin/delete-user", {
-    method: "POST", headers: {"Content-Type":"application/json"},
-    body: JSON.stringify({username: username, secret: ADMIN_SECRET})
-  });
-  var data = await res.json();
-  alert(res.ok ? "✅ Dihapus" : "❌ " + data.error);
-}
-
-function adminKickUser() {
-  var name = document.getElementById("apDeleteName").value.trim();
-  if (!name) return alert("Masukkan username!");
-  wsSend({ type: "kick_user", name: name });
-  showNotif("⚡ Kick " + name + " dikirim");
-}
-
-async function adminBanUser() {
-  var name = document.getElementById("apBanName").value.trim();
-  if (!name) return alert("Masukkan username!");
-  var res = await fetch("/ban?name=" + encodeURIComponent(name) + "&secret=" + encodeURIComponent(ADMIN_SECRET));
-  var data = await res.json();
-  alert(res.ok ? "🚫 " + data.banned + " dibanned" : "❌ " + data.error);
-}
-
-async function adminUnbanUser() {
-  var name = document.getElementById("apBanName").value.trim();
-  if (!name) return alert("Masukkan username!");
-  var res = await fetch("/unban?name=" + encodeURIComponent(name) + "&secret=" + encodeURIComponent(ADMIN_SECRET));
-  var data = await res.json();
-  alert(res.ok ? "✅ " + data.unbanned + " di-unban" : "❌ " + data.error);
+function submitName() {
+  var val = document.getElementById("nameInput").value.trim();
+  val = val.replace(/[^a-zA-Z0-9]/g, "");
+  if (!val) return;
+  myName = val;
+  wsSend({ type: "set_name", name: myName });
+  document.getElementById("nameModal").classList.remove("show");
 }
 
 /* ── Reactions ── */
@@ -1144,8 +978,8 @@ function addChat() {
 document.addEventListener("DOMContentLoaded",function(){
   document.getElementById("chatInput").addEventListener("keydown",function(e){ if(e.key==="Enter") addChat(); });
   document.getElementById("ytInput").addEventListener("keydown",function(e){ if(e.key==="Enter") searchYT(); });
-  document.getElementById("nameInput").addEventListener("keydown",function(e){ if(e.key==="Enter") submitLogin(); });
-  document.getElementById("passwordInput").addEventListener("keydown",function(e){ if(e.key==="Enter") submitLogin(); });
+  document.getElementById("nameInput").addEventListener("keydown",function(e){ if(e.key==="Enter") submitName(); });
+
   document.getElementById("bubbleInput").addEventListener("keydown",function(e){ if(e.key==="Enter") sendBubble(); });
   document.getElementById("bubbleInput").addEventListener("input",function(){
     var w=this.value.trim().split(/\s+/).filter(Boolean).length;
@@ -1233,6 +1067,37 @@ function sendGifBubble(url) {
   wsSend({ type: "bubble", text: url });
   spawnBubble(url, myName, myColor);
   toggleGif();
+}
+function toggleIframe() {
+  var m = document.getElementById("iframeModal");
+  m.style.display = m.style.display === "flex" ? "none" : "flex";
+  if (m.style.display === "flex") {
+    setTimeout(function(){ document.getElementById("iframeTitle").focus(); }, 100);
+  }
+}
+
+function submitIframe() {
+  var title = document.getElementById("iframeTitle").value.trim();
+  var thumb = document.getElementById("iframeThumb").value.trim();
+  var url   = document.getElementById("iframeUrl").value.trim();
+
+  if (!title) { alert("Judul harus diisi!"); return; }
+  if (!url || !url.startsWith("http")) { alert("URL tidak valid!"); return; }
+
+  document.getElementById("ytStatus").style.display = "none";
+  document.getElementById("ytResults").style.display = "none";
+  document.getElementById("ytPlayerWrap").style.display = "flex";
+  document.getElementById("reactionBar").style.display = "flex";
+  document.getElementById("bubbleRow").style.display = "flex";
+  document.getElementById("nowPlaying").style.display = "flex";
+  document.getElementById("nowPlayingTitle").textContent = title;
+  document.getElementById("nowPlayingThumb").src = (thumb && thumb.startsWith("http")) ? thumb : "";
+  document.getElementById("ytFrame").src = url;
+
+  wsSend({ type: "iframe_url", url: url, title: title, thumb: thumb });
+
+  toggleIframe();
+  document.getElementById("ytWindow").style.display = "flex";
 }
 </script>
 </body></html>
