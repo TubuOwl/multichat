@@ -4,7 +4,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <link rel="icon" type="image/png" href="https://i.imgur.com/3WnhDqR.png">
-<title>Chatango Multi Room — Shoujo Chat</title>
+<title>Chatango ✗ Shoujo Chat</title>
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -338,10 +338,10 @@ body {
 <!-- NAME MODAL -->
 <div id="nameModal">
   <div id="nameBox">
-    <h3>👤 Siapa namamu?</h3>
-    <p>Biar teman-teman tahu kamu online</p>
-    <input type="text" id="nameInput" placeholder="Nama kamu... " maxlength="20" pattern="[a-zA-Z0-9]*">
-    <button id="nameSubmitBtn" onclick="submitName()">Masuk →</button>
+    <h3>👤 What's your name?</h3>
+    <p>So your friends know you're online</p>
+    <input type="text" id="nameInput" placeholder="Your name..." maxlength="20" pattern="[a-zA-Z0-9]*">
+    <button id="nameSubmitBtn" onclick="submitName()">Enter →</button>
   </div>
 </div>
 
@@ -351,7 +351,7 @@ body {
 <!-- GIF PANEL -->
 <div id="gifPanel" style="display:none;position:fixed;bottom:60px;left:14px;width:300px;background:rgba(15,15,25,0.96);border:1px solid rgba(255,255,255,0.15);border-radius:12px;padding:10px;z-index:1200;box-shadow:0 6px 24px rgba(0,0,0,0.5);">
   <div style="display:flex;gap:6px;margin-bottom:8px;">
-    <input id="gifInput" type="text" placeholder="Cari GIF/sticker..." style="flex:1;padding:6px 10px;border-radius:8px;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.1);color:#fff;font-size:12px;outline:none;">
+    <input id="gifInput" type="text" placeholder="Search GIF/sticker..." style="flex:1;padding:6px 10px;border-radius:8px;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.1);color:#fff;font-size:12px;outline:none;">
     <button onclick="searchGif(0)" style="padding:6px 10px;border-radius:8px;border:none;background:#ff6b9d;color:#fff;font-size:12px;cursor:pointer;">Cari</button>
     <button onclick="toggleGif()" style="padding:6px 8px;border-radius:8px;border:none;background:rgba(255,255,255,0.1);color:#fff;font-size:12px;cursor:pointer;">×</button>
   </div>
@@ -403,21 +403,19 @@ body {
     </div>
     <button id="ytCloseBtn" onclick="hideYT()">×</button>
   </div>
-
   <div id="nowPlaying">
     <div id="nowPlayingDot"></div>
     <img id="nowPlayingThumb" src="" alt="">
-    <div id="nowPlayingTitle">Memuat...</div>
+    <div id="nowPlayingTitle">Loading...</div>
   </div>
-
   <div id="ytSearchRow">
-    <input type="text" id="ytInput" placeholder="Cari video YouTube...">
-    <button id="ytSearchBtn" onclick="searchYT()">Cari</button>
+    <input type="text" id="ytInput" placeholder="Search YouTube videos...">
+    <button id="ytSearchBtn" onclick="searchYT()">Search</button>
   </div>
-  <div id="ytStatus" style="display:block;">Cari video untuk diputar bersama.</div>
+  <div id="ytStatus" style="display:block;">Search for a video to watch together.</div>
   <div id="ytResults" style="display:none;"></div>
   <div id="ytPlayerWrap" style="display:none;">
-    <button id="ytBackBtn" onclick="showResults()">← Kembali ke hasil</button>
+    <button id="ytBackBtn" onclick="showResults()">← Back to results</button>
     <iframe id="ytFrame" allowfullscreen allow="autoplay; encrypted-media"></iframe>
     <!-- Reaction + Voice Note Bar -->
     <div id="reactionBar">
@@ -430,18 +428,18 @@ body {
       <button id="voiceBtn"
         onmousedown="startRecord()" onmouseup="stopRecord()"
         ontouchstart="startRecord(event)" ontouchend="stopRecord(event)">
-        🎤 Tahan
+        🎤 Hold
       </button>
     </div>
     <!-- Bubble Chat Row -->
     <div id="bubbleRow">
-      <input type="text" id="bubbleInput" placeholder="Tulis pesan... (maks 10 kata)" maxlength="80">
+      <input type="text" id="bubbleInput" placeholder="Type a message... (max 10 words)" maxlength="80">
       <span id="bubbleWordCount">0/10</span>
       <button id="bubbleSendBtn" onclick="sendBubble()">💬</button>
     </div>
   </div>
 </div>
-
+  
 <!-- CHAT AREA -->
 <div id="chatArea"></div>
 
@@ -695,7 +693,6 @@ function spawnBubble(text, name, color) {
   overlay.appendChild(el);
   setTimeout(function(){ el.remove(); }, 10200);
 }
-
 /* ── Voice Note ── */
 var mediaRecorder = null;
 var audioChunks = [];
@@ -714,10 +711,10 @@ async function startRecord(e) {
     mediaRecorder.onstop = async function() {
       var duration = Date.now() - recordStart;
       var blob = new Blob(audioChunks, { type: "audio/webm" });
-      // Kirim metadata (termasuk duration) dulu, lalu binary
+      // Send metadata (including duration) first, then binary
       wsSend({ type: "voice_note_incoming", name: myName, color: myColor, duration: duration });
       if (ws && ws.readyState === WebSocket.OPEN) ws.send(blob);
-      // Tampilkan di diri sendiri
+      // Display on own side
       spawnVoiceBubble(blob, myName, myColor, true, duration);
       stream.getTracks().forEach(function(t){ t.stop(); });
     };
@@ -725,10 +722,10 @@ async function startRecord(e) {
     recordStart = Date.now();
     isRecording = true;
     var btn = document.getElementById("voiceBtn");
-    btn.textContent = "⏺ Rekam";
+    btn.textContent = "⏺ Recording";
     btn.classList.add("recording");
   } catch(err) {
-    alert("Izin mikrofon ditolak.");
+    alert("Microphone permission denied.");
   }
 }
 function stopRecord(e) {
@@ -737,7 +734,7 @@ function stopRecord(e) {
   mediaRecorder.stop();
   isRecording = false;
   var btn = document.getElementById("voiceBtn");
-  btn.textContent = "🎤 Tahan";
+  btn.textContent = "🎤 Hold";
   btn.classList.remove("recording");
 }
 function spawnVoiceBubble(blobOrUrl, name, color, isSelf, duration) {
@@ -750,12 +747,12 @@ function spawnVoiceBubble(blobOrUrl, name, color, isSelf, duration) {
   var vnId = "vn-" + Date.now();
   el.innerHTML =
     '<div class="voice-bubble">' +
-      '<span class="vn-name" style="color:' + color + '">' + (isSelf ? (name || "Kamu") : name) + ' 🎤</span>' +
+      '<span class="vn-name" style="color:' + color + '">' + (isSelf ? (name || "You") : name) + ' 🎤</span>' +
       '<audio id="' + vnId + '" controls autoplay src="' + url + '"></audio>' +
     '</div>';
   el.style.pointerEvents = "auto";
 
-  // Tombol close
+  // Close button
   var closeVn = document.createElement("button");
   closeVn.textContent = "×";
   closeVn.style.cssText = "position:absolute;top:-6px;right:-6px;width:16px;height:16px;border-radius:50%;border:none;background:#ff4444;color:#fff;font-size:10px;cursor:pointer;line-height:1;display:flex;align-items:center;justify-content:center;";
@@ -764,7 +761,7 @@ function spawnVoiceBubble(blobOrUrl, name, color, isSelf, duration) {
   el.appendChild(closeVn);
   overlay.appendChild(el);
 
-  // Auto-hilang setelah 2x durasi rekaman (min 4 detik)
+  // Auto-hide after 2x recording duration (min 4 seconds)
   var hideAfter = duration ? duration * 2 : 8000;
   hideAfter = Math.max(hideAfter, 4000);
   setTimeout(function(){ el.remove(); }, hideAfter);
@@ -813,17 +810,17 @@ function hideYT() { document.getElementById("ytWindow").style.display = "none"; 
 
 async function searchYT() {
   var q = document.getElementById("ytInput").value.trim();
-  if (!q) return alert("Masukkan kata kunci pencarian.");
+  if (!q) return alert("Enter a search keyword.");
   var status = document.getElementById("ytStatus");
   var results = document.getElementById("ytResults");
   var player = document.getElementById("ytPlayerWrap");
-  status.textContent = "Mencari..."; results.innerHTML = "";
+  status.textContent = "Searching..."; results.innerHTML = "";
   results.style.display = "none"; player.style.display = "none"; status.style.display = "block";
   try {
     var res = await fetch("https://youtube-alpha-ruddy.vercel.app/youtube/search?video=" + encodeURIComponent(q));
     var data = await res.json();
     var items = data?.result || data?.results || data?.data || [];
-    if (!Array.isArray(items) || !items.length) { status.textContent = "Tidak ada hasil."; return; }
+    if (!Array.isArray(items) || !items.length) { status.textContent = "No results found."; return; }
     lastResults = items; status.style.display = "none"; results.style.display = "flex";
     items.slice(0,10).forEach(function(item) {
       var videoId = item.videoId || item.id || item.video_id || "";
@@ -832,12 +829,12 @@ async function searchYT() {
       var div = document.createElement("div");
       div.className = "yt-item";
       div.innerHTML = '<img src="'+thumb+'" onerror="this.src=\'https://i.ytimg.com/vi/'+videoId+'/mqdefault.jpg\'">'+
-        '<div class="yt-item-info"><div class="yt-item-title">'+(item.title||"Tanpa judul")+'</div>'+
+        '<div class="yt-item-info"><div class="yt-item-title">'+(item.title||"Untitled")+'</div>'+
         '<div class="yt-item-meta">'+(item.authorName||item.channel||"")+' · '+(item.duration||item.durationH||"")+'</div></div>';
       div.onclick = function(){ selectVideo(videoId, item.title||"", thumb); };
       results.appendChild(div);
     });
-  } catch(err) { status.textContent = "Gagal memuat hasil. Coba lagi."; status.style.display = "block"; }
+  } catch(err) { status.textContent = "Failed to load results. Try again."; status.style.display = "block"; }
 }
 function selectVideo(videoId, title, thumbnail) {
   wsSend({ type: "load", videoId: videoId, title: title, thumbnail: thumbnail });
@@ -852,7 +849,7 @@ function showResults() {
   document.getElementById("ytResults").style.display = "flex";
 }
 
-/* ── Notif ── */
+/* ── Notification ── */
 function showNotif(text) {
   var n = document.createElement("div");
   n.style.cssText = "position:fixed;top:60px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.75);color:#fff;padding:8px 16px;border-radius:20px;font-size:12px;z-index:9999;pointer-events:none;backdrop-filter:blur(6px);transition:opacity 0.5s;";
@@ -968,9 +965,9 @@ window.onload=function(){ initChats(); connectWS(); setTimeout(showNameModal,800
 function addChat() {
   var input=document.getElementById("chatInput");
   var name=input.value.trim().replace(/[^a-zA-Z0-9-]/g,"");
-  if(!name) return alert("Masukkan nama room.");
+  if(!name) return alert("Enter a room name.");
   var exists=Array.from(document.querySelectorAll(".chat-box")).some(function(b){ return b.dataset.room===name.toLowerCase(); });
-  if(exists) return alert("Chatroom sudah ada.");
+  if(exists) return alert("Chatroom already exists.");
   document.getElementById("chatArea").appendChild(createChatElement(name));
   input.value="";
 }
@@ -1036,13 +1033,13 @@ async function searchGif(page) {
   gifQuery = q;
   gifPage = page || 0;
   var results = document.getElementById("gifResults");
-  results.innerHTML = '<div style="color:#666;font-size:11px;text-align:center;padding:20px;grid-column:span 2;">Mencari...</div>';
+  results.innerHTML = '<div style="color:#666;font-size:11px;text-align:center;padding:20px;grid-column:span 2;">Searching...</div>';
   try {
     var res = await fetch("/tenor?q=" + encodeURIComponent(q) + "&page=" + gifPage);
     var data = await res.json();
     results.innerHTML = "";
     if (!data.results || !data.results.length) {
-      results.innerHTML = '<div style="color:#666;font-size:11px;text-align:center;padding:20px;grid-column:span 2;">Tidak ada hasil.</div>';
+      results.innerHTML = '<div style="color:#666;font-size:11px;text-align:center;padding:20px;grid-column:span 2;">No results found.</div>';
       return;
     }
     data.results.forEach(function(url) {
@@ -1057,9 +1054,9 @@ async function searchGif(page) {
     nav.style.display = "flex";
     document.getElementById("gifPrev").style.display = data.has_prev ? "block" : "none";
     document.getElementById("gifNext").style.display = data.has_next ? "block" : "none";
-    document.getElementById("gifPageInfo").textContent = "Hal. " + (gifPage + 1);
+    document.getElementById("gifPageInfo").textContent = "Page " + (gifPage + 1);
   } catch(e) {
-    results.innerHTML = '<div style="color:#f87171;font-size:11px;text-align:center;padding:20px;grid-column:span 2;">Gagal memuat.</div>';
+    results.innerHTML = '<div style="color:#f87171;font-size:11px;text-align:center;padding:20px;grid-column:span 2;">Failed to load.</div>';
   }
 }
 
@@ -1068,6 +1065,7 @@ function sendGifBubble(url) {
   spawnBubble(url, myName, myColor);
   toggleGif();
 }
+
 function toggleIframe() {
   var m = document.getElementById("iframeModal");
   m.style.display = m.style.display === "flex" ? "none" : "flex";
@@ -1081,8 +1079,8 @@ function submitIframe() {
   var thumb = document.getElementById("iframeThumb").value.trim();
   var url   = document.getElementById("iframeUrl").value.trim();
 
-  if (!title) { alert("Judul harus diisi!"); return; }
-  if (!url || !url.startsWith("http")) { alert("URL tidak valid!"); return; }
+  if (!title) { alert("Title is required!"); return; }
+  if (!url || !url.startsWith("http")) { alert("Invalid URL!"); return; }
 
   document.getElementById("ytStatus").style.display = "none";
   document.getElementById("ytResults").style.display = "none";
