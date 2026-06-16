@@ -11,9 +11,14 @@ app = FastAPI()
 # ── Groq / Macha ─────────────────────────────────────────────────────
 GROQ_API_KEY = os.environ.get("GROQ_API_KEY", "")
 GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions"
+MACHA_SYSTEM = "Nama kamu adalah Macha. Balas kurang dari 30 kata, kepribadian tsundere, pakai bahasa Indonesia gaul dan kasual. Jangan tanya 'ada yang bisa dibantu' atau sejenisnya, langsung jawab aja dengan gaya tsundere. Enggak perlu sopan."
+GROQ_HEADERS = {"Content-Type": "application/json", "Authorization": f"Bearer {GROQ_API_KEY}"}
 
-def get_macha_response(prompt: str):
-    if not GROQ_API_KEY:
+@app.post("/chat/macha")
+async def chat_macha(request: Request):
+    body = await request.json()
+    prompt = body.get("message", "").strip()
+    if not prompt:
         return JSONResponse({"text": "..."})
     payload = {
         "model": "llama-3.3-70b-versatile",
@@ -68,7 +73,6 @@ iframe_state = {
 
 # ── Clients ───────────────────────────────────────────────────────────
 clients: dict[WebSocket, dict] = {}
-
 COLORS = ["#ff6b9d","#c084fc","#60a5fa","#34d399","#fbbf24","#f87171","#a78bfa","#38bdf8"]
 
 # ── Anti-spam ─────────────────────────────────────────────────────────
@@ -77,6 +81,7 @@ RATE_LIMITS = {
     "reaction": {"limit": 2,  "window": 5},   # max 2 reaction per 5 detik
     "bubble":   {"limit": 2,  "window": 6},   # max 2 bubble per 6 detik
     "voice":    {"limit": 1,  "window": 15},  # max 1 voice note per 15 detik
+
 }
 spam_times:   dict[WebSocket, dict] = defaultdict(lambda: defaultdict(list))
 spam_strikes: dict[WebSocket, int]  = defaultdict(int)
@@ -94,6 +99,8 @@ def check_rate_limit(ws: WebSocket, msg_type: str) -> bool:
     if len(spam_times[ws][msg_type]) >= cfg["limit"]:
         spam_strikes[ws] += 1
         return True
+    spam_times[ws][msg_type].append(now)
+    return False
 
 def sanitize_emoji(raw: str) -> str:
     import unicodedata
@@ -161,12 +168,11 @@ async def remove_client(ws: WebSocket):
     await broadcast_viewers()
 
 async def kick_spammer(ws: WebSocket, reason: str = "Spam terdeteksi!"):
-    name = clients.get(ws, {}).get("name", "?")
+    name = clients.get(ws, {}).get("name", "anon")
     try:
-        await ws.send_text(json.dumps({"type": "kicked", "reason": reason}))
+        await ws.send_text(json.dumps({"type": "banned", "msg": reason}))
         await ws.close()
-    except:
-        pass
+    except: pass
     await remove_client(ws)
     await broadcast({"type": "notif", "msg": f"⚠️ {name} dikick: {reason}"})
 
@@ -206,20 +212,20 @@ async def websocket_endpoint(ws: WebSocket):
     }
 
     await ws.send_text(json.dumps({
-        "type": "init",
-        "color": color,
-        "yt": yt_state,
+        "type": "sync", **yt_state,
+        "your_color": color,
+        "viewers": get_viewer_list(),
         "count": len(clients)
     }))
 
-    if iframe_state.get("active"):
+    if iframe_state.get("active"):        
         await ws.send_text(json.dumps({
             "type": "iframe_url",
             "url": iframe_state["url"],
             "title": iframe_state["title"],
             "thumb": iframe_state["thumb"]
         }))
-
+        
     await broadcast_viewers()
 
     async def ping_loop():
@@ -235,7 +241,8 @@ async def websocket_endpoint(ws: WebSocket):
     asyncio.create_task(ping_loop())
 
     try:
-        async for msg_data in ws.iter_json():
+        while True:
+            msg_data = await ws.receive()
 
             # ── Binary: voice note ────────────────────────────────────
             if "bytes" in msg_data:
@@ -264,6 +271,12 @@ async def websocket_endpoint(ws: WebSocket):
             msg = json.loads(msg_data["text"])
             t = msg.get("type")
 
+            # Cek banned
+            name = clients[ws].get("name", "")
+            if name and name.lower() in banned_names:
+                await kick_spammer(ws, "Kamu dibanned.")
+                break
+
             if t == "pong":
                 pass
 
@@ -275,7 +288,7 @@ async def websocket_endpoint(ws: WebSocket):
                 clients[ws]["name"] = new_name
                 await broadcast_viewers()
 
-            elif t == "vn_duration":
+            elif t == "voice_note_incoming":
                 clients[ws]["last_vn_duration"] = msg.get("duration", 0)
 
             elif t == "bubble":
@@ -330,19 +343,20 @@ async def websocket_endpoint(ws: WebSocket):
                 await broadcast({"type": "seek", "current_time": yt_state["current_time"]}, exclude=ws)
 
             elif t == "load":
+
                 if check_rate_limit(ws, "load"):
                     if spam_strikes[ws] >= 3:
                         await kick_spammer(ws, "Spam load video!")
                         break
                     continue
-
+            
                 if not clients[ws].get("name"):
                     continue
-
+            
                 video_id = re.sub(r'[^a-zA-Z0-9_-]', '', msg.get("videoId", ""))[:11]
                 if len(video_id) < 5:
                     continue
-
+            
                 try:
                     oembed = http_requests.get(
                         f"https://www.youtube.com/oembed?url=https://youtu.be/{video_id}",
@@ -353,7 +367,7 @@ async def websocket_endpoint(ws: WebSocket):
                     data = oembed.json()
                 except:
                     continue
-
+            
                 yt_state.update(
                     videoId=video_id,
                     title=data["title"],
@@ -377,10 +391,10 @@ async def websocket_endpoint(ws: WebSocket):
                     thumb = "https://i.imgur.com/21CjTu1.gif"
                 if not url.startswith("http") or not title:
                     continue
-
+                    
                 iframe_state.update(url=url, title=title, thumb=thumb, active=True)
                 yt_state.update(videoId="", is_playing=False)
-
+                
                 await broadcast({
                     "type": "iframe_url",
                     "url": url,
