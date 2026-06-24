@@ -386,7 +386,7 @@ body {
 <!-- TOOLBAR -->
 <div id="toolbar">
   <button class="tool-icon-btn" onclick="toggleYT()" title="YouTube Sync">▶️</button>
-  <button class="tool-icon-btn" onclick="toggleGif()" title="GIF Search">🎬</button>
+  <!-- <button class="tool-icon-btn" onclick="toggleGif()" title="GIF Search">🎬</button> -->
   <button class="tool-icon-btn" onclick="toggleIframe()" title="Custom URL">🌐</button>
 
   <input type="text" id="chatInput" placeholder="Enter/click a Chatango name (e.g.: room)">
@@ -425,6 +425,7 @@ body {
       <button class="react-btn" onclick="sendReaction('😮')">😮</button>
       <button class="react-btn" onclick="sendReaction('👏')">👏</button>
       <button class="react-btn" onclick="sendReaction('💀')">💀</button>
+      <button class="react-btn" onclick="toggleGif()" title="GIF Search">🎬</button>
       <button id="voiceBtn"
         onmousedown="startRecord()" onmouseup="stopRecord()"
         ontouchstart="startRecord(event)" ontouchend="stopRecord(event)">
