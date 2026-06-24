@@ -4,3 +4,5 @@ websockets
 requests
 python-dotenv
 httpx
+psycopg[binary]
+psycopg
