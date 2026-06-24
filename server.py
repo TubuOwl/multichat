@@ -5,7 +5,9 @@ import json, os, time, asyncio, re
 
 import requests as http_requests
 from collections import defaultdict
+import psycopg
 
+conn = psycopg.connect(os.environ["DATABASE_URL"])
 app = FastAPI()
 
 # ── Groq / Macha ─────────────────────────────────────────────────────
@@ -40,6 +42,25 @@ async def chat_macha(request: Request):
 async def favicon():
     return FileResponse("static/favicon.ico")
 
+@app.get("/stats")
+async def stats():
+    with conn.cursor() as cur:
+        cur.execute("""
+            SELECT
+                total_joins,
+                total_messages,
+                total_songs
+            FROM room_stats
+            WHERE id = 1
+        """)
+
+        joins, messages, songs = cur.fetchone()
+
+    return {
+        "joins": joins,
+        "messages": messages,
+        "songs": songs
+    }
 # ── Tenor GIF scraper ─────────────────────────────────────────────────
 @app.get("/tenor")
 async def tenor_search(q: str, page: int = 0):
@@ -210,6 +231,13 @@ async def websocket_endpoint(ws: WebSocket):
         "joined_at": int(time.time() * 1000),
         "last_vn_duration": 0
     }
+    with conn.cursor() as cur:
+        cur.execute("""
+            UPDATE room_stats
+            SET total_joins = total_joins + 1
+            WHERE id = 1
+        """)
+        conn.commit()
 
     await ws.send_text(json.dumps({
         "type": "sync", **yt_state,
@@ -303,6 +331,13 @@ async def websocket_endpoint(ws: WebSocket):
                 text = sanitize_text(msg.get("text", ""), max_words=10, max_chars=200)
                 if not text:
                     continue
+                with conn.cursor() as cur:
+                    cur.execute("""
+                        UPDATE room_stats
+                        SET total_messages = total_messages + 1
+                        WHERE id = 1
+                    """)
+                    conn.commit()
                 await broadcast({
                     "type": "bubble", "text": text,
                     "name": clients[ws].get("name", ""),
@@ -406,6 +441,13 @@ async def websocket_endpoint(ws: WebSocket):
                     current_time=0
                 )
                 iframe_state.update(url="", title="", thumb="", active=False)
+                with conn.cursor() as cur:
+                    cur.execute("""
+                        UPDATE room_stats
+                        SET total_songs = total_songs + 1
+                        WHERE id = 1
+                    """)
+                    conn.commit()
                 await broadcast({
                     "type": "load", **yt_state,
                     "by": clients[ws].get("name", "")
