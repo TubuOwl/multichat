@@ -308,7 +308,37 @@ async def websocket_endpoint(ws: WebSocket):
                     "name": clients[ws].get("name", ""),
                     "color": clients[ws].get("color", "#fff")
                 }, exclude=ws)
+                if "@macha" in text.lower():
+                    prompt = text.lower().replace("@macha", "").strip()
 
+                    try:
+                        payload = {
+                           "model": "llama-3.3-70b-versatile",
+                           "messages": [
+                               {"role": "system", "content": MACHA_SYSTEM},
+                               {"role": "user", "content": prompt}
+                           ]
+                        }
+ 
+                        res = http_requests.post(
+                            GROQ_API_URL,
+                            json=payload,
+                            headers=GROQ_HEADERS,
+                            timeout=15
+                        )
+
+                        answer = res.json()["choices"][0]["message"]["content"].strip()
+
+                        await broadcast({
+                          "type": "bubble",
+                          "text": answer,
+                          "name": "Macha",
+                          "color": "#ff69b4"
+                        })
+
+                    except Exception:
+                        pass
+    
             elif t == "reaction":
                 if not clients[ws].get("name"):
                     continue
