@@ -8,6 +8,24 @@ from collections import defaultdict
 import psycopg
 
 conn = psycopg.connect(os.environ["DATABASE_URL"])
+with conn.cursor() as cur:
+    cur.execute("""
+        CREATE TABLE IF NOT EXISTS room_stats (
+            id INTEGER PRIMARY KEY,
+            total_joins BIGINT DEFAULT 0,
+            total_messages BIGINT DEFAULT 0,
+            total_songs BIGINT DEFAULT 0
+        )
+    """)
+
+    cur.execute("""
+        INSERT INTO room_stats (id)
+        VALUES (1)
+        ON CONFLICT (id) DO NOTHING
+    """)
+
+    conn.commit()
+    
 app = FastAPI()
 
 # ── Groq / Macha ─────────────────────────────────────────────────────
@@ -492,28 +510,6 @@ async def root():
     return FileResponse("static/index.html")
 
 if __name__ == "__main__":
-    import psycopg
     import uvicorn
-
-    conn = psycopg.connect(os.environ["DATABASE_URL"])
-
-    with conn.cursor() as cur:
-        cur.execute("""
-            CREATE TABLE IF NOT EXISTS room_stats (
-                id INTEGER PRIMARY KEY,
-                total_joins BIGINT DEFAULT 0,
-                total_messages BIGINT DEFAULT 0,
-                total_songs BIGINT DEFAULT 0
-            )
-        """)
-
-        cur.execute("""
-            INSERT INTO room_stats (id)
-            VALUES (1)
-            ON CONFLICT (id) DO NOTHING
-        """)
-
-        conn.commit()
-
     port = int(os.environ.get("PORT", 8000))
     uvicorn.run("server:app", host="0.0.0.0", port=port)
