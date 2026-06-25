@@ -393,6 +393,7 @@ body {
 <div id="toolbar">
   <button class="tool-icon-btn" onclick="toggleYT()" title="YouTube Sync">▶️</button>
   <!-- <button class="tool-icon-btn" onclick="toggleGif()" title="GIF Search">🎬</button> -->
+  <button class="tool-icon-btn" onclick="showStats()" title="Statistik">📊</button>
   <button class="tool-icon-btn" onclick="toggleIframe()" title="Custom URL">🌐</button>
 
   <input type="text" id="chatInput" placeholder="Enter/click a Chatango name (e.g.: room)">
@@ -1072,6 +1073,22 @@ function sendGifBubble(url) {
   wsSend({ type: "bubble", text: url });
   spawnBubble(url, myName, myColor);
   toggleGif();
+}
+
+function showStats() {
+    fetch("/stats")
+        .then(response => response.json())
+        .then(data => {
+            alert(
+                "📊 Room Statistics\n\n" +
+                "👥 Total Joins: " + data.joins.toLocaleString() + "\n" +
+                "💬 Messages: " + data.messages.toLocaleString() + "\n" +
+                "🎵 Songs Played: " + data.songs.toLocaleString()
+            );
+        })
+        .catch(() => {
+            alert("Failed to load statistics");
+        });
 }
 
 function toggleIframe() {
