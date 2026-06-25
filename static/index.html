@@ -389,13 +389,15 @@ body {
 <div id="statsModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);backdrop-filter:blur(4px);z-index:2000;align-items:center;justify-content:center;">
   <div style="background:#1a1a2e;border:1px solid rgba(255,255,255,0.2);border-radius:14px;padding:24px 28px;display:flex;flex-direction:column;gap:14px;width:300px;box-shadow:0 8px 32px rgba(0,0,0,0.5);">
 
-    <h3 style="color:#fff;font-size:15px;text-align:center;">📊 Room Statistics</h3>
+    <h3 style="color:#fff;font-size:15px;text-align:center;margin:0;">
+      📊 Room Statistics
+    </h3>
 
     <div id="statsContent" style="display:flex;flex-direction:column;gap:10px;color:#fff;font-size:14px;">
       Loading...
     </div>
 
-    <button onclick="toggleStats()"
+    <button onclick="showStats()"
       style="padding:9px;border-radius:8px;border:none;background:rgba(255,255,255,0.1);color:#fff;font-size:13px;cursor:pointer;">
       Close
     </button>
@@ -1102,17 +1104,29 @@ function showStats() {
   fetch("/stats")
     .then(r => r.json())
     .then(data => {
+
       document.getElementById("statsContent").innerHTML = `
-        <div>👥 Total Joins: <b>${data.joins.toLocaleString()}</b></div>
-        <div>💬 Messages: <b>${data.messages.toLocaleString()}</b></div>
-        <div>🎵 Songs Played: <b>${data.songs.toLocaleString()}</b></div>
+        <div style="display:flex;justify-content:space-between;padding:10px;border-radius:8px;background:rgba(255,255,255,.08);">
+          <span>👥 Total Joins</span>
+          <b>${data.joins.toLocaleString()}</b>
+        </div>
+
+        <div style="display:flex;justify-content:space-between;padding:10px;border-radius:8px;background:rgba(255,255,255,.08);">
+          <span>💬 Messages</span>
+          <b>${data.messages.toLocaleString()}</b>
+        </div>
+
+        <div style="display:flex;justify-content:space-between;padding:10px;border-radius:8px;background:rgba(255,255,255,.08);">
+          <span>🎵 Songs Played</span>
+          <b>${data.songs.toLocaleString()}</b>
+        </div>
       `;
 
       modal.style.display = "flex";
     })
     .catch(() => {
       document.getElementById("statsContent").innerHTML =
-        "<div>Failed to load statistics.</div>";
+        "<div style='color:#ff8080;text-align:center;'>Failed to load statistics.</div>";
 
       modal.style.display = "flex";
     });
