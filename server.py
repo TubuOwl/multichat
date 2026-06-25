@@ -187,32 +187,32 @@ async def broadcast_bytes(data: bytes, exclude: WebSocket = None):
         except:
             dead.append(ws)
     for ws in dead:
-        s.pop(ws, None)
+        clients.pop(ws, None)
 
 async def broadcast_viewers():
-    await broadcast({"type": "viewer_list", "viewers": get_viewer_list(), "count": len(s)})
+    await broadcast({"type": "viewer_list", "viewers": get_viewer_list(), "count": len(clients)})
 
 async def _broadcast_viewers_safe():
-    msg = json.dumps({"type": "viewer_list", "viewers": get_viewer_list(), "count": len(s)})
-    for ws in list(s):
+    msg = json.dumps({"type": "viewer_list", "viewers": get_viewer_list(), "count": len(clients)})
+    for ws in list(clients):
         try:
             await ws.send_text(msg)
         except:
-            s.pop(ws, None)
+            clients.pop(ws, None)
 
-async def remove_(ws: WebSocket):
-    s.pop(ws, None)
+async def remove_client(ws: WebSocket):
+    clients.pop(ws, None)
     spam_times.pop(ws, None)
     spam_strikes.pop(ws, None)
     await broadcast_viewers()
 
 async def kick_spammer(ws: WebSocket, reason: str = "Spam terdeteksi!"):
-    name = s.get(ws, {}).get("name", "anon")
+    name = clients.get(ws, {}).get("name", "anon")
     try:
         await ws.send_text(json.dumps({"type": "banned", "msg": reason}))
         await ws.close()
     except: pass
-    await remove_(ws)
+    await remove_client(ws)
     await broadcast({"type": "notif", "msg": f"⚠️ {name} dikick: {reason}"})
 
 # ── Ban endpoints ─────────────────────────────────────────────────────
@@ -221,7 +221,7 @@ async def ban_user(name: str, secret: str):
     if secret != BAN_SECRET:
         return JSONResponse({"error": "Unauthorized"}, status_code=403)
     banned_names.add(name.lower())
-    to_kick = [ws for ws, v in list(s.items()) if v.get("name","").lower() == name.lower()]
+    to_kick = [ws for ws, v in list(clients.items()) if v.get("name","").lower() == name.lower()]
     for ws in to_kick:
         await kick_spammer(ws, "Kamu dibanned oleh admin.")
     return JSONResponse({"banned": name})
@@ -243,8 +243,8 @@ async def list_banned(secret: str):
 @app.websocket("/ws")
 async def websocket_endpoint(ws: WebSocket):
     await ws.accept()
-    color = COLORS[len(s) % len(COLORS)]
-    s[ws] = {
+    color = COLORS[len(clients) % len(COLORS)]
+    clients[ws] = {
         "name": "", "color": color,
         "joined_at": int(time.time() * 1000),
         "last_vn_duration": 0
@@ -261,7 +261,7 @@ async def websocket_endpoint(ws: WebSocket):
         "type": "sync", **yt_state,
         "your_color": color,
         "viewers": get_viewer_list(),
-        "count": len(s)
+        "count": len(clients)
     }))
 
     if iframe_state.get("active"):        
@@ -275,7 +275,7 @@ async def websocket_endpoint(ws: WebSocket):
     await broadcast_viewers()
 
     async def ping_loop():
-        while ws in s:
+        while ws in clients:
             await asyncio.sleep(10)
             if ws not in clients: break
             try:
@@ -414,52 +414,17 @@ async def websocket_endpoint(ws: WebSocket):
             elif t == "play":
                 yt_state["is_playing"] = True
                 yt_state["current_time"] = msg.get("current_time", 0)
-            
-                await broadcast({
-                    "type": "play",
-                    "current_time": yt_state["current_time"]
-                }, exclude=ws)
-            
-                mins = int(yt_state["current_time"]) // 60
-                secs = int(yt_state["current_time"]) % 60
-            
-                await broadcast({
-                    "type": "activity",
-                    "text": f"▶️ {clients[ws].get('name','Unknown')} resumed at {mins}:{secs:02d}"
-                })
-            
+                await broadcast({"type": "play", "current_time": yt_state["current_time"]}, exclude=ws)
+
             elif t == "pause":
                 yt_state["is_playing"] = False
                 yt_state["current_time"] = msg.get("current_time", 0)
-            
-                await broadcast({
-                    "type": "pause",
-                    "current_time": yt_state["current_time"]
-                }, exclude=ws)
-            
-                mins = int(yt_state["current_time"]) // 60
-                secs = int(yt_state["current_time"]) % 60
-            
-                await broadcast({
-                    "type": "activity",
-                    "text": f"⏸️ {clients[ws].get('name','Unknown')} paused at {mins}:{secs:02d}"
-                })
-            
+                await broadcast({"type": "pause", "current_time": yt_state["current_time"]}, exclude=ws)
+
             elif t == "seek":
                 yt_state["current_time"] = msg.get("current_time", 0)
-            
-                await broadcast({
-                    "type": "seek",
-                    "current_time": yt_state["current_time"]
-                }, exclude=ws)
-            
-                mins = int(yt_state["current_time"]) // 60
-                secs = int(yt_state["current_time"]) % 60
-            
-                await broadcast({
-                    "type": "activity",
-                    "text": f"⏩ {clients[ws].get('name','Unknown')} jumped to {mins}:{secs:02d}"
-                })
+                await broadcast({"type": "seek", "current_time": yt_state["current_time"]}, exclude=ws)
+
             elif t == "load":
 
                 if check_rate_limit(ws, "load"):
