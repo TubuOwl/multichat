@@ -386,6 +386,22 @@ body {
   </div>
 </div>
 
+<div id="statsModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);backdrop-filter:blur(4px);z-index:2000;align-items:center;justify-content:center;">
+  <div style="background:#1a1a2e;border:1px solid rgba(255,255,255,0.2);border-radius:14px;padding:24px 28px;display:flex;flex-direction:column;gap:14px;width:300px;box-shadow:0 8px 32px rgba(0,0,0,0.5);">
+
+    <h3 style="color:#fff;font-size:15px;text-align:center;">📊 Room Statistics</h3>
+
+    <div id="statsContent" style="display:flex;flex-direction:column;gap:10px;color:#fff;font-size:14px;">
+      Loading...
+    </div>
+
+    <button onclick="toggleStats()"
+      style="padding:9px;border-radius:8px;border:none;background:rgba(255,255,255,0.1);color:#fff;font-size:13px;cursor:pointer;">
+      Close
+    </button>
+
+  </div>
+</div>
 <!-- WS STATUS -->
 <div id="wsStatus" class="disconnected">⬤ Disconnected</div>
 
@@ -1076,19 +1092,30 @@ function sendGifBubble(url) {
 }
 
 function showStats() {
-    fetch("/stats")
-        .then(response => response.json())
-        .then(data => {
-            alert(
-                "📊 Room Statistics\n\n" +
-                "👥 Total Joins: " + data.joins.toLocaleString() + "\n" +
-                "💬 Messages: " + data.messages.toLocaleString() + "\n" +
-                "🎵 Songs Played: " + data.songs.toLocaleString()
-            );
-        })
-        .catch(() => {
-            alert("Failed to load statistics");
-        });
+  var modal = document.getElementById("statsModal");
+
+  if (modal.style.display === "flex") {
+    modal.style.display = "none";
+    return;
+  }
+
+  fetch("/stats")
+    .then(r => r.json())
+    .then(data => {
+      document.getElementById("statsContent").innerHTML = `
+        <div>👥 Total Joins: <b>${data.joins.toLocaleString()}</b></div>
+        <div>💬 Messages: <b>${data.messages.toLocaleString()}</b></div>
+        <div>🎵 Songs Played: <b>${data.songs.toLocaleString()}</b></div>
+      `;
+
+      modal.style.display = "flex";
+    })
+    .catch(() => {
+      document.getElementById("statsContent").innerHTML =
+        "<div>Failed to load statistics.</div>";
+
+      modal.style.display = "flex";
+    });
 }
 
 function toggleIframe() {
