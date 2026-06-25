@@ -288,6 +288,21 @@ body {
 }
 #wsStatus.connected { color: #4cff91; }
 #wsStatus.disconnected { color: #ff5555; }
+/* Activity */
+#activityBar{
+  position: fixed;
+  top: 70px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0,0,0,.8);
+  color: #fff;
+  padding: 8px 14px;
+  border-radius: 12px;
+  z-index: 9999;
+  display: none;
+  font-size: 13px;
+  backdrop-filter: blur(6px);
+}
 
 /* ── CHAT AREA ── */
 #chatArea {
@@ -466,6 +481,10 @@ body {
     </div>
   </div>
 </div>
+
+<div id="activityBar">
+  🎵 Activity
+</div>
   
 <!-- CHAT AREA -->
 <div id="chatArea"></div>
@@ -536,6 +555,11 @@ function handleServerMsg(msg) {
 
   if (msg.type === "notif") {
     showNotif(msg.msg);
+    return;
+  }
+
+  if (msg.type === "activity") {
+    showActivity(msg.text);
     return;
   }
 
@@ -1092,7 +1116,21 @@ function sendGifBubble(url) {
   spawnBubble(url, myName, myColor);
   toggleGif();
 }
+  
+function showActivity(text){
 
+    const bar = document.getElementById("activityBar");
+
+    bar.textContent = text;
+    bar.style.display = "block";
+
+    clearTimeout(bar.timer);
+
+    bar.timer = setTimeout(() => {
+        bar.style.display = "none";
+    }, 3000);
+}
+  
 function showStats() {
   var modal = document.getElementById("statsModal");
 
