@@ -43,148 +43,15 @@ body {
   color: white; cursor: pointer; flex-shrink: 0;
 }
 /* ── BG SET ── */
-#bgBtn{
-    position:fixed;
-    left:12px;
-    bottom:46px;   /* sejajar websocket */
-    z-index:1000;
-}
-
-#bgBtn{
-    position: fixed;
-    left: 12px;
-    bottom: 12px;
-
-    display: flex;
-    align-items: center;
-    gap: 6px;
-
-    padding: 4px 10px;
-
-    background: rgba(0,0,0,.55);
-    backdrop-filter: blur(4px);
-
-    border: 1px solid rgba(255,255,255,.15);
-    border-radius: 20px;
-
-    color: #4cff91;
-    font-family: Arial, sans-serif;
-    font-size: 10px;
-
-    cursor: pointer;
-
-    transition: .3s;
-    z-index: 1000;
-}
-
-#bgBtn:hover{
-    color:#fff;
-    background:rgba(0,0,0,.75);
-}
-#bgMenu{
-    position:fixed;
-    left:12px;
-    bottom:50px; /* atau 55px */
-
-    width:260px;
-
-    display:none;
-    flex-direction:column;
-    gap:10px;
-
-    padding:14px;
-
-    background:rgba(20,20,20,.92);
-    backdrop-filter:blur(10px);
-
-    border:1px solid rgba(255,255,255,.15);
-    border-radius:14px;
-
-    z-index:1001;
-}
-#bgMenu h3{
-    color:#fff;
-    margin:0;
-    font-size:14px;
-    padding-right:30px;
-}
-
-#bgMenu input{
-    width:100%;
-    padding:10px;
-
-    border:none;
-    outline:none;
-
-    border-radius:8px;
-
-    background:rgba(255,255,255,.08);
-    color:#fff;
-    box-sizing:border-box;
-}
-
-.bgButtons{
-    display:flex;
-    gap:8px;
-}
-
-.bgButtons button{
-    flex:1;
-
-    padding:9px;
-
-    border:none;
-    border-radius:8px;
-
-    cursor:pointer;
-
-    background:#ff6b9d;
-    color:white;
-    font-weight:bold;
-
-    transition:.2s;
-}
-
-.bgButtons button:hover{
-    opacity:.9;
-}
-
-.bgButtons button:last-child{
-    background:#444;
-}
-
-/* ===== Close Button ===== */
-
-#bgClose{
-    position:absolute;
-    top:8px;
-    right:8px;
-
-    width:26px;
-    height:26px;
-
-    border:none;
-    border-radius:50%;
-
-    background:rgba(255,255,255,.08);
-    color:#fff;
-
-    cursor:pointer;
-
-    font-size:15px;
-    font-weight:bold;
-
-    display:flex;
-    align-items:center;
-    justify-content:center;
-
-    transition:.2s;
-}
-
-#bgClose:hover{
-    background:rgba(255,255,255,.18);
-    transform:rotate(90deg);
-}
+#bgBtn{position:fixed;left:12px;bottom:12px;display:flex;align-items:center;gap:6px;padding:6px 12px;background:rgba(0,0,0,.6);backdrop-filter:blur(4px);border:1px solid rgba(255,255,255,.2);border-radius:20px;color:#4cff91;font-size:11px;cursor:pointer;z-index:1000}
+#bgMenu{position:fixed;left:12px;bottom:55px;width:min(260px,calc(100vw - 24px));display:none;flex-direction:column;gap:10px;padding:14px;background:rgba(20,20,20,.95);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.15);border-radius:14px;z-index:1001;box-sizing:border-box}
+#bgMenu h3{color:#fff;margin:0;font-size:13px}
+#bgUrl{width:100%;padding:9px;border:none;outline:none;border-radius:8px;background:rgba(255,255,255,.1);color:#fff;font-size:12px;box-sizing:border-box}
+.bgButtons{display:flex;gap:8px}
+.bgButtons button{flex:1;padding:9px;border:none;border-radius:8px;cursor:pointer;font-weight:bold;font-size:12px}
+.bgButtons button:first-child{background:#ff6b9d;color:#fff}
+.bgButtons button:last-child{background:#444;color:#fff}
+#bgClose{position:absolute;top:8px;right:8px;width:24px;height:24px;border:none;border-radius:50%;background:rgba(255,255,255,.1);color:#fff;cursor:pointer;font-size:13px}
   
 /* ── YT WINDOW ── */
 #ytWindow {
@@ -547,23 +414,16 @@ body {
 
   </div>
 </div>
-<button id="bgBtn" onclick="toggleBgMenu()" title="Wallpaper">
-    <span>🎨</span>
-    <span>Wallpaper</span>
-</button>
+<button id="bgBtn" onclick="toggleBgMenu()">🎨 Wallpaper</button>
+
 <div id="bgMenu">
-
     <button id="bgClose" onclick="toggleBgMenu()">✕</button>
-
     <h3>🎨 Background</h3>
-
     <input id="bgUrl" type="text" placeholder="https://example.com/image.jpg">
-
     <div class="bgButtons">
         <button onclick="applyBg()">Apply</button>
-        <button onclick="resetBg()">Default</button>
+        <button onclick="resetBg()">Reset</button>
     </div>
-
 </div>
 <!-- WS STATUS -->
 <div id="wsStatus" class="disconnected">⬤ Disconnected</div>
@@ -1255,62 +1115,42 @@ function sendGifBubble(url) {
   toggleGif();
 }
 function toggleBgMenu() {
-
-    const menu = document.getElementById("bgMenu");
-
-    menu.style.display =
-        menu.style.display === "flex"
-        ? "none"
-        : "flex";
+    const m = document.getElementById("bgMenu");
+    m.style.display = m.style.display === "flex" ? "none" : "flex";
 }
 
 function applyBg() {
-
     const url = document.getElementById("bgUrl").value.trim();
-
     if (!url) return;
-
-    document.body.style.backgroundImage = `url("${url}")`;
-    document.body.style.backgroundSize = "cover";
-    document.body.style.backgroundPosition = "center";
-    document.body.style.backgroundRepeat = "no-repeat";
-    document.body.style.backgroundAttachment = "fixed";
-
-    localStorage.setItem("background", url);
-
+    const s = document.body.style;
+    s.backgroundImage = `url("${url}")`;
+    s.backgroundSize = "cover";
+    s.backgroundPosition = "center";
+    s.backgroundRepeat = "no-repeat";
+    s.backgroundAttachment = "fixed";
+    localStorage.setItem("bg", url);
     toggleBgMenu();
 }
 
 function resetBg() {
-
-    document.body.style.backgroundImage = "";
-    document.body.style.backgroundSize = "";
-    document.body.style.backgroundPosition = "";
-    document.body.style.backgroundRepeat = "";
-    document.body.style.backgroundAttachment = "";
-
+    const s = document.body.style;
+    s.backgroundImage = s.backgroundSize = s.backgroundPosition =
+    s.backgroundRepeat = s.backgroundAttachment = "";
     document.getElementById("bgUrl").value = "";
-
-    localStorage.removeItem("background");
-
+    localStorage.removeItem("bg");
     toggleBgMenu();
 }
 
-window.addEventListener("load", function () {
-
-    const bg = localStorage.getItem("background");
-
-    if (bg) {
-
-        document.body.style.backgroundImage = `url("${bg}")`;
-        document.body.style.backgroundSize = "cover";
-        document.body.style.backgroundPosition = "center";
-        document.body.style.backgroundRepeat = "no-repeat";
-        document.body.style.backgroundAttachment = "fixed";
-
-        document.getElementById("bgUrl").value = bg;
-    }
-
+window.addEventListener("load", () => {
+    const bg = localStorage.getItem("bg");
+    if (!bg) return;
+    const s = document.body.style;
+    s.backgroundImage = `url("${bg}")`;
+    s.backgroundSize = "cover";
+    s.backgroundPosition = "center";
+    s.backgroundRepeat = "no-repeat";
+    s.backgroundAttachment = "fixed";
+    document.getElementById("bgUrl").value = bg;
 });
 
 /* Tutup popup jika klik di luar */
