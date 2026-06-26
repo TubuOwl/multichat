@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Welcome Scene</title>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Noto+Sans:wght@400;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:'Noto Sans',sans-serif;}
+
+/* ── scene wrapper ── */
+.scene{
+  position:relative;
+  width:100vw;height:100vh;
+  overflow:hidden;
+  cursor:pointer;
+  user-select:none;
+}
+
+/* background */
+.sc-bg{
+  position:absolute;inset:0;
+  background:url('https://i.ytimg.com/vi/jTO5gy_4MxQ/maxresdefault.jpg') center/cover no-repeat;
+}
+.sc-vignette{
+  position:absolute;inset:0;
+  background:radial-gradient(ellipse at center,transparent 50%,rgba(0,0,0,0.5) 100%);
+  pointer-events:none;
+}
+
+/* ── characters ── */
+.sc-char{
+  position:absolute;
+  bottom:0;
+  height:90%;
+  object-fit:contain;
+  object-position:bottom center;
+  pointer-events:none;
+  transition:left 0.7s cubic-bezier(.4,0,.2,1),
+             transform 0.7s cubic-bezier(.4,0,.2,1),
+             opacity 0.5s ease,
+             filter 0.4s ease;
+}
+
+/* Macha starts center */
+#charMacha{
+  left:50%;
+  transform:translateX(-50%);
+  opacity:0;
+  z-index:2;
+}
+#charMacha.show   { opacity:1; }
+#charMacha.slide-left{
+  left:22%;
+  transform:translateX(-50%);
+}
+#charMacha.darken { filter:brightness(0.55); }
+
+/* Master hidden off-screen right */
+#charMaster{
+  left:120%;
+  transform:translateX(-50%);
+  height:75%;
+  opacity:0;
+  z-index:3;
+  image-rendering:auto;
+  /* stick figure is on white bg — multiply blends it */
+  mix-blend-mode:multiply;
+}
+#charMaster.show   { opacity:1; }
+#charMaster.slide-in{
+  left:74%;
+  transform:translateX(-50%);
+}
+
+/* ── bottom UI ── */
+.sc-gradient{
+  position:absolute;bottom:0;left:0;right:0;height:40%;
+  background:linear-gradient(180deg,rgba(13,27,42,0) 0%,rgba(13,27,42,0.75) 35%,rgba(13,27,42,0.92) 60%,rgba(13,27,42,0.95) 100%);
+  pointer-events:none;
+  z-index:10;
+}
+.sc-line{
+  position:absolute;left:4%;right:4%;bottom:23%;
+  height:1px;background:rgba(255,255,255,0.45);
+  pointer-events:none;
+  opacity:0;transition:opacity 0.4s;
+  z-index:11;
+}
+.sc-line.show{opacity:1;}
+
+.sc-nameblock{
+  position:absolute;left:5%;bottom:24.5%;
+  pointer-events:none;
+  opacity:0;transition:opacity 0.4s;
+  z-index:11;
+}
+.sc-nameblock.show{opacity:1;}
+.sc-name{
+  font-family:'Noto Sans',sans-serif;
+  font-size:clamp(16px,2.6vw,30px);
+  font-weight:700;color:#fff;
+  text-shadow:0 0 6px #1a2f46,-1px -1px 0 #1a2f46,1px -1px 0 #1a2f46,-1px 1px 0 #1a2f46,1px 1px 0 #1a2f46;
+  line-height:1;
+}
+.sc-affiliation{
+  display:inline-block;margin-left:10px;
+  font-family:'Noto Sans',sans-serif;
+  font-size:clamp(11px,1.8vw,20px);
+  font-weight:700;color:#7accf9;
+  text-shadow:0 0 4px #1a2f46,-1px -1px 0 #1a2f46,1px 1px 0 #1a2f46;
+  vertical-align:middle;
+}
+
+.sc-dialogue{
+  position:absolute;left:5%;right:5%;bottom:9%;
+  font-family:'Noto Sans',sans-serif;
+  font-size:clamp(13px,1.9vw,21px);
+  font-weight:400;color:#fff;line-height:1.65;
+  pointer-events:none;
+  text-shadow:0 0 5px #1a2f46,-1px -1px 0 #1a2f46,1px -1px 0 #1a2f46,-1px 1px 0 #1a2f46,1px 1px 0 #1a2f46;
+  white-space:pre-wrap;word-break:break-word;min-height:3.5em;
+  z-index:11;
+}
+
+/* advance triangle */
+.sc-triangle{
+  position:absolute;right:4.5%;bottom:9%;
+  pointer-events:none;opacity:0;transition:opacity 0.3s;
+  animation:blink 1.2s ease-in-out infinite;
+  z-index:11;
+}
+.sc-triangle.show{opacity:1;}
+.sc-triangle svg{width:clamp(12px,1.6vw,22px);fill:#fff;filter:drop-shadow(0 0 3px rgba(77,217,255,0.7));}
+
+/* surprise flash overlay */
+.sc-flash{
+  position:absolute;inset:0;
+  background:rgba(255,255,255,0);
+  pointer-events:none;
+  transition:background 0.1s;
+  z-index:10;
+}
+.sc-flash.pop{background:rgba(255,255,255,0.18);}
+
+/* "???" entry dark overlay */
+.sc-darkbg{
+  position:absolute;inset:0;
+  background:rgba(0,0,0,0);
+  pointer-events:none;
+  transition:background 1s;
+  z-index:1;
+}
+.sc-darkbg.dim{background:rgba(0,0,0,0.25);}
+
+/* start hint */
+.hint{
+  position:absolute;top:50%;left:50%;
+  transform:translate(-50%,-50%);
+  font-family:'Rajdhani',sans-serif;
+  font-size:clamp(13px,1.6vw,20px);
+  letter-spacing:3px;color:rgba(255,255,255,0.6);
+  text-transform:uppercase;pointer-events:none;
+  animation:pulse 2s ease-in-out infinite;
+}
+
+@keyframes blink{0%,100%{opacity:1;}50%{opacity:0.15;}}
+@keyframes pulse{0%,100%{opacity:0.6;}50%{opacity:0.15;}}
+</style>
+</head>
+<body>
+
+<div class="scene" id="scene" onclick="advance()">
+
+  <div class="sc-bg"></div>
+  <div class="sc-vignette"></div>
+  <div class="sc-darkbg" id="scDarkBg"></div>
+  <div class="sc-flash" id="scFlash"></div>
+
+  <!-- characters -->
+  <img id="charMacha" class="sc-char"
+    src="https://i.ibb.co.com/LzTt4gsn/491713-Photoroom.png"
+    alt="Macha">
+
+  <img id="charMaster" class="sc-char"
+    src="https://avatars.githubusercontent.com/u/74395702?v=4"
+    alt="???">
+
+  <!-- bottom UI -->
+  <div class="sc-gradient"></div>
+  <div class="sc-line"      id="scLine"></div>
+  <div class="sc-nameblock" id="scNameBlock">
+    <span class="sc-name" id="scName"></span><span class="sc-affiliation" id="scAffiliation"></span>
+  </div>
+  <div class="sc-dialogue"  id="scDialogue"></div>
+  <div class="sc-triangle"  id="scTriangle">
+    <svg viewBox="0 0 16 16"><polygon points="8,14 0,2 16,2"/></svg>
+  </div>
+
+  <div class="hint" id="hint">Click anywhere to begin</div>
+</div>
+
+<script>
+// ── dialogue data ───────────────────────────────────────────
+// type: "line"   → normal dialogue
+// type: "trans"  → trigger character transition before showing next line
+// speaker: "macha" | "master" | "unknown"
+const script = [
+
+  {
+    speaker:"macha",
+    name:"Macha",
+    aff:"Assistant",
+    text:"...Hm?\nA new visitor?"
+  },
+
+  {
+    speaker:"macha",
+    name:"Macha",
+    aff:"Assistant",
+    text:"Welcome. I'm Macha, the Assistant around here.\nI'll be looking after you... at least for now."
+  },
+
+  {
+    speaker:"macha",
+    name:"Macha",
+    aff:"Assistant",
+    text:"Before you step inside, there are a few simple rules.\nThey're not difficult... unless you try to make them difficult."
+  },
+
+  {
+    speaker:"macha",
+    name:"Macha",
+    aff:"Assistant",
+    text:"Rule One. — Stay calm.\nNo unnecessary drama, no chaos."
+  },
+
+  {
+    speaker:"macha",
+    name:"Macha",
+    aff:"Assistant",
+    text:"Rule Two. — Treat others with kindness.\nEveryone deserves respect."
+  },
+
+  {
+    speaker:"macha",
+    name:"Macha",
+    aff:"Assistant",
+    text:"Rule Three. — Enjoy yourself.\nAfter all... that's why this place exists."
+  },
+
+  {
+    speaker:"macha",
+    name:"Macha",
+    aff:"Assistant",
+    text:"Easy enough, right?\nGood. Then let's—"
+  },
+
+  { type:"transition" },
+
+  {
+    speaker:"unknown",
+    name:"???",
+    aff:"",
+    text:"Ahem."
+  },
+
+  {
+    speaker:"macha",
+    name:"Macha",
+    aff:"Assistant",
+    surprise:true,
+    text:"...M-Master?!"
+  },
+
+  {
+    speaker:"master",
+    name:"Tida",
+    aff:"Master",
+    text:"Macha."
+  },
+
+  {
+    speaker:"macha",
+    name:"Macha",
+    aff:"Assistant",
+    surprise:true,
+    text:"Y-Yes?!"
+  },
+
+  {
+    speaker:"master",
+    name:"Tida",
+    aff:"Master",
+    text:"Are you giving another one of your 'perfect introductions'?"
+  },
+
+  {
+    speaker:"macha",
+    name:"Macha",
+    aff:"Assistant",
+    text:"W-Well...\nI was trying to make a good first impression..."
+  },
+
+  {
+    speaker:"master",
+    name:"Tida",
+    aff:"Master",
+    text:"You forgot the most important part."
+  },
+
+  {
+    speaker:"macha",
+    name:"Macha",
+    aff:"Assistant",
+    surprise:true,
+    text:"I... did?"
+  },
+
+  {
+    speaker:"master",
+    name:"Tida",
+    aff:"Master",
+    text:"Our guest hasn't even introduced themselves yet."
+  },
+
+  {
+    speaker:"macha",
+    name:"Macha",
+    aff:"Assistant",
+    text:"...Oh."
+  },
+
+  {
+    speaker:"macha",
+    name:"Macha",
+    aff:"Assistant",
+    text:"That's...\na very good point."
+  },
+
+  {
+    speaker:"master",
+    name:"Tida",
+    aff:"Master",
+    text:"Welcome.\nTake your time, choose a name you're comfortable with, and make yourself at home."
+  },
+
+  {
+    speaker:"macha",
+    name:"Macha",
+    aff:"Assistant",
+    text:"I'll be here if you need anything. Now then...\nWhat should we call you?"
+  }
+
+];
+
+// ── audio setup ─────────────────────────────────────────────
+const sndTyping = new Audio('https://www.myinstants.com/media/sounds/blue-archive-respond-chat.mp3');
+sndTyping.volume = 0.55;
+
+const sndCat = new Audio('https://static.wikitide.net/bluearchivewiki/transcoded/d/d8/SE_Cat_01.wav/SE_Cat_01.wav.ogg');
+sndCat.volume = 0.8;
+
+const sndBgm = new Audio('https://static.wikitide.net/bluearchivewiki/3/3a/Track_15_Mitsukiyo_Honey_Jam.ogg');
+sndBgm.loop   = true;
+sndBgm.volume = 0.4;
+
+let bgmStarted = false;
+function startBgm(){
+  if (bgmStarted) return;
+  bgmStarted = true;
+  sndBgm.play().catch(() => {});
+}
+
+function playTyping(){
+  sndTyping.currentTime = 0;
+  sndTyping.play().catch(() => {});
+}
+
+// ── state ───────────────────────────────────────────────────
+let step    = -1;
+let typing  = false;
+let tyTimer = null;
+let inTrans = false;
+
+const hint       = document.getElementById('hint');
+const charMacha  = document.getElementById('charMacha');
+const charMaster = document.getElementById('charMaster');
+const scLine     = document.getElementById('scLine');
+const scNameBlock= document.getElementById('scNameBlock');
+const scName     = document.getElementById('scName');
+const scAff      = document.getElementById('scAffiliation');
+const scDialogue = document.getElementById('scDialogue');
+const scTriangle = document.getElementById('scTriangle');
+const scFlash    = document.getElementById('scFlash');
+const scDarkBg   = document.getElementById('scDarkBg');
+
+// ── helpers ─────────────────────────────────────────────────
+function show(el){ el.classList.add('show'); }
+function hide(el){ el.classList.remove('show'); }
+
+function flash(){
+  scFlash.classList.add('pop');
+  setTimeout(() => scFlash.classList.remove('pop'), 180);
+}
+
+function doTransition(onDone){
+  inTrans = true;
+  scDialogue.textContent = '';
+  scName.textContent     = '';
+  scAff.textContent      = '';
+  hide(scTriangle);
+
+  charMacha.classList.add('slide-left');
+  charMacha.classList.add('darken');
+  scDarkBg.classList.add('dim');
+
+  setTimeout(() => {
+    // play cat sound when ??? slides in
+    sndCat.currentTime = 0;
+    sndCat.play().catch(() => {});
+
+    show(charMaster);
+    charMaster.classList.add('slide-in');
+    setTimeout(() => {
+      inTrans = false;
+      if (onDone) onDone();
+    }, 700);
+  }, 500);
+}
+
+const BEEP_EVERY = 2;
+function typewrite(text, speed, onDone){
+  scDialogue.textContent = '';
+  typing  = true;
+  let i   = 0;
+  const tick = () => {
+    const ch = text.charAt(i);
+    scDialogue.textContent += ch;
+    // play blip every BEEP_EVERY visible chars (skip newlines)
+    if (ch !== '\n' && i % BEEP_EVERY === 0) playTyping();
+    i++;
+    if (i < text.length) tyTimer = setTimeout(tick, speed);
+    else { typing = false; show(scTriangle); if (onDone) onDone(); }
+  };
+  tick();
+}
+
+function showLine(entry){
+  scName.textContent = entry.name || '';
+  scAff.textContent  = entry.aff  || '';
+  show(scLine); show(scNameBlock);
+
+  if (entry.speaker === 'macha'){
+    charMacha.classList.remove('darken');
+    charMaster.classList.add('darken');
+  } else {
+    charMaster.classList.remove('darken');
+    charMacha.classList.add('darken');
+  }
+
+  if (entry.surprise) flash();
+
+  hide(scTriangle);
+  typewrite(entry.text, 50, null);
+}
+
+// ── main advance ────────────────────────────────────────────
+function advance(){
+  if (inTrans) return;
+
+  startBgm();
+
+  if (typing){
+    clearTimeout(tyTimer);
+    typing = false;
+    scDialogue.textContent = script[step].text;
+    show(scTriangle);
+    return;
+  }
+
+  step++;
+
+  if (step === 0){
+    hint.style.display = 'none';
+    show(charMacha);
+    setTimeout(() => { show(scLine); show(scNameBlock); }, 300);
+    showLine(script[0]);
+    return;
+  }
+
+  if (step >= script.length){
+    document.getElementById('scene').style.transition = 'opacity 1.2s';
+    document.getElementById('scene').style.opacity = '0';
+    return;
+  }
+
+  const entry = script[step];
+
+  if (entry.type === 'transition'){
+    doTransition(() => {
+      step++;
+      showLine(script[step]);
+    });
+    return;
+  }
+
+  showLine(entry);
+}
+</script>
+</body>
+</html>
