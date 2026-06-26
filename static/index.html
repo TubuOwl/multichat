@@ -237,7 +237,13 @@ body {
   background: linear-gradient(135deg, #ff6b9d, #c084fc);
   color: #fff; font-size: 13px; font-weight: bold; cursor: pointer;
 }
+  
 #nameSubmitBtn:hover { opacity: 0.9; }
+#nameSubmitBtn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+#nameSubmitBtn:disabled:hover { opacity: 0.4; }
 
 /* ── FLOATING OVERLAY ── */
 #reactionOverlay {
@@ -448,7 +454,7 @@ body {
       </span>
     </label>
 
-    <button id="nameSubmitBtn" disabled onclick="submitName()">
+    <button id="nameSubmitBtn" disabled>
       Enter →
     </button>
   </div>
@@ -774,11 +780,24 @@ function showNameModal() {
   setTimeout(function(){ document.getElementById("nameInput").focus(); }, 100);
 }
 function submitName() {
+  var tosCheckbox = document.getElementById("tosCheckbox");
+
+  if (!tosCheckbox.checked) {
+    alert("You must agree to the Terms & Conditions first.");
+    return;
+  }
+
   var val = document.getElementById("nameInput").value.trim();
   val = val.replace(/[^a-zA-Z0-9]/g, "");
+
   if (!val) return;
+
   myName = val;
-  wsSend({ type: "set_name", name: myName });
+  wsSend({
+    type: "set_name",
+    name: myName
+  });
+
   document.getElementById("nameModal").classList.remove("show");
 }
 
@@ -1176,6 +1195,21 @@ document.addEventListener("DOMContentLoaded",function(){
     var wrap=document.getElementById("viewerBadgeWrap");
     if(wrap&&!wrap.contains(e.target)) document.getElementById("viewerPanel").style.display="none";
   });
+  var tosCheckbox = document.getElementById("tosCheckbox");
+  var nameSubmitBtn = document.getElementById("nameSubmitBtn");
+  var nameInput = document.getElementById("nameInput");
+
+  function updateSubmitState() {
+    nameSubmitBtn.disabled = !(nameInput.value.trim() && tosCheckbox.checked);
+  }
+
+  tosCheckbox.addEventListener("change", updateSubmitState);
+  nameInput.addEventListener("input", updateSubmitState);
+
+  nameSubmitBtn.addEventListener("click", submitName);
+
+  updateSubmitState();
+
 });
 
 function nextChat() {
