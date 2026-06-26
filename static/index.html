@@ -375,7 +375,7 @@ body {
     display: flex;
     overflow-x: auto;
     gap: 12px;
-    padding: 40px 12px 12px;
+    padding: 32px 12px 12px;
     scroll-snap-type: x mandatory;
     -webkit-overflow-scrolling: touch;
     scroll-behavior: smooth;
@@ -1065,13 +1065,26 @@ function createChatElement(chatname) {
   var scr=document.createElement("script");
   scr.setAttribute("id",fetchCid()); scr.setAttribute("data-cfasync","false"); scr.async=true;
   scr.src="//st.chatango.com/js/gz/emb.js";
-    scr.text=JSON.stringify({handle:chatname,arch:"js",styles:{a:"ffffff",b:100,c:"000000",d:"000000",e:"ffffff",g:"000000",h:"ffffff",j:"000000",k:"888888",l:"E0E0E0",m:"ffffff",n:"ffffff",p:10,q:"ffffff",w:1,ab:1,surl:0}});
-  container.appendChild(scr)
+  scr.text=JSON.stringify({handle:chatname,arch:"js",styles:{a:"ffffff",b:100,c:"000000",d:"000000",e:"ffffff",g:"000000",h:"ffffff",j:"000000",k:"888888",l:"E0E0E0",m:"ffffff",n:"ffffff",p:10,q:"ffffff",w:1,ab:1,surl:0}});
   container.appendChild(scr);
-  setTimeout(function(){ fixContainer(container); },800);
-  setTimeout(function(){ fixContainer(container); },2500);
-  setTimeout(function(){ fixContainer(container); },5000);
-  new MutationObserver(function(){ fixContainer(container); }).observe(container,{childList:true,subtree:true,attributes:true});
+
+  function lockIframe(){
+    fixContainer(container);
+    var iframe = container.querySelector("iframe");
+    if (iframe && !iframe.dataset.locked){
+      iframe.removeAttribute("target");
+      iframe.setAttribute(
+        "sandbox",
+        "allow-scripts allow-same-origin allow-forms allow-popups"
+      );
+      iframe.dataset.locked = "1";
+    }
+  }
+
+  setTimeout(lockIframe,800);
+  setTimeout(lockIframe,2500);
+  setTimeout(lockIframe,5000);
+  new MutationObserver(lockIframe).observe(container,{childList:true,subtree:true,attributes:true});
   return box;
 }
 
