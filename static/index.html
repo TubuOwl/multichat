@@ -1062,7 +1062,7 @@ function createChatElement(chatname) {
   var scr=document.createElement("script");
   scr.setAttribute("id",fetchCid()); scr.setAttribute("data-cfasync","false"); scr.async=true;
   scr.src="//st.chatango.com/js/gz/emb.js";
-  scr.text=JSON.stringify({handle:chatname,arch:"js",styles:{a:"ffffff",b:0,c:"ffffff",d:"ffffff",e:"ffffff",g:"ffffff",h:"ffffff",j:"ffffff",k:"cccccc",l:"dadada",m:"ffffff",n:"ffffff",p:10,q:"ffffff",w:1,ab:1,surl:0}});
+  scr.text = JSON.stringify({handle:chatname,arch:"js",styles:{a:"FFFFFF",b:0,c:"666666",d:"666666",e:"FFFFFF",f:0,g:"000000",h:"FFFFFF",i:0,j:"000000",k:"999999",l:"CCCCCC",n:"000000",m:"DADADA",o:100,p:"11",q:"FFFFFF",r:0,s:0,t:1,u:0,v:1,w:1,aa:0,ab:1,ac:0,usricon:1,sbc:"BBBBBB",sba:100,surl:0,allowpm:1,fwtickm:1,cnrs:0,showhdr:1,showx:1}});
   container.appendChild(scr);
   setTimeout(function(){ fixContainer(container); },800);
   setTimeout(function(){ fixContainer(container); },2500);
