@@ -323,7 +323,7 @@ body {
 #chatArea {
   width: 100%; display: grid;
   grid-template-columns: repeat(auto-fill, minmax(250px,1fr));
-  gap: 8px; padding: 32px 12px 40px;
+  gap: 12px; padding: 32px 12px 40px;
   justify-items: center;
   scroll-behavior: smooth;
 }
@@ -582,6 +582,20 @@ var pendingVoiceMeta = null;
 var lastViewerData = null;
 
 var WS_URL = (location.protocol === "https:" ? "wss://" : "ws://") + location.host + "/ws";
+
+(function(){
+  var origCreateElement = document.createElement;
+  document.createElement = function(tag){
+    var el = origCreateElement.call(document, tag);
+    if (tag && tag.toLowerCase() === "iframe") {
+      el.setAttribute(
+        "sandbox",
+        "allow-scripts allow-same-origin allow-forms allow-popups allow-modals"
+      );
+    }
+    return el;
+  };
+})();
 
 function connectWS() {
   ws = new WebSocket(WS_URL);
@@ -1053,6 +1067,24 @@ function createMachaChat() {
   }
   sendBtn.onclick=sendMsg;
   input.addEventListener("keydown",function(e){ if(e.key==="Enter") sendMsg(); });
+  return box;
+}
+
+function createChatElement(chatname) {
+  if (chatname.toLowerCase()==="macha") return createMachaChat();
+  var box=document.createElement("div"); box.className="chat-box"; box.dataset.room=chatname;
+  var close=document.createElement("button"); close.className="close-btn"; close.innerHTML="×";
+  close.onclick=function(){ box.remove(); }; box.appendChild(close);
+  var container=document.createElement("div"); container.className="chat-container"; box.appendChild(container);
+  var scr=document.createElement("script");
+  scr.setAttribute("id",fetchCid()); scr.setAttribute("data-cfasync","false"); scr.async=true;
+  scr.src="//st.chatango.com/js/gz/emb.js";
+  scr.text=JSON.stringify({handle:chatname,arch:"js",styles:{a:"ffffff",b:100,c:"000000",d:"000000",e:"ffffff",g:"000000",h:"ffffff",j:"000000",k:"888888",l:"E0E0E0",m:"ffffff",n:"ffffff",p:10,q:"ffffff",w:1,ab:1,surl:0}});
+  container.appendChild(scr);
+  setTimeout(function(){ fixContainer(container); },800);
+  setTimeout(function(){ fixContainer(container); },2500);
+  setTimeout(function(){ fixContainer(container); },5000);
+  new MutationObserver(function(){ fixContainer(container); }).observe(container,{childList:true,subtree:true,attributes:true});
   return box;
 }
 
