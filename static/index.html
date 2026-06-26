@@ -427,10 +427,30 @@ body {
 <!-- NAME MODAL -->
 <div id="nameModal">
   <div id="nameBox">
-    <h3>👤 What's your name?</h3>
-    <p>So your friends know you're online</p>
-    <input type="text" id="nameInput" placeholder="Your name..." maxlength="20" pattern="[a-zA-Z0-9]*">
-    <button id="nameSubmitBtn" onclick="submitName()">Enter →</button>
+    <h3>👤 Enter Your Name</h3>
+    <p>This name will be visible to other users.</p>
+
+    <input
+      type="text"
+      id="nameInput"
+      placeholder="Your name..."
+      maxlength="20"
+      pattern="[a-zA-Z0-9]*"
+    >
+
+    <label id="tosRow" style="display:flex;align-items:flex-start;gap:8px;font-size:11px;color:#ccc;">
+      <input type="checkbox" id="tosCheckbox" style="margin-top:2px;">
+      <span>
+        I have read and agree to the
+        <a href="rules.html" target="_blank" style="color:#ff6b9d;text-decoration:underline;">
+          Terms &amp; Conditions
+        </a>
+      </span>
+    </label>
+
+    <button id="nameSubmitBtn" disabled onclick="submitName()">
+      Enter →
+    </button>
   </div>
 </div>
 
