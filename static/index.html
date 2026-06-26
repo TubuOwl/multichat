@@ -49,17 +49,21 @@ body {
   bottom: 12px !important;
   display: flex !important;
   align-items: center;
-  gap: 6px;
-  padding: 6px 12px;
-  background: rgba(0,0,0,.6);
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  background: rgba(0,0,0,0.55);
   backdrop-filter: blur(4px);
-  border: 1px solid rgba(255,255,255,.2);
-  border-radius: 20px;
-  color: #ffffff;
-  font-size: 11px;
+  -webkit-backdrop-filter: blur(4px);
+  border: 1px solid rgba(255,255,255,.15);
+  border-radius: 50%;
+  font-size: 14px;
   cursor: pointer;
-  z-index: 1000 !important;
+  z-index: 999 !important;
+  transition: color 0.3s;
 }
+#bgBtn:hover { background: rgba(0,0,0,0.75); }
 #bgMenu{position:fixed;left:12px;bottom:55px;width:min(260px,calc(100vw - 24px));display:none;flex-direction:column;gap:10px;padding:14px;background:rgba(20,20,20,.95);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.15);border-radius:14px;z-index:1001;box-sizing:border-box}
 #bgMenu h3{color:#fff;margin:0;font-size:13px}
 #bgUrl{width:100%;padding:9px;border:none;outline:none;border-radius:8px;background:rgba(255,255,255,.1);color:#fff;font-size:12px;box-sizing:border-box}
@@ -480,7 +484,7 @@ body {
 
   </div>
 </div>
-<button id="bgBtn" onclick="toggleBgMenu()">🎨 Wallpaper</button>
+<button id="bgBtn" onclick="toggleBgMenu()">🎨</button>
 
 <div id="bgMenu">
     <button id="bgClose" onclick="toggleBgMenu()">✕</button>
