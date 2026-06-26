@@ -421,6 +421,8 @@ body {
 </head>
 <body>
 
+<video id="bgVideo" autoplay muted loop playsinline style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;object-fit:cover;z-index:-1;"></video>
+  
 <!-- NAME MODAL -->
 <div id="nameModal">
   <div id="nameBox">
@@ -1192,12 +1194,24 @@ function toggleBgMenu() {
 function applyBg() {
     const url = document.getElementById("bgUrl").value.trim();
     if (!url) return;
-    const s = document.body.style;
-    s.backgroundImage = `url("${url}")`;
-    s.backgroundSize = "cover";
-    s.backgroundPosition = "center";
-    s.backgroundRepeat = "no-repeat";
-    s.backgroundAttachment = "fixed";
+    const isVideo = /\.(mp4|webm|ogg)(\?.*)?$/i.test(url);
+    const video = document.getElementById("bgVideo");
+
+    if (isVideo) {
+        document.body.style.backgroundImage = "";
+        video.src = url;
+        video.style.display = "block";
+    } else {
+        video.style.display = "none";
+        video.src = "";
+        const s = document.body.style;
+        s.backgroundImage = `url("${url}")`;
+        s.backgroundSize = "cover";
+        s.backgroundPosition = "center";
+        s.backgroundRepeat = "no-repeat";
+        s.backgroundAttachment = "fixed";
+    }
+
     localStorage.setItem("bg", url);
     toggleBgMenu();
 }
@@ -1206,6 +1220,8 @@ function resetBg() {
     const s = document.body.style;
     s.backgroundImage = s.backgroundSize = s.backgroundPosition =
     s.backgroundRepeat = s.backgroundAttachment = "";
+    document.getElementById("bgVideo").style.display = "none";
+    document.getElementById("bgVideo").src = "";
     document.getElementById("bgUrl").value = "";
     localStorage.removeItem("bg");
     toggleBgMenu();
@@ -1214,12 +1230,20 @@ function resetBg() {
 window.addEventListener("load", () => {
     const bg = localStorage.getItem("bg");
     if (!bg) return;
-    const s = document.body.style;
-    s.backgroundImage = `url("${bg}")`;
-    s.backgroundSize = "cover";
-    s.backgroundPosition = "center";
-    s.backgroundRepeat = "no-repeat";
-    s.backgroundAttachment = "fixed";
+    const isVideo = /\.(mp4|webm|ogg)(\?.*)?$/i.test(bg);
+    const video = document.getElementById("bgVideo");
+
+    if (isVideo) {
+        video.src = bg;
+        video.style.display = "block";
+    } else {
+        const s = document.body.style;
+        s.backgroundImage = `url("${bg}")`;
+        s.backgroundSize = "cover";
+        s.backgroundPosition = "center";
+        s.backgroundRepeat = "no-repeat";
+        s.backgroundAttachment = "fixed";
+    }
     document.getElementById("bgUrl").value = bg;
 });
 
