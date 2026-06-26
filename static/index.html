@@ -50,28 +50,37 @@ body {
     z-index:1000;
 }
 
-#bgMenu{
-    position:fixed;
-    left:12px;
-    bottom:95px;
-    width:260px;
+#bgBtn{
+    position: fixed;
+    left: 12px;
+    bottom: 12px;
 
-    display:none;
-    flex-direction:column;
-    gap:10px;
+    z-index: 1000;
 
-    padding:14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 
-    background:rgba(20,20,20,.92);
-    backdrop-filter:blur(10px);
+    width: 42px;
+    height: 42px;
 
-    border:1px solid rgba(255,255,255,.15);
-    border-radius:14px;
+    border: none;
+    border-radius: 50%;
 
-    z-index:1001;
+    background: rgba(0,0,0,.55);
+    backdrop-filter: blur(4px);
 
-    /* Tambahan */
-    position:fixed;
+    color: #4cff91;
+    font-size: 20px;
+
+    cursor: pointer;
+
+    transition: .3s;
+}
+
+#bgBtn:hover{
+    transform: scale(1.08);
+    background: rgba(0,0,0,.75);
 }
 
 #bgMenu h3{
