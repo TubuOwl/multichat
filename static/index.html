@@ -43,7 +43,23 @@ body {
   color: white; cursor: pointer; flex-shrink: 0;
 }
 /* ── BG SET ── */
-#bgBtn{position:fixed;left:12px;bottom:12px;display:flex;align-items:center;gap:6px;padding:6px 12px;background:rgba(0,0,0,.6);backdrop-filter:blur(4px);border:1px solid rgba(255,255,255,.2);border-radius:20px;color:#4cff91;font-size:11px;cursor:pointer;z-index:1000}
+#bgBtn {
+  position: fixed !important;
+  left: 12px !important;
+  bottom: 12px !important;
+  display: flex !important;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: rgba(0,0,0,.6);
+  backdrop-filter: blur(4px);
+  border: 1px solid rgba(255,255,255,.2);
+  border-radius: 20px;
+  color: #4cff91;
+  font-size: 11px;
+  cursor: pointer;
+  z-index: 9999 !important;
+}
 #bgMenu{position:fixed;left:12px;bottom:55px;width:min(260px,calc(100vw - 24px));display:none;flex-direction:column;gap:10px;padding:14px;background:rgba(20,20,20,.95);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.15);border-radius:14px;z-index:1001;box-sizing:border-box}
 #bgMenu h3{color:#fff;margin:0;font-size:13px}
 #bgUrl{width:100%;padding:9px;border:none;outline:none;border-radius:8px;background:rgba(255,255,255,.1);color:#fff;font-size:12px;box-sizing:border-box}
