@@ -700,9 +700,8 @@ function handleSceneClick(){
 }
 
 // ── navigation ──
-function goBack(){
-  if(window.history.length > 1) window.history.back();
-  else alert('Tidak ada halaman sebelumnya. Buka file ini dari halaman lain untuk menggunakan tombol Kembali.');
+function goBack() {
+    window.location.href = '/';
 }
 
 function replayScene(){
