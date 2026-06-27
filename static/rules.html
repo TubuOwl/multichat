@@ -3,364 +3,463 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Welcome Scene</title>
-<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Noto+Sans:wght@400;700&display=swap" rel="stylesheet">
+<title>Welcome Scene — Blue Archive</title>
 <style>
+@import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Noto+Sans:wght@400;700&display=swap');
 *{margin:0;padding:0;box-sizing:border-box;}
 html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:'Noto Sans',sans-serif;}
 
-/* ── scene wrapper ── */
-.scene{
-  position:relative;
-  width:100vw;height:100vh;
-  overflow:hidden;
-  cursor:pointer;
-  user-select:none;
-}
+.scene{position:relative;width:100%;height:100vh;overflow:hidden;cursor:pointer;user-select:none;background:#0d1b2a;}
 
-/* background */
-.sc-bg{
-  position:absolute;inset:0;
-  background:url('https://i.ytimg.com/vi/jTO5gy_4MxQ/maxresdefault.jpg') center/cover no-repeat;
-}
-.sc-vignette{
-  position:absolute;inset:0;
-  background:radial-gradient(ellipse at center,transparent 50%,rgba(0,0,0,0.5) 100%);
-  pointer-events:none;
-}
-
-/* ── characters ── */
-.sc-char{
-  position:absolute;
-  bottom:0;
-  height:90%;
-  object-fit:contain;
-  object-position:bottom center;
-  pointer-events:none;
-  transition:left 0.7s cubic-bezier(.4,0,.2,1),
-             transform 0.7s cubic-bezier(.4,0,.2,1),
-             opacity 0.5s ease,
-             filter 0.4s ease;
-}
-
-/* Macha starts center */
-#charMacha{
-  left:50%;
-  transform:translateX(-50%);
-  opacity:0;
-  z-index:2;
-}
-#charMacha.show   { opacity:1; }
-#charMacha.slide-left{
-  left:22%;
-  transform:translateX(-50%);
-}
-#charMacha.darken { filter:brightness(0.55); }
-
-/* Master hidden off-screen right */
-#charMaster{
-  left:120%;
-  transform:translateX(-50%);
-  height:75%;
-  opacity:0;
-  z-index:3;
-  image-rendering:auto;
-  /* stick figure is on white bg — multiply blends it */
-  mix-blend-mode:multiply;
-}
-#charMaster.show   { opacity:1; }
-#charMaster.slide-in{
-  left:74%;
-  transform:translateX(-50%);
-}
-
-/* ── bottom UI ── */
-.sc-gradient{
-  position:absolute;bottom:0;left:0;right:0;height:40%;
-  background:linear-gradient(180deg,rgba(13,27,42,0) 0%,rgba(13,27,42,0.75) 35%,rgba(13,27,42,0.92) 60%,rgba(13,27,42,0.95) 100%);
-  pointer-events:none;
-  z-index:10;
-}
-.sc-line{
-  position:absolute;left:4%;right:4%;bottom:23%;
-  height:1px;background:rgba(255,255,255,0.45);
-  pointer-events:none;
-  opacity:0;transition:opacity 0.4s;
-  z-index:11;
-}
-.sc-line.show{opacity:1;}
-
-.sc-nameblock{
-  position:absolute;left:5%;bottom:24.5%;
-  pointer-events:none;
-  opacity:0;transition:opacity 0.4s;
-  z-index:11;
-}
-.sc-nameblock.show{opacity:1;}
-.sc-name{
-  font-family:'Noto Sans',sans-serif;
-  font-size:clamp(16px,2.6vw,30px);
-  font-weight:700;color:#fff;
-  text-shadow:0 0 6px #1a2f46,-1px -1px 0 #1a2f46,1px -1px 0 #1a2f46,-1px 1px 0 #1a2f46,1px 1px 0 #1a2f46;
-  line-height:1;
-}
-.sc-affiliation{
-  display:inline-block;margin-left:10px;
-  font-family:'Noto Sans',sans-serif;
-  font-size:clamp(11px,1.8vw,20px);
-  font-weight:700;color:#7accf9;
-  text-shadow:0 0 4px #1a2f46,-1px -1px 0 #1a2f46,1px 1px 0 #1a2f46;
-  vertical-align:middle;
-}
-
-.sc-dialogue{
-  position:absolute;left:5%;right:5%;bottom:9%;
-  font-family:'Noto Sans',sans-serif;
-  font-size:clamp(13px,1.9vw,21px);
-  font-weight:400;color:#fff;line-height:1.65;
-  pointer-events:none;
-  text-shadow:0 0 5px #1a2f46,-1px -1px 0 #1a2f46,1px -1px 0 #1a2f46,-1px 1px 0 #1a2f46,1px 1px 0 #1a2f46;
-  white-space:pre-wrap;word-break:break-word;min-height:3.5em;
-  z-index:11;
-}
-
-/* advance triangle */
-.sc-triangle{
-  position:absolute;right:4.5%;bottom:9%;
-  pointer-events:none;opacity:0;transition:opacity 0.3s;
-  animation:blink 1.2s ease-in-out infinite;
-  z-index:11;
-}
-.sc-triangle.show{opacity:1;}
-.sc-triangle svg{width:clamp(12px,1.6vw,22px);fill:#fff;filter:drop-shadow(0 0 3px rgba(77,217,255,0.7));}
-
-/* surprise flash overlay */
-.sc-flash{
-  position:absolute;inset:0;
-  background:rgba(255,255,255,0);
-  pointer-events:none;
-  transition:background 0.1s;
-  z-index:10;
-}
-.sc-flash.pop{background:rgba(255,255,255,0.18);}
-
-/* "???" entry dark overlay */
-.sc-darkbg{
-  position:absolute;inset:0;
-  background:rgba(0,0,0,0);
-  pointer-events:none;
-  transition:background 1s;
-  z-index:1;
-}
+.sc-bg{position:absolute;inset:0;background:url('https://i.ytimg.com/vi/jTO5gy_4MxQ/maxresdefault.jpg') center/cover no-repeat;transition:filter 0.8s;}
+.sc-vignette{position:absolute;inset:0;background:radial-gradient(ellipse at center,transparent 50%,rgba(0,0,0,0.5) 100%);pointer-events:none;}
+.sc-darkbg{position:absolute;inset:0;background:rgba(0,0,0,0);pointer-events:none;transition:background 1s;z-index:1;}
 .sc-darkbg.dim{background:rgba(0,0,0,0.25);}
+.sc-flash{position:absolute;inset:0;background:rgba(255,255,255,0);pointer-events:none;transition:background 0.1s;z-index:10;}
+.sc-flash.pop{background:rgba(255,255,255,0.2);}
+.sc-fade{position:absolute;inset:0;background:#000;pointer-events:none;z-index:50;transition:opacity 1.2s;}
+.sc-fade.out{opacity:0;}
 
-/* start hint */
-.hint{
-  position:absolute;top:50%;left:50%;
-  transform:translate(-50%,-50%);
-  font-family:'Rajdhani',sans-serif;
-  font-size:clamp(13px,1.6vw,20px);
-  letter-spacing:3px;color:rgba(255,255,255,0.6);
-  text-transform:uppercase;pointer-events:none;
-  animation:pulse 2s ease-in-out infinite;
+.sc-char{
+    position:absolute;
+    bottom:0;
+    height:90%;
+    object-fit:contain;
+    object-position:bottom center;
+    pointer-events:none;
+    transition:left 0.7s cubic-bezier(.4,0,.2,1),
+               transform 0.7s cubic-bezier(.4,0,.2,1),
+               opacity 0.5s ease,
+               filter 0.4s ease;
+  }
+
+  /* Macha starts center */
+  #charMacha{
+    left:50%;
+    transform:translateX(-50%);
+    opacity:0;
+    z-index:2;
+  }
+  #charMacha.show   { opacity:1; }
+  #charMacha.slide-left{
+    left:22%;
+    transform:translateX(-50%);
+  }
+  #charMacha.darken { filter:brightness(0.55); }
+
+  /* Master hidden off-screen right */
+  #charMaster{
+    left:120%;
+    transform:translateX(-50%);
+    height:75%;
+    opacity:0;
+    z-index:3;
+    image-rendering:auto;
+    /* stick figure is on white bg — multiply blends it */
+    mix-blend-mode:multiply;
+  }
+  #charMaster.show   { opacity:1; }
+  #charMaster.slide-in{
+    left:74%;
+    transform:translateX(-50%);
+  }
+
+
+.sc-gradient{position:absolute;bottom:0;left:0;right:0;height:40%;background:linear-gradient(180deg,rgba(13,27,42,0) 0%,rgba(13,27,42,0.75) 35%,rgba(13,27,42,0.92) 60%,rgba(13,27,42,0.95) 100%);pointer-events:none;z-index:10;}
+.sc-line{position:absolute;left:4%;right:4%;bottom:23%;height:1px;background:rgba(255,255,255,0.45);pointer-events:none;opacity:0;transition:opacity 0.4s;z-index:11;}
+.sc-line.show{opacity:1;}
+.sc-nameblock{position:absolute;left:5%;bottom:24.5%;pointer-events:none;opacity:0;transition:opacity 0.4s;z-index:11;}
+.sc-nameblock.show{opacity:1;}
+.sc-name{font-family:'Noto Sans',sans-serif;font-size:clamp(14px,2.4vw,28px);font-weight:700;color:#fff;
+  text-shadow:0 0 6px #1a2f46,-1px -1px 0 #1a2f46,1px -1px 0 #1a2f46,-1px 1px 0 #1a2f46,1px 1px 0 #1a2f46;line-height:1;}
+.sc-affiliation{display:inline-block;margin-left:10px;font-family:'Noto Sans',sans-serif;font-size:clamp(10px,1.7vw,18px);
+  font-weight:700;color:#7accf9;text-shadow:0 0 4px #1a2f46,-1px -1px 0 #1a2f46,1px 1px 0 #1a2f46;vertical-align:middle;}
+.sc-dialogue{
+      position:absolute;
+      left:5%;
+      right:5%;
+      bottom:8%;
+
+      font-family:'Noto Sans',sans-serif;
+      font-size:clamp(13px,1.9vw,21px);
+      line-height:1.6;
+      color:#fff;
+
+      white-space:pre-wrap;
+      word-break:break-word;
+
+      max-height:20vh; /* lebih tinggi */
+      overflow:hidden; /* hilangkan scrollbar */
+
+      z-index:11;
+  }
+.sc-triangle{position:absolute;right:4.5%;bottom:9%;pointer-events:none;opacity:0;transition:opacity 0.3s;z-index:11;}
+.sc-triangle.show{opacity:1;}
+.sc-triangle svg{width:clamp(10px,1.4vw,18px);fill:#fff;filter:drop-shadow(0 0 3px rgba(77,217,255,0.7));}
+
+/* ── CHOICE BOX ── */
+.choice-box{
+  position:absolute;left:50%;bottom:6%;transform:translateX(-50%);
+  display:flex;flex-direction:column;gap:8px;
+  width:min(560px,90%);
+  z-index:20;
+  opacity:0;pointer-events:none;transition:opacity 0.4s;
 }
+.choice-box.show{opacity:1;pointer-events:all;}
+.choice-btn{
+  font-family:'Rajdhani',sans-serif;font-size:clamp(13px,1.7vw,18px);font-weight:600;letter-spacing:1px;
+  padding:10px 20px;
+  background:rgba(13,27,42,0.88);
+  border:1px solid rgba(77,217,255,0.4);
+  color:#e8f4ff;
+  cursor:pointer;text-align:left;border-radius:2px;
+  clip-path:polygon(8px 0%,100% 0%,calc(100% - 8px) 100%,0% 100%);
+  transition:background 0.15s,border-color 0.15s,transform 0.1s;
+}
+.choice-btn::before{content:'▸';color:#4dd9ff;margin-right:10px;}
+.choice-btn:hover{background:rgba(30,60,90,0.92);border-color:rgba(77,217,255,0.8);transform:translateX(4px);}
+.choice-btn:active{transform:translateX(2px);}
 
-@keyframes blink{0%,100%{opacity:1;}50%{opacity:0.15;}}
+/* ── ROUTE BADGE ── */
+.route-badge{
+  position:absolute;top:14px;left:50%;transform:translateX(-50%);
+  font-family:'Rajdhani',sans-serif;font-size:11px;letter-spacing:3px;
+  padding:4px 14px;border-radius:2px;
+  clip-path:polygon(6px 0%,100% 0%,calc(100% - 6px) 100%,0% 100%);
+  z-index:20;opacity:0;transition:opacity 0.5s;pointer-events:none;
+}
+.route-badge.show{opacity:1;}
+.route-badge.route-kind{background:rgba(77,217,255,0.15);border:1px solid rgba(77,217,255,0.4);color:#7accf9;}
+.route-badge.route-bold{background:rgba(255,180,60,0.15);border:1px solid rgba(255,180,60,0.4);color:#f5c842;}
+.route-badge.route-shy {background:rgba(160,100,220,0.15);border:1px solid rgba(160,100,220,0.4);color:#c8a0f0;}
+
+/* ── ENDING CARD ── */
+.ending-card{
+  position:absolute;inset:0;z-index:40;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;
+  background:rgba(5,14,26,0.88);
+  opacity:0;pointer-events:none;transition:opacity 0.6s;
+}
+.ending-card.show{opacity:1;pointer-events:all;}
+.ending-icon{font-size:clamp(28px,4vw,48px);}
+.ending-title{font-family:'Rajdhani',sans-serif;font-size:clamp(18px,3vw,32px);font-weight:700;color:#fff;letter-spacing:4px;text-transform:uppercase;text-align:center;}
+.ending-sub{font-size:clamp(12px,1.5vw,16px);color:rgba(160,200,230,0.7);text-align:center;max-width:420px;line-height:1.7;}
+.ending-sep{width:120px;height:1px;background:rgba(77,217,255,0.25);}
+.back-btn{
+  font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:700;letter-spacing:3px;
+  padding:11px 32px;border:1px solid rgba(77,217,255,0.5);
+  background:rgba(77,217,255,0.08);color:#7accf9;
+  cursor:pointer;border-radius:2px;text-transform:uppercase;
+  clip-path:polygon(8px 0%,100% 0%,calc(100% - 8px) 100%,0% 100%);
+  transition:background 0.2s,border-color 0.2s;margin-top:8px;
+}
+.back-btn:hover{background:rgba(77,217,255,0.18);border-color:rgba(77,217,255,0.8);}
+.replay-btn{
+  font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:600;letter-spacing:2px;
+  padding:8px 24px;border:1px solid rgba(255,255,255,0.15);
+  background:transparent;color:rgba(255,255,255,0.45);
+  cursor:pointer;border-radius:2px;text-transform:uppercase;
+  transition:all 0.2s;
+}
+.replay-btn:hover{background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.7);}
+
+.hint{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+  font-family:'Rajdhani',sans-serif;font-size:clamp(12px,1.5vw,18px);letter-spacing:3px;
+  color:rgba(255,255,255,0.6);text-transform:uppercase;pointer-events:none;
+  animation:pulse 2s ease-in-out infinite;z-index:15;}
+
 @keyframes pulse{0%,100%{opacity:0.6;}50%{opacity:0.15;}}
+@keyframes triFloat{0%,100%{transform:translateY(0);}50%{transform:translateY(-4px);}}
+.sc-triangle.show svg{animation:triFloat 1.2s ease-in-out infinite;}
 </style>
 </head>
 <body>
 
-<div class="scene" id="scene" onclick="advance()">
+<div class="scene" id="scene" onclick="handleSceneClick()">
 
   <div class="sc-bg"></div>
   <div class="sc-vignette"></div>
   <div class="sc-darkbg" id="scDarkBg"></div>
-  <div class="sc-flash" id="scFlash"></div>
+  <div class="sc-flash"  id="scFlash"></div>
+  <div class="sc-fade"   id="scFade"></div>
 
   <!-- characters -->
-  <img id="charMacha" class="sc-char"
-    src="https://i.ibb.co.com/LzTt4gsn/491713-Photoroom.png"
-    alt="Macha">
-
-  <img id="charMaster" class="sc-char"
-    src="https://avatars.githubusercontent.com/u/74395702?v=4"
-    alt="???">
+  <img id="charMacha"  class="sc-char" src="https://i.ibb.co.com/LzTt4gsn/491713-Photoroom.png" alt="Macha">
+  <img id="charMaster" class="sc-char" src="https://avatars.githubusercontent.com/u/74395702?v=4" alt="Tida">
 
   <!-- bottom UI -->
   <div class="sc-gradient"></div>
   <div class="sc-line"      id="scLine"></div>
   <div class="sc-nameblock" id="scNameBlock">
-    <span class="sc-name" id="scName"></span><span class="sc-affiliation" id="scAffiliation"></span>
+    <span class="sc-name" id="scName"></span><span class="sc-affiliation" id="scAff"></span>
   </div>
   <div class="sc-dialogue"  id="scDialogue"></div>
   <div class="sc-triangle"  id="scTriangle">
     <svg viewBox="0 0 16 16"><polygon points="8,14 0,2 16,2"/></svg>
   </div>
 
+  <!-- choices -->
+  <div class="choice-box" id="choiceBox"></div>
+
+  <!-- route badge -->
+  <div class="route-badge" id="routeBadge"></div>
+
+  <!-- ending card -->
+  <div class="ending-card" id="endingCard">
+    <div class="ending-icon"  id="endIcon">✨</div>
+    <div class="ending-title" id="endTitle">END</div>
+    <div class="ending-sep"></div>
+    <div class="ending-sub"   id="endSub"></div>
+    <button class="back-btn"   onclick="goBack()">← Kembali</button>
+    <button class="replay-btn" onclick="replayScene()">↺ Mulai Ulang</button>
+  </div>
+
   <div class="hint" id="hint">Click anywhere to begin</div>
+
 </div>
 
 <script>
-// ── dialogue data ───────────────────────────────────────────
-// type: "line"   → normal dialogue
-// type: "trans"  → trigger character transition before showing next line
-// speaker: "macha" | "master" | "unknown"
-const script = [
+// ============================================================
+// MACHA SPRITES (EXPRESSIONS)
+// Ganti link "blush" di bawah ini dengan link gambar Macha
+// versi blushing/tersipu kamu sendiri.
+// Format harus sama (background transparan/PNG sejenis,
+// pose & ukuran serupa) supaya transisinya halus.
+// ============================================================
+const MACHA_SPRITES = {
+  normal: 'https://i.ibb.co.com/LzTt4gsn/491713-Photoroom.png',
+  blush:  'https://i.ibb.co.com/SwY4wxWP/Gemini-Generated-Image-balccnbalccnbalc-2.png',
+  truend: 'https://i.ibb.co.com/Z1tvNLWm/upscalemedia-transformed-Photoroom.png'
+};
 
-  {
-    speaker:"macha",
-    name:"Macha",
-    aff:"Assistant",
-    text:"...Hm?\nA new visitor?"
-  },
+// ============================================================
+// SCRIPT DATA
+// node types: line | choice | transition | ending | badge
+// ============================================================
+const SCRIPTS = {
 
-  {
-    speaker:"macha",
-    name:"Macha",
-    aff:"Assistant",
-    text:"Welcome. I'm Macha, the Assistant around here.\nI'll be looking after you... at least for now."
-  },
+  /* ════════════════════════════════════════════════
+     OPENING (shared)
+     ════════════════════════════════════════════════ */
+  main: [
+    { speaker:'macha', name:'Macha', aff:'Assistant', text:'...Hm?\nFootsteps... someone\'s here.' },
+    { speaker:'macha', name:'Macha', aff:'Assistant', text:'Oh! A new visitor.\nWe don\'t get many of those.' },
+    { speaker:'macha', name:'Macha', aff:'Assistant', text:'Welcome. I\'m Macha — the Assistant around here.\nThink of me as your guide, your handler, and occasionally your scapegoat.' },
+    { speaker:'macha', name:'Macha', aff:'Assistant', text:'I\'ll be looking after you... at least for now.\nWhether that changes depends entirely on you.' },
+    { speaker:'macha', name:'Macha', aff:'Assistant', text:'Before you step any further inside, there are a few simple rules.\nThey\'re not difficult... unless you go out of your way to make them difficult.' },
+    { speaker:'macha', name:'Macha', aff:'Assistant', text:'Rule one —\nDon\'t lose your mind. Whatever you see here, keep yourself together. Always.' },
+    { speaker:'macha', name:'Macha', aff:'Assistant', text:'Rule two —\nDon\'t be a jerk. No one here has the patience for that, least of all me.' },
+    { speaker:'macha', name:'Macha', aff:'Assistant', text:'Rule three —\nRespect everyone around you. Without. Exception. That includes the furniture, on bad days.' },
+    { speaker:'macha', name:'Macha', aff:'Assistant', text:'Rule four, the most important one —\nWhatever happens next... don\'t blame me for it.' },
+    { speaker:'macha', name:'Macha', aff:'Assistant', text:'Easy enough, right? Now then...\nHow are you feeling about all this?' },
+    { type:'choice', choices:[
+      { label:'"This sounds like it could be fun!"',     route:'kind' },
+      { label:'"...Just show me what\'s here already."', route:'bold' },
+      { label:'(Stay quiet, a little nervous...)',        route:'shy'  },
+    ]},
+  ],
 
-  {
-    speaker:"macha",
-    name:"Macha",
-    aff:"Assistant",
-    text:"Before you step inside, there are a few simple rules.\nThey're not difficult... unless you try to make them difficult."
-  },
+  /* ════════════════════════════════════════════════
+     ROUTE A — THE WARM ONE (formerly "kind")
+     ════════════════════════════════════════════════ */
+  kind: [
+    { type:'badge', text:'◈ THE WARM PATH ◈', cls:'route-kind' },
+    { speaker:'macha', name:'Macha', aff:'Assistant', text:'Oh—!\nA smile like that is already a good sign.' },
+    { speaker:'macha', name:'Macha', aff:'Assistant', text:'You seem like someone who\'d fit right in.\nThat makes my job a whole lot easier, honestly.' },
+    { speaker:'macha', name:'Macha', aff:'Assistant', text:'Most people walk in here stiff as a board.\nYou, though — you walked in like you already belonged.' },
+    { type:'choice', choices:[
+      { label:'"I try to make a good first impression."',  route:'kind_a' },
+      { label:'"I just go with the flow, really."',        route:'kind_b' },
+    ]},
+  ],
 
-  {
-    speaker:"macha",
-    name:"Macha",
-    aff:"Assistant",
-    text:"Rule One. — Stay calm.\nNo unnecessary drama, no chaos."
-  },
+  kind_a: [
+    { speaker:'macha', name:'Macha', aff:'Assistant', text:'Ha! A planner, then.\nI respect that. Chaos and I don\'t always get along.' },
+    { speaker:'macha', name:'Macha', aff:'Assistant', text:'You\'ll want to remember that instinct.\nIt\'ll serve you well around here.' },
+    { type:'transition' },
+    { speaker:'unknown', name:'???', aff:'', text:'Macha.' },
+    { speaker:'macha', name:'Macha', aff:'Assistant', surprise:true, text:'M-Master?! You were listening this whole time?!' },
+    { speaker:'master', name:'Tida', aff:'Master', text:'I just wanted to meet the new guest myself.\nSomeone composed and cheerful is always welcome here.' },
+    { speaker:'master', name:'Tida', aff:'Master', text:'Take your time settling in.\nYou\'ll find this place grows on you, slowly but surely.' },
+    { speaker:'master', name:'Tida', aff:'Master', text:'And Macha here has been taking good care of you, by the way.\nShe doesn\'t get nearly enough credit for that.' },
+    { speaker:'macha',  name:'Macha', aff:'Assistant', blush:true, text:'I—! That\'s really not necessary to mention, Master...!' },
+    { speaker:'macha', name:'Macha', aff:'Assistant', text:'See? Even the Master approves of you.\nThat almost never happens this fast.' },
+    { type:'choice', choices:[
+      { label:'"Thank you, Macha — for everything so far."', route:'kind_end_warm' },
+      { label:'"Hey, Tida seems pretty nice too."',          route:'kind_end_tida' },
+    ]},
+  ],
 
-  {
-    speaker:"macha",
-    name:"Macha",
-    aff:"Assistant",
-    text:"Rule Two. — Treat others with kindness.\nEveryone deserves respect."
-  },
+  kind_b: [
+    { speaker:'macha', name:'Macha', aff:'Assistant', text:'Going with the flow, hm?\nThat\'s either going to make your life very easy, or very strange. Possibly both.' },
+    { speaker:'macha', name:'Macha', aff:'Assistant', text:'Either way, I like that energy.\nIt suits this place more than you\'d think.' },
+    { type:'transition' },
+    { speaker:'unknown', name:'???', aff:'', text:'Macha.' },
+    { speaker:'macha', name:'Macha', aff:'Assistant', surprise:true, text:'M-Master?! You were listening this whole time?!' },
+    { speaker:'master', name:'Tida', aff:'Master', text:'I just wanted to meet the new guest myself.\nSomeone relaxed and cheerful is always welcome here.' },
+    { speaker:'master', name:'Tida', aff:'Master', text:'Take your time settling in.\nYou\'ll find this place grows on you, slowly but surely.' },
+    { speaker:'master', name:'Tida', aff:'Master', text:'And Macha here has been taking good care of you, by the way.\nShe doesn\'t get nearly enough credit for that.' },
+    { speaker:'macha',  name:'Macha', aff:'Assistant', blush:true, text:'I—! That\'s really not necessary to mention, Master...!' },
+    { speaker:'macha', name:'Macha', aff:'Assistant', text:'See? Even the Master approves of you.\nThat almost never happens this fast.' },
+    { type:'choice', choices:[
+      { label:'"Thank you, Macha — for everything so far."', route:'kind_end_warm' },
+      { label:'"Hey, Tida seems pretty nice too."',          route:'kind_end_tida' },
+    ]},
+  ],
 
-  {
-    speaker:"macha",
-    name:"Macha",
-    aff:"Assistant",
-    text:"Rule Three. — Enjoy yourself.\nAfter all... that's why this place exists."
-  },
+  kind_end_warm: [
+    { speaker:'macha',  name:'Macha', aff:'Assistant', text:'Hehe~ You\'re very welcome.\nI don\'t hear that nearly often enough around here.' },
+    { speaker:'macha',  name:'Macha', aff:'Assistant', text:'Alright, enough standing around.\nRight this way — let me show you everything.' },
+    { speaker:'macha', name:'Macha', aff:'Assistant', truend:true, text:'Mm... I suppose it\'s about that time, isn\'t it?\nSee you again soon. Don\'t go disappearing on me.' },
+    { type:'ending', icon:'🌸', title:'ENDING A — Warm Welcome',
+      sub:'You made a truly wonderful first impression.\nMacha and Tida have welcomed you with open arms — your story here is just beginning.' },
+  ],
 
-  {
-    speaker:"macha",
-    name:"Macha",
-    aff:"Assistant",
-    text:"Easy enough, right?\nGood. Then let's—"
-  },
+  kind_end_tida: [
+    { speaker:'master', name:'Tida',  aff:'Master',    text:'...I try.\nNot everyone notices, but I appreciate that you did.' },
+    { speaker:'macha',  name:'Macha', aff:'Assistant', text:'Don\'t let that flat tone fool you — the Master genuinely cares about everyone here.\nShe just expresses it... differently.' },
+    { speaker:'master', name:'Tida',  aff:'Master',    text:'Macha.' },
+    { speaker:'macha',  name:'Macha', aff:'Assistant', surprise:true, text:'S-Sorry! I said too much, didn\'t I?' },
+    { speaker:'master', name:'Tida',  aff:'Master',    text:'...No. It\'s fine, this once.' },
+    { speaker:'macha', name:'Macha', aff:'Assistant', truend:true, text:'Well then... I\'ll let you two have your moment.\nSee you soon — I mean it this time.' },
+    { type:'ending', icon:'☀️', title:'ENDING B — Sunny Arrival',
+      sub:'You connected with Tida almost instantly.\nA bright, easy beginning awaits you both.' },
+  ],
 
-  { type:"transition" },
+  /* ════════════════════════════════════════════════
+     ROUTE B — THE BOLD ONE
+     ════════════════════════════════════════════════ */
+  bold: [
+    { type:'badge', text:'◈ THE BOLD PATH ◈', cls:'route-bold' },
+    { speaker:'macha', name:'Macha', aff:'Assistant', text:'...Straight to the point, hm?\nI can respect that. No wasted words.' },
+    { speaker:'macha', name:'Macha', aff:'Assistant', text:'Most people are a little hesitant at first — nervous laughter, fidgeting, the usual.\nBut someone like you? You\'ll do just fine here.' },
+    { speaker:'macha', name:'Macha', aff:'Assistant', text:'Just be careful.\nConfidence opens doors here... but it can also slam a few shut.' },
+    { type:'choice', choices:[
+      { label:'"I know exactly what I\'m doing."',   route:'bold_a' },
+      { label:'"I don\'t scare easily. Try me."',    route:'bold_b' },
+    ]},
+  ],
 
-  {
-    speaker:"unknown",
-    name:"???",
-    aff:"",
-    text:"Ahem."
-  },
+  bold_a: [
+    { speaker:'macha', name:'Macha', aff:'Assistant', text:'Confident. I like it.\nLet\'s see if that holds up once things actually get interesting.' },
+    { type:'transition' },
+    { speaker:'unknown', name:'???', aff:'', text:'Ahem.' },
+    { speaker:'macha', name:'Macha', aff:'Assistant', surprise:true, text:'M-Master?! How long were you standing there?!' },
+    { speaker:'master', name:'Tida', aff:'Master', text:'Confident. I like that too, apparently.\nDon\'t lose that edge — this place tends to wear it down.' },
+    { speaker:'master', name:'Tida', aff:'Master', text:'Macha picked well, bringing this one to me.\nShe has a good eye, when she bothers to use it.' },
+    { speaker:'macha',  name:'Macha', aff:'Assistant', blush:true, text:'I—! I just did my job, that\'s all! No need to make it weird, Master...' },
+    { speaker:'macha', name:'Macha', aff:'Assistant', text:'Master rarely compliments someone so quickly.\nYou\'ve made an impression already, and we\'ve barely started.' },
+    { type:'choice', choices:[
+      { label:'"Of course I have."',          route:'bold_end_cool'   },
+      { label:'"I just say what I mean."',    route:'bold_end_honest' },
+    ]},
+  ],
 
-  {
-    speaker:"macha",
-    name:"Macha",
-    aff:"Assistant",
-    surprise:true,
-    text:"...M-Master?!"
-  },
+  bold_b: [
+    { speaker:'macha', name:'Macha', aff:'Assistant', text:'Bold words. I hope they hold up.\nThis place has a way of testing exactly that kind of statement.' },
+    { type:'transition' },
+    { speaker:'unknown', name:'???', aff:'', text:'Ahem.' },
+    { speaker:'macha', name:'Macha', aff:'Assistant', surprise:true, text:'M-Master?! How long were you standing there?!' },
+    { speaker:'master', name:'Tida', aff:'Master', text:'Bold. I like that.\nDon\'t lose that edge — this place tends to wear it down.' },
+    { speaker:'master', name:'Tida', aff:'Master', text:'Macha picked well, bringing this one to me.\nShe has a good eye, when she bothers to use it.' },
+    { speaker:'macha',  name:'Macha', aff:'Assistant', blush:true, text:'I—! I just did my job, that\'s all! No need to make it weird, Master...' },
+    { speaker:'macha', name:'Macha', aff:'Assistant', text:'Master rarely compliments someone so quickly.\nYou\'ve made an impression already, and we\'ve barely started.' },
+    { type:'choice', choices:[
+      { label:'"Of course I have."',          route:'bold_end_cool'   },
+      { label:'"I just say what I mean."',    route:'bold_end_honest' },
+    ]},
+  ],
 
-  {
-    speaker:"master",
-    name:"Tida",
-    aff:"Master",
-    text:"Macha."
-  },
+  bold_end_cool: [
+    { speaker:'master', name:'Tida', aff:'Master', text:'...' },
+    { speaker:'master', name:'Tida', aff:'Master', text:'I think we\'re going to get along.\nDon\'t make me regret saying that.' },
+    { speaker:'macha',  name:'Macha', aff:'Assistant', text:'Wow... that\'s actually the nicest thing the Master has said to a newcomer.\nEver. I have it on record.' },
+    { speaker:'macha', name:'Macha', aff:'Assistant', truend:true, text:'Hmph. Don\'t get used to the easy compliments.\nSee you around — try not to make me regret letting you in.' },
+    { type:'ending', icon:'⚔️', title:'ENDING C — Bold Arrival',
+      sub:'Your confidence left a real impression on Tida.\nYou\'ve already earned a measure of respect — rare, and not given lightly.' },
+  ],
 
-  {
-    speaker:"macha",
-    name:"Macha",
-    aff:"Assistant",
-    surprise:true,
-    text:"Y-Yes?!"
-  },
+  bold_end_honest: [
+    { speaker:'master', name:'Tida',  aff:'Master',    text:'Honesty is rare.\nKeep it. Don\'t let this place talk you out of it.' },
+    { speaker:'macha',  name:'Macha', aff:'Assistant', text:'...I have a feeling you two are going to have some very interesting conversations.\nI\'ll go ahead and prepare the tea now.' },
+    { speaker:'macha', name:'Macha', aff:'Assistant', truend:true, text:'...The tea\'s getting cold waiting on you two.\nSee you next time. I\'ll hold you to that honesty.' },
+    { type:'ending', icon:'🔥', title:'ENDING D — True Grit',
+      sub:'Your honesty was valued more than you realized.\nWelcome, adventurer — the path ahead suits someone like you.' },
+  ],
 
-  {
-    speaker:"master",
-    name:"Tida",
-    aff:"Master",
-    text:"Are you giving another one of your 'perfect introductions'?"
-  },
+  /* ════════════════════════════════════════════════
+     ROUTE C — THE QUIET ONE
+     ════════════════════════════════════════════════ */
+  shy: [
+    { type:'badge', text:'◈ THE QUIET PATH ◈', cls:'route-shy' },
+    { speaker:'macha', name:'Macha', aff:'Assistant', text:'...It\'s okay to be nervous.\nEveryone is, the first time. Even the loud ones, deep down.' },
+    { speaker:'macha', name:'Macha', aff:'Assistant', text:'There\'s no rush here. Take your time.\nI\'ll be right beside you the whole way.' },
+    { speaker:'macha', name:'Macha', aff:'Assistant', text:'...You know, when I first arrived here,\nI was scared too. More than I\'d ever admit out loud.' },
+    { type:'choice', choices:[
+      { label:'(Look at her, curious)',          route:'shy_a' },
+      { label:'(Say nothing, just listen)',      route:'shy_b' },
+    ]},
+  ],
 
-  {
-    speaker:"macha",
-    name:"Macha",
-    aff:"Assistant",
-    text:"W-Well...\nI was trying to make a good first impression..."
-  },
+  shy_a: [
+    { speaker:'macha', name:'Macha', aff:'Assistant', text:'Oh? You want to hear more?\n...Maybe some other time. For now, let\'s just focus on you.' },
+    { speaker:'macha', name:'Macha', aff:'Assistant', text:'But for what it\'s worth — that fear doesn\'t last.\nIt fades, a little at a time.' },
+    { type:'transition' },
+    { speaker:'unknown', name:'???', aff:'', text:'...' },
+    { speaker:'macha',  name:'Macha', aff:'Assistant', surprise:true, text:'M-Master! Don\'t sneak up like that, you\'ll give someone a heart attack!' },
+    { speaker:'master', name:'Tida',  aff:'Master', text:'Sorry.\nI didn\'t want to startle our guest any further than they already were.' },
+    { speaker:'master', name:'Tida',  aff:'Master', text:'You don\'t have to say anything.\nJust... be here. That\'s enough, for now.' },
+    { speaker:'master', name:'Tida',  aff:'Master', text:'Macha\'s good at that, by the way — sitting with someone\'s silence without rushing it.\nMore than most people give her credit for.' },
+    { speaker:'macha',  name:'Macha', aff:'Assistant', blush:true, text:'M-Master, please... I\'m supposed to be the one helping them, not the other way around!' },
+    { type:'choice', choices:[
+      { label:'(Nod slowly)',           route:'shy_end_accept' },
+      { label:'"...Th-thank you..."',   route:'shy_end_speak'  },
+    ]},
+  ],
 
-  {
-    speaker:"master",
-    name:"Tida",
-    aff:"Master",
-    text:"You forgot the most important part."
-  },
+  shy_b: [
+    { speaker:'macha', name:'Macha', aff:'Assistant', text:'...Thank you for listening.\nNot everyone bothers to. You\'re kinder than you think.' },
+    { type:'transition' },
+    { speaker:'unknown', name:'???', aff:'', text:'...' },
+    { speaker:'macha',  name:'Macha', aff:'Assistant', surprise:true, text:'M-Master! Don\'t sneak up like that, you\'ll give someone a heart attack!' },
+    { speaker:'master', name:'Tida',  aff:'Master', text:'Sorry.\nI didn\'t want to startle our guest any further than they already were.' },
+    { speaker:'master', name:'Tida',  aff:'Master', text:'You don\'t have to say anything.\nJust... be here. That\'s enough, for now.' },
+    { speaker:'master', name:'Tida',  aff:'Master', text:'Macha\'s good at that, by the way — sitting with someone\'s silence without rushing it.\nMore than most people give her credit for.' },
+    { speaker:'macha',  name:'Macha', aff:'Assistant', blush:true, text:'M-Master, please... I\'m supposed to be the one helping them, not the other way around!' },
+    { type:'choice', choices:[
+      { label:'(Nod slowly)',           route:'shy_end_accept' },
+      { label:'"...Th-thank you..."',   route:'shy_end_speak'  },
+    ]},
+  ],
 
-  {
-    speaker:"macha",
-    name:"Macha",
-    aff:"Assistant",
-    surprise:true,
-    text:"I... did?"
-  },
+  shy_end_accept: [
+    { speaker:'macha',  name:'Macha', aff:'Assistant', text:'...See that? Even silence can be an answer.\nYou\'re doing better than you think you are.' },
+    { speaker:'master', name:'Tida',  aff:'Master',    text:'Welcome.\nReally. There\'s no need to prove anything to anyone here.' },
+    { speaker:'macha', name:'Macha', aff:'Assistant', truend:true, text:'...See you again, okay?\nTake your time. There\'s no rush to be brave.' },
+    { type:'ending', icon:'🌙', title:'ENDING E — Quiet Beginning',
+      sub:'Your silence carried more meaning than words ever could.\nYou are accepted exactly as you are.' },
+  ],
 
-  {
-    speaker:"master",
-    name:"Tida",
-    aff:"Master",
-    text:"Our guest hasn't even introduced themselves yet."
-  },
-
-  {
-    speaker:"macha",
-    name:"Macha",
-    aff:"Assistant",
-    text:"...Oh."
-  },
-
-  {
-    speaker:"macha",
-    name:"Macha",
-    aff:"Assistant",
-    text:"That's...\na very good point."
-  },
-
-  {
-    speaker:"master",
-    name:"Tida",
-    aff:"Master",
-    text:"Welcome.\nTake your time, choose a name you're comfortable with, and make yourself at home."
-  },
-
-  {
-    speaker:"macha",
-    name:"Macha",
-    aff:"Assistant",
-    text:"I'll be here if you need anything. Now then...\nWhat should we call you?"
-  }
-
-];
-
-// ── audio setup ─────────────────────────────────────────────
+  shy_end_speak: [
+    { speaker:'master', name:'Tida',  aff:'Master',    text:'...\nThose two small words mean more than you probably realize.' },
+    { speaker:'macha',  name:'Macha', aff:'Assistant', text:'The Master is right.\nWelcome, truly. You found your voice when it mattered.' },
+    { speaker:'macha', name:'Macha', aff:'Assistant', truend:true, text:'You found your voice today.\nSee you soon — I\'ll be looking forward to hearing it again.' },
+    { type:'ending', icon:'💜', title:'ENDING F — First Words',
+      sub:'Your first words opened a door you didn\'t know was there.\nA gentle, meaningful journey awaits you.' },
+  ],
+};
+// ============================================================
+// AUDIO
+// ============================================================
 const sndTyping = new Audio('https://www.myinstants.com/media/sounds/blue-archive-respond-chat.mp3');
 sndTyping.volume = 0.55;
 
 const sndCat = new Audio('https://static.wikitide.net/bluearchivewiki/transcoded/d/d8/SE_Cat_01.wav/SE_Cat_01.wav.ogg');
 sndCat.volume = 0.8;
+
+const sndChoice = new Audio('https://www.myinstants.com/media/sounds/blue-archive-respond-chat.mp3');
+sndChoice.volume = 0.4;
+sndChoice.playbackRate = 1.6;
 
 const sndBgm = new Audio('https://static.wikitide.net/bluearchivewiki/3/3a/Track_15_Mitsukiyo_Honey_Jam.ogg');
 sndBgm.loop   = true;
@@ -368,146 +467,269 @@ sndBgm.volume = 0.4;
 
 let bgmStarted = false;
 function startBgm(){
-  if (bgmStarted) return;
+  if(bgmStarted) return;
   bgmStarted = true;
-  sndBgm.play().catch(() => {});
+  sndBgm.play().catch(()=>{});
 }
 
-function playTyping(){
+let typingBeepCounter = 0;
+function playTypingBeep(){
+  typingBeepCounter++;
+  if(typingBeepCounter % 2 !== 0) return;
   sndTyping.currentTime = 0;
-  sndTyping.play().catch(() => {});
+  sndTyping.play().catch(()=>{});
 }
 
-// ── state ───────────────────────────────────────────────────
-let step    = -1;
-let typing  = false;
-let tyTimer = null;
-let inTrans = false;
+function playChoiceSfx(){
+  sndChoice.currentTime = 0;
+  sndChoice.play().catch(()=>{});
+}
 
-const hint       = document.getElementById('hint');
-const charMacha  = document.getElementById('charMacha');
-const charMaster = document.getElementById('charMaster');
-const scLine     = document.getElementById('scLine');
-const scNameBlock= document.getElementById('scNameBlock');
-const scName     = document.getElementById('scName');
-const scAff      = document.getElementById('scAffiliation');
-const scDialogue = document.getElementById('scDialogue');
-const scTriangle = document.getElementById('scTriangle');
-const scFlash    = document.getElementById('scFlash');
-const scDarkBg   = document.getElementById('scDarkBg');
+// ============================================================
+// ENGINE
+// ============================================================
+let currentRoute = 'main';
+let stepIdx      = 0;
+let typing       = false;
+let tyTimer      = null;
+let inTrans      = false;
+let choosingMode = false;
+let started      = false;
 
-// ── helpers ─────────────────────────────────────────────────
+const hint        = document.getElementById('hint');
+const charMacha   = document.getElementById('charMacha');
+const charMaster  = document.getElementById('charMaster');
+const scLine      = document.getElementById('scLine');
+const scNameBlock = document.getElementById('scNameBlock');
+const scName      = document.getElementById('scName');
+const scAff       = document.getElementById('scAff');
+const scDialogue  = document.getElementById('scDialogue');
+const scTriangle  = document.getElementById('scTriangle');
+const scFlash     = document.getElementById('scFlash');
+const scDarkBg    = document.getElementById('scDarkBg');
+const choiceBox   = document.getElementById('choiceBox');
+const routeBadge  = document.getElementById('routeBadge');
+const endingCard  = document.getElementById('endingCard');
+const scFade      = document.getElementById('scFade');
+
+// ── helpers ──
 function show(el){ el.classList.add('show'); }
 function hide(el){ el.classList.remove('show'); }
 
 function flash(){
   scFlash.classList.add('pop');
-  setTimeout(() => scFlash.classList.remove('pop'), 180);
+  setTimeout(()=>scFlash.classList.remove('pop'), 200);
 }
 
-function doTransition(onDone){
-  inTrans = true;
-  scDialogue.textContent = '';
-  scName.textContent     = '';
-  scAff.textContent      = '';
-  hide(scTriangle);
+// ── set Macha's sprite based on the current line's expression flag ──
+function setMachaExpression(entry){
+  const isMachaLine = entry.speaker === 'macha' || entry.speaker === 'unknown';
+  if(!isMachaLine) return;
 
-  charMacha.classList.add('slide-left');
-  charMacha.classList.add('darken');
-  scDarkBg.classList.add('dim');
+  let exprKey = 'normal';
+  for(const key in MACHA_SPRITES){
+    if(key !== 'normal' && entry[key] === true){
+      exprKey = key;
+      break;
+    }
+  }
 
-  setTimeout(() => {
-    // play cat sound when ??? slides in
-    sndCat.currentTime = 0;
-    sndCat.play().catch(() => {});
-
-    show(charMaster);
-    charMaster.classList.add('slide-in');
-    setTimeout(() => {
-      inTrans = false;
-      if (onDone) onDone();
-    }, 700);
-  }, 500);
+  const targetSrc = MACHA_SPRITES[exprKey] || MACHA_SPRITES.normal;
+  if(charMacha.getAttribute('src') !== targetSrc){
+    charMacha.setAttribute('src', targetSrc);
+  }
 }
 
-const BEEP_EVERY = 2;
-function typewrite(text, speed, onDone){
+// ── typewriter ──
+function typewrite(text){
   scDialogue.textContent = '';
-  typing  = true;
-  let i   = 0;
+  typing = true;
+  typingBeepCounter = 0;
+  let i = 0;
   const tick = () => {
     const ch = text.charAt(i);
     scDialogue.textContent += ch;
-    // play blip every BEEP_EVERY visible chars (skip newlines)
-    if (ch !== '\n' && i % BEEP_EVERY === 0) playTyping();
+    if(ch !== '\n') playTypingBeep();
     i++;
-    if (i < text.length) tyTimer = setTimeout(tick, speed);
-    else { typing = false; show(scTriangle); if (onDone) onDone(); }
+    if(i < text.length) tyTimer = setTimeout(tick, 42);
+    else { typing = false; show(scTriangle); }
   };
   tick();
 }
 
+// ── show dialogue line ──
 function showLine(entry){
   scName.textContent = entry.name || '';
   scAff.textContent  = entry.aff  || '';
   show(scLine); show(scNameBlock);
 
-  if (entry.speaker === 'macha'){
-    charMacha.classList.remove('darken');
-    charMaster.classList.add('darken');
-  } else {
-    charMaster.classList.remove('darken');
-    charMacha.classList.add('darken');
-  }
+  const isMacha = entry.speaker === 'macha' || entry.speaker === 'unknown';
+  if(isMacha){ charMacha.classList.remove('darken'); charMaster.classList.add('darken'); }
+  else        { charMaster.classList.remove('darken'); charMacha.classList.add('darken'); }
 
-  if (entry.surprise) flash();
+  // swap Macha's sprite to the blush expression (or back to normal)
+  setMachaExpression(entry);
 
-  hide(scTriangle);
-  typewrite(entry.text, 50, null);
+  if(entry.surprise) flash();
+  hide(scTriangle); hide(choiceBox);
+  choosingMode = false;
+  typewrite(entry.text);
 }
 
-// ── main advance ────────────────────────────────────────────
-function advance(){
-  if (inTrans) return;
+// ── show choice buttons ──
+function showChoice(entry){
+  hide(scTriangle);
+  typing = false;
+  choosingMode = true;
+  scDialogue.textContent = '';
+  scName.textContent = ''; scAff.textContent = '';
+  hide(scNameBlock); hide(scLine);
+  choiceBox.innerHTML = '';
+  entry.choices.forEach(c => {
+    const btn = document.createElement('button');
+    btn.className = 'choice-btn';
+    btn.textContent = c.label;
+    btn.onclick = e => { e.stopPropagation(); playChoiceSfx(); selectRoute(c.route); };
+    choiceBox.appendChild(btn);
+  });
+  show(choiceBox);
+}
 
-  startBgm();
+// ── transition: Macha slides left, Master slides in ──
+function doTransition(onDone){
+  inTrans = true;
+  scDialogue.textContent = ''; scName.textContent = ''; scAff.textContent = '';
+  hide(scTriangle); hide(scNameBlock); hide(scLine);
+  charMacha.setAttribute('src', MACHA_SPRITES.normal); // reset expression before the transition
+  charMacha.classList.add('slide-left', 'darken');
+  scDarkBg.classList.add('dim');
+  setTimeout(() => {
+    sndCat.currentTime = 0;
+    sndCat.play().catch(()=>{});
+    show(charMaster);
+    charMaster.classList.add('slide-in');
+    setTimeout(() => { inTrans = false; if(onDone) onDone(); }, 700);
+  }, 500);
+}
 
-  if (typing){
+// ── route badge flash ──
+function showBadge(entry, onDone){
+  routeBadge.textContent = entry.text;
+  routeBadge.className   = 'route-badge show ' + entry.cls;
+  setTimeout(() => {
+    routeBadge.classList.remove('show');
+    if(onDone) onDone();
+  }, 2000);
+}
+
+// ── ending screen ──
+function showEnding(entry){
+  document.getElementById('endIcon').textContent  = entry.icon  || '✨';
+  document.getElementById('endTitle').textContent = entry.title || 'END';
+  document.getElementById('endSub').textContent   = entry.sub   || '';
+  hide(choiceBox);
+  setTimeout(() => show(endingCard), 600);
+}
+
+// ── select route ──
+function selectRoute(route){
+  hide(choiceBox);
+  choosingMode = false;
+  currentRoute = route;
+  stepIdx = 0;
+  playStep();
+}
+
+// ── play current step ──
+function playStep(){
+  const script = SCRIPTS[currentRoute];
+  if(!script || stepIdx >= script.length) return;
+  const entry = script[stepIdx];
+
+  if(entry.type === 'badge'){
+    showBadge(entry, () => { stepIdx++; playStep(); });
+  } else if(entry.type === 'choice'){
+    showChoice(entry);
+  } else if(entry.type === 'transition'){
+    doTransition(() => { stepIdx++; playStep(); });
+  } else if(entry.type === 'ending'){
+    showEnding(entry);
+  } else {
+    showLine(entry);
+  }
+}
+
+// ── main click handler ──
+function handleSceneClick(){
+  if(choosingMode || inTrans) return;
+
+  if(!started){
+    started = true;
+    startBgm();
+    hint.style.display = 'none';
+    show(charMacha);
+    setTimeout(() => { show(scLine); show(scNameBlock); }, 300);
+    currentRoute = 'main';
+    stepIdx = 0;
+    showLine(SCRIPTS.main[0]);
+    return;
+  }
+
+  // skip typewriter
+  if(typing){
     clearTimeout(tyTimer);
     typing = false;
-    scDialogue.textContent = script[step].text;
+    const cur = SCRIPTS[currentRoute][stepIdx];
+    if(cur && cur.text) scDialogue.textContent = cur.text;
     show(scTriangle);
     return;
   }
 
-  step++;
+  // advance
+  stepIdx++;
+  const script = SCRIPTS[currentRoute];
+  if(!script || stepIdx >= script.length) return;
+  const entry = script[stepIdx];
+  if(!entry) return;
 
-  if (step === 0){
-    hint.style.display = 'none';
-    show(charMacha);
-    setTimeout(() => { show(scLine); show(scNameBlock); }, 300);
-    showLine(script[0]);
-    return;
-  }
-
-  if (step >= script.length){
-    document.getElementById('scene').style.transition = 'opacity 1.2s';
-    document.getElementById('scene').style.opacity = '0';
-    return;
-  }
-
-  const entry = script[step];
-
-  if (entry.type === 'transition'){
-    doTransition(() => {
-      step++;
-      showLine(script[step]);
-    });
-    return;
-  }
-
-  showLine(entry);
+  if(entry.type === 'badge')        showBadge(entry, () => { stepIdx++; playStep(); });
+  else if(entry.type === 'choice')  showChoice(entry);
+  else if(entry.type === 'transition') doTransition(() => { stepIdx++; playStep(); });
+  else if(entry.type === 'ending')  showEnding(entry);
+  else                              showLine(entry);
 }
+
+// ── navigation ──
+function goBack(){
+  if(window.history.length > 1) window.history.back();
+  else alert('Tidak ada halaman sebelumnya. Buka file ini dari halaman lain untuk menggunakan tombol Kembali.');
+}
+
+function replayScene(){
+  sndBgm.pause();
+  sndBgm.currentTime = 0;
+  bgmStarted = false;
+  endingCard.classList.remove('show');
+  charMacha.className  = 'sc-char';
+  charMaster.className = 'sc-char';
+  charMacha.setAttribute('src', MACHA_SPRITES.normal); // reset expression on replay
+  scDarkBg.classList.remove('dim');
+  hide(scLine); hide(scNameBlock); hide(scTriangle); hide(choiceBox);
+  routeBadge.className = 'route-badge';
+  scDialogue.textContent = ''; scName.textContent = ''; scAff.textContent = '';
+
+  currentRoute = 'main'; stepIdx = 0;
+  typing = false; inTrans = false; choosingMode = false; started = false;
+
+  scFade.style.opacity = '1'; scFade.style.transition = 'none';
+  setTimeout(() => { scFade.style.transition = 'opacity 1.2s'; scFade.classList.add('out'); }, 100);
+  hint.style.display = '';
+}
+
+// ── fade in on load ──
+window.onload = () => {
+  setTimeout(() => { scFade.style.transition = 'opacity 1.2s'; scFade.classList.add('out'); }, 300);
+};
 </script>
 </body>
 </html>
