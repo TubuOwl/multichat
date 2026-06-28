@@ -335,7 +335,7 @@ body {
 }
 .chat-box {
   position: relative; width: 250px; height: 350px;
-  background: rgba(255,255,255,0.95); border-radius: 8px; overflow: hidden;
+  background: transparent; border-radius: 8px; overflow: hidden;
   box-shadow: 0 3px 8px rgba(0,0,0,0.3);
   will-change: transform;
 }
@@ -1118,7 +1118,7 @@ function createChatElement(chatname) {
   var scr=document.createElement("script");
   scr.setAttribute("id",fetchCid()); scr.setAttribute("data-cfasync","false"); scr.async=true;
   scr.src="//st.chatango.com/js/gz/emb.js";
-  scr.text=JSON.stringify({handle:chatname,arch:"js",styles:{a:"ffffff",b:100,c:"000000",d:"000000",e:"ffffff",g:"000000",h:"ffffff",j:"000000",k:"888888",l:"E0E0E0",m:"ffffff",n:"ffffff",p:10,q:"ffffff",w:1,ab:1,surl:0}});
+  scr.text=JSON.stringify({handle:chatname,arch:"js",styles:{a:"ffffff", c:"000000", d:"000000", f:50, h:"ffffff", i:30, l:"cccccc", m:"dadada", q:"ffffff", sbc:"bbbbbb", fwtickm:0}});
   container.appendChild(scr);
   setTimeout(function(){ fixContainer(container); },800);
   setTimeout(function(){ fixContainer(container); },2500);
@@ -1136,7 +1136,7 @@ function createChatElement(chatname) {
   var scr=document.createElement("script");
   scr.setAttribute("id",fetchCid()); scr.setAttribute("data-cfasync","false"); scr.async=true;
   scr.src="//st.chatango.com/js/gz/emb.js";
-  scr.text=JSON.stringify({handle:chatname,arch:"js",styles:{a:"ffffff",b:100,c:"000000",d:"000000",e:"ffffff",g:"000000",h:"ffffff",j:"000000",k:"888888",l:"E0E0E0",m:"ffffff",n:"ffffff",p:10,q:"ffffff",w:1,ab:1,surl:0}});
+  scr.text=JSON.stringify({handle:chatname,arch:"js",styles:{a:"ffffff", c:"000000", d:"000000", f:50, h:"ffffff", i:30, l:"cccccc", m:"dadada", q:"ffffff", sbc:"bbbbbb", fwtickm:0}});
   container.appendChild(scr);
 
   function lockIframe(){
