@@ -1118,25 +1118,7 @@ function createChatElement(chatname) {
   var scr=document.createElement("script");
   scr.setAttribute("id",fetchCid()); scr.setAttribute("data-cfasync","false"); scr.async=true;
   scr.src="//st.chatango.com/js/gz/emb.js";
-  scr.text=JSON.stringify({handle:chatname,arch:"js",styles:{a:"ffffff", c:"000000", d:"000000", f:50, h:"ffffff", i:30, l:"cccccc", m:"dadada", q:"ffffff", sbc:"bbbbbb", fwtickm:0}});
-  container.appendChild(scr);
-  setTimeout(function(){ fixContainer(container); },800);
-  setTimeout(function(){ fixContainer(container); },2500);
-  setTimeout(function(){ fixContainer(container); },5000);
-  new MutationObserver(function(){ fixContainer(container); }).observe(container,{childList:true,subtree:true,attributes:true});
-  return box;
-}
-
-function createChatElement(chatname) {
-  if (chatname.toLowerCase()==="macha") return createMachaChat();
-  var box=document.createElement("div"); box.className="chat-box"; box.dataset.room=chatname;
-  var close=document.createElement("button"); close.className="close-btn"; close.innerHTML="×";
-  close.onclick=function(){ box.remove(); }; box.appendChild(close);
-  var container=document.createElement("div"); container.className="chat-container"; box.appendChild(container);
-  var scr=document.createElement("script");
-  scr.setAttribute("id",fetchCid()); scr.setAttribute("data-cfasync","false"); scr.async=true;
-  scr.src="//st.chatango.com/js/gz/emb.js";
-  scr.text=JSON.stringify({handle:chatname,arch:"js",styles:{a:"ffffff", c:"000000", d:"000000", f:50, h:"ffffff", i:30, l:"cccccc", m:"dadada", q:"ffffff", sbc:"bbbbbb", fwtickm:0}});
+  scr.text=JSON.stringify({handle:chatname,arch:"js",styles:{a:"ffffff", c:"000000", d:"000000", f:30, h:"ffffff", i:30, l:"cccccc", m:"dadada", q:"ffffff", "cnrs":"1.4", sbc:"bbbbbb", fwtickm:0}});
   container.appendChild(scr);
 
   function lockIframe(){
