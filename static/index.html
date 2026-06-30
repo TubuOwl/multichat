@@ -1,0 +1,180 @@
+<html lang="en"><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimal-ui">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<link rel="icon" type="image/png" href="https://i.imgur.com/3WnhDqR.png">
+<title>Chatango ✗ Shoujo Chat</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<video id="bgVideo" autoplay muted loop playsinline style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;object-fit:cover;z-index:-1;"></video>
+  
+<!-- NAME MODAL -->
+<div id="nameModal">
+  <div id="nameBox">
+    <h3>👤 Enter Your Name</h3>
+    <p>This name will be visible to other users.</p>
+
+    <input
+      type="text"
+      id="nameInput"
+      placeholder="Your name..."
+      maxlength="20"
+      pattern="[a-zA-Z0-9]*"
+    >
+
+    <label id="tosRow" style="display:flex;align-items:flex-start;gap:8px;font-size:11px;color:#ccc;">
+      <input type="checkbox" id="tosCheckbox" style="margin-top:2px;">
+      <span>
+        I have read and agree to the
+        <a href="rules.html" target="_blank" style="color:#ff6b9d;text-decoration:underline;">
+          Terms &amp; Conditions
+        </a>
+      </span>
+    </label>
+
+    <button id="nameSubmitBtn" disabled>
+      Enter →
+    </button>
+  </div>
+</div>
+
+<!-- FLOATING OVERLAY (reaction, bubble, voice) -->
+<div id="reactionOverlay"></div>
+
+<!-- GIF PANEL -->
+<div id="gifPanel" style="display:none;position:fixed;bottom:60px;left:14px;width:300px;background:rgba(15,15,25,0.96);border:1px solid rgba(255,255,255,0.15);border-radius:12px;padding:10px;z-index:1200;box-shadow:0 6px 24px rgba(0,0,0,0.5);">
+  <div style="display:flex;gap:6px;margin-bottom:8px;">
+    <input id="gifInput" type="text" placeholder="Search GIF/sticker..." style="flex:1;padding:6px 10px;border-radius:8px;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.1);color:#fff;font-size:12px;outline:none;">
+    <button onclick="searchGif(0)" style="padding:6px 10px;border-radius:8px;border:none;background:#ff6b9d;color:#fff;font-size:12px;cursor:pointer;">Cari</button>
+    <button onclick="toggleGif()" style="padding:6px 8px;border-radius:8px;border:none;background:rgba(255,255,255,0.1);color:#fff;font-size:12px;cursor:pointer;">×</button>
+  </div>
+  <div id="gifResults" style="display:grid;grid-template-columns:1fr 1fr;gap:6px;max-height:240px;overflow-y:auto;"></div>
+  <div id="gifNav" style="display:none;justify-content:space-between;margin-top:8px;">
+    <button id="gifPrev" onclick="searchGif(gifPage-1)" style="padding:4px 12px;border-radius:8px;border:none;background:rgba(255,255,255,0.1);color:#fff;font-size:11px;cursor:pointer;">← Prev</button>
+    <span id="gifPageInfo" style="color:#888;font-size:10px;align-self:center;"></span>
+    <button id="gifNext" onclick="searchGif(gifPage+1)" style="padding:4px 12px;border-radius:8px;border:none;background:rgba(255,255,255,0.1);color:#fff;font-size:11px;cursor:pointer;">Next →</button>
+  </div>
+</div>
+
+<!-- IFRAME URL MODAL -->
+<div id="iframeModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);backdrop-filter:blur(4px);z-index:2000;align-items:center;justify-content:center;">
+  <div style="background:#1a1a2e;border:1px solid rgba(255,255,255,0.2);border-radius:14px;padding:24px 28px;display:flex;flex-direction:column;gap:14px;width:300px;box-shadow:0 8px 32px rgba(0,0,0,0.5);">
+    <h3 style="color:#fff;font-size:15px;text-align:center;">🌐 Custom URL</h3>
+    <input type="text" id="iframeTitle" placeholder="Judul..." maxlength="50"
+      style="padding:9px 12px;border-radius:8px;border:1px solid rgba(255,255,255,0.25);background:rgba(255,255,255,0.1);color:#fff;font-size:13px;outline:none;">
+    <input type="text" id="iframeThumb" placeholder="URL thumbnail (opsional)..." maxlength="300"
+      style="padding:9px 12px;border-radius:8px;border:1px solid rgba(255,255,255,0.25);background:rgba(255,255,255,0.1);color:#fff;font-size:13px;outline:none;">
+    <input type="text" id="iframeUrl" placeholder="https://..." maxlength="300"
+      style="padding:9px 12px;border-radius:8px;border:1px solid rgba(255,255,255,0.25);background:rgba(255,255,255,0.1);color:#fff;font-size:13px;outline:none;">
+    <div style="display:flex;gap:8px;">
+      <button onclick="submitIframe()" style="flex:1;padding:9px;border-radius:8px;border:none;background:linear-gradient(135deg,#ff6b9d,#c084fc);color:#fff;font-size:13px;font-weight:bold;cursor:pointer;">Tampilkan</button>
+      <button onclick="toggleIframe()" style="padding:9px 14px;border-radius:8px;border:none;background:rgba(255,255,255,0.1);color:#fff;font-size:13px;cursor:pointer;">Batal</button>
+    </div>
+  </div>
+</div>
+
+<div id="statsModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);backdrop-filter:blur(4px);z-index:2000;align-items:center;justify-content:center;">
+  <div style="background:#1a1a2e;border:1px solid rgba(255,255,255,0.2);border-radius:14px;padding:24px 28px;display:flex;flex-direction:column;gap:14px;width:300px;box-shadow:0 8px 32px rgba(0,0,0,0.5);">
+
+    <h3 style="color:#fff;font-size:15px;text-align:center;margin:0;">
+      📊 Room Statistics
+    </h3>
+
+    <div id="statsContent" style="display:flex;flex-direction:column;gap:10px;color:#fff;font-size:14px;">
+      Loading...
+    </div>
+
+    <button onclick="showStats()"
+      style="padding:9px;border-radius:8px;border:none;background:rgba(255,255,255,0.1);color:#fff;font-size:13px;cursor:pointer;">
+      Close
+    </button>
+
+  </div>
+</div>
+<button id="bgBtn" onclick="toggleBgMenu()">🎨</button>
+
+<div id="bgMenu">
+    <button id="bgClose" onclick="toggleBgMenu()">✕</button>
+    <h3>🎨 Background</h3>
+    <input id="bgUrl" type="text" placeholder="https://example.com/image.jpg">
+    <div class="bgButtons">
+        <button onclick="applyBg()">Apply</button>
+        <button onclick="resetBg()">Reset</button>
+    </div>
+</div>
+<!-- WS STATUS -->
+<div id="wsStatus" class="disconnected">⬤ Disconnected</div>
+
+<!-- TOOLBAR -->
+<div id="toolbar">
+  <button class="tool-icon-btn" onclick="toggleYT()" title="YouTube Sync">▶️</button>
+  <!-- <button class="tool-icon-btn" onclick="toggleGif()" title="GIF Search">🎬</button> -->
+  <button class="tool-icon-btn" onclick="showStats()" title="Statistik">📊</button>
+  <button class="tool-icon-btn" onclick="toggleIframe()" title="Custom URL">🌐</button>
+  
+
+  <input type="text" id="chatInput" placeholder="Enter/click a Chatango name (e.g.: room)">
+  <button id="addBtn" onclick="addChat()">+</button>
+</div>
+
+<!-- YT FLOATING WINDOW -->
+<div id="ytWindow" style="display:flex;">
+  <div id="ytTitleBar">
+    <span>▶ YouTube Shoujo</span>
+    <div id="viewerBadgeWrap">
+      <div id="viewerBadge" onclick="toggleViewerPanel()">👁 0 viewers</div>
+      <div id="viewerPanel"></div>
+    </div>
+    <button id="ytCloseBtn" onclick="hideYT()">×</button>
+  </div>
+  <div id="nowPlaying">
+    <div id="nowPlayingDot"></div>
+    <img id="nowPlayingThumb" src="" alt="">
+    <div id="nowPlayingTitle">Loading...</div>
+  </div>
+  <div id="ytSearchRow">
+    <input type="text" id="ytInput" placeholder="Search YouTube videos...">
+    <button id="ytSearchBtn" onclick="searchYT()">Search</button>
+  </div>
+  <div id="ytStatus" style="display:block;">Search for a video to watch together.</div>
+  <div id="ytResults" style="display:none;"></div>
+  <div id="ytPlayerWrap" style="display:none;">
+    <button id="ytBackBtn" onclick="showResults()">← Back to results</button>
+    <iframe id="ytFrame" allowfullscreen allow="autoplay; encrypted-media; picture-in-picture"
+></iframe>
+    <!-- Reaction + Voice Note Bar -->
+    <div id="reactionBar">
+      <button class="react-btn" onclick="sendReaction('❤️')">❤️</button>
+      <button class="react-btn" onclick="sendReaction('😂')">😂</button>
+      <button class="react-btn" onclick="sendReaction('🔥')">🔥</button>
+      <button class="react-btn" onclick="sendReaction('😮')">😮</button>
+      <button class="react-btn" onclick="sendReaction('👏')">👏</button>
+      <button class="react-btn" onclick="sendReaction('💀')">💀</button>
+      <button class="react-btn" onclick="toggleGif()" title="GIF Search">🎬</button>
+      <button id="voiceBtn"
+        onmousedown="startRecord()" onmouseup="stopRecord()"
+        ontouchstart="startRecord(event)" ontouchend="stopRecord(event)">
+        🎤 Hold
+      </button>
+    </div>
+    <!-- Bubble Chat Row -->
+    <div id="bubbleRow">
+      <input type="text" id="bubbleInput" placeholder="Type a message... (max 10 words)" maxlength="80">
+      <span id="bubbleWordCount">0/10</span>
+      <button id="bubbleSendBtn" onclick="sendBubble()">💬</button>
+    </div>
+  </div>
+</div>
+  
+<!-- CHAT AREA -->
+<div id="chatArea"></div>
+
+<!-- SWIPE (mobile) -->
+<button id="prevBtn" class="nav-btn" onclick="prevChat()">❮</button>
+<button id="nextBtn" class="nav-btn" onclick="nextChat()">❯</button>
+
+<script src="script.js"></script>
+</body></html>
