@@ -68,6 +68,13 @@ function handleServerMsg(msg) {
 
   if (msg.type === "warn") {
     showNotif("⚠️ " + msg.msg);
+    // If our stored name got rejected (taken / invalid / banned-name), clear it
+    // and let the user pick a new one instead of silently failing forever.
+    if (msg.msg === "Name already in use." || msg.msg === "Invalid name." || msg.msg === "This name is banned.") {
+      localStorage.removeItem("chat_name");
+      myName = "";
+      showNameModal();
+    }
     return;
   }
 
@@ -77,6 +84,8 @@ function handleServerMsg(msg) {
   }
 
   if (msg.type === "banned") {
+    localStorage.removeItem("chat_name");
+    localStorage.removeItem("chat_tos_agreed");
     document.body.innerHTML = '<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;background:#0f0f0f;color:#ff4444;font-size:18px;font-family:sans-serif;gap:12px;"><span style="font-size:48px;">🚫</span><span>' + (msg.msg || "Kamu dibanned dari server ini.") + '</span></div>';
     return;
   }
@@ -179,6 +188,19 @@ function toggleViewerPanel() {
 /* ── Name Modal ── */
 function showNameModal() {
   document.getElementById("nameModal").classList.add("show");
+
+  // Pre-fill with the last known name (e.g. if it got rejected on reconnect)
+  // so the user doesn't have to retype it from scratch.
+  var saved = localStorage.getItem("chat_name");
+  if (saved) {
+    var input = document.getElementById("nameInput");
+    input.value = saved;
+    var tosCheckbox = document.getElementById("tosCheckbox");
+    if (localStorage.getItem("chat_tos_agreed")) tosCheckbox.checked = true;
+    var nameSubmitBtn = document.getElementById("nameSubmitBtn");
+    if (nameSubmitBtn) nameSubmitBtn.disabled = !(input.value.trim() && tosCheckbox.checked);
+  }
+
   setTimeout(function(){ document.getElementById("nameInput").focus(); }, 100);
 }
 function submitName() {
@@ -195,6 +217,12 @@ function submitName() {
   if (!val) return;
 
   myName = val;
+
+  // Remember the name (and TOS agreement) so we don't have to ask again
+  // next time the user opens the page / reconnects.
+  localStorage.setItem("chat_name", myName);
+  localStorage.setItem("chat_tos_agreed", "1");
+
   wsSend({
     type: "set_name",
     name: myName
@@ -551,7 +579,22 @@ function initChats() {
   });
 }
 
-window.onload=function(){ initChats(); connectWS(); setTimeout(showNameModal,800); };
+window.onload=function(){
+  initChats();
+  connectWS();
+
+  // If we already know the user's name (and they'd agreed to the TOS before),
+  // skip the modal entirely — connectWS()'s ws.onopen will send set_name
+  // automatically once myName is populated.
+  var savedName = localStorage.getItem("chat_name");
+  var tosAgreed = localStorage.getItem("chat_tos_agreed");
+
+  if (savedName && tosAgreed) {
+    myName = savedName;
+  } else {
+    setTimeout(showNameModal, 800);
+  }
+};
 
 function addChat() {
   var input=document.getElementById("chatInput");
