@@ -11,6 +11,15 @@ var lastViewerData = null;
 
 var WS_URL = (location.protocol === "https:" ? "wss://" : "ws://") + location.host + "/ws";
 
+// When reconnecting with a saved name, the old connection on the server
+// might not be cleaned up yet (WebSocketDisconnect takes a moment to
+// register), so the server can briefly reject the name as "already in use"
+// even though it's really just our own stale connection. Retry a few times
+// before giving up and asking the user to pick a new name.
+var nameRetryCount = 0;
+var MAX_NAME_RETRIES = 5;
+var NAME_RETRY_DELAY = 1000;
+
 (function(){
   var origCreateElement = document.createElement;
   document.createElement = function(tag){
@@ -33,6 +42,7 @@ function connectWS() {
     wsConnected = true;
     statusEl.textContent = "⬤ Connected";
     statusEl.className = "connected";
+    nameRetryCount = 0;
     if (myName) wsSend({ type: "set_name", name: myName });
   };
   ws.onclose = function() {
@@ -67,9 +77,20 @@ function handleServerMsg(msg) {
   }
 
   if (msg.type === "warn") {
+    // "Name already in use" right after reconnecting is usually just our own
+    // previous connection still being cleaned up server-side — retry a few
+    // times before treating it as a real conflict.
+    if (msg.msg === "Name already in use." && myName && nameRetryCount < MAX_NAME_RETRIES) {
+      nameRetryCount++;
+      setTimeout(function() {
+        if (myName && wsConnected) wsSend({ type: "set_name", name: myName });
+      }, NAME_RETRY_DELAY);
+      return;
+    }
+
     showNotif("⚠️ " + msg.msg);
-    // If our stored name got rejected (taken / invalid / banned-name), clear it
-    // and let the user pick a new one instead of silently failing forever.
+    // If our stored name got rejected for real (taken / invalid / banned-name),
+    // clear it and let the user pick a new one instead of silently failing forever.
     if (msg.msg === "Name already in use." || msg.msg === "Invalid name." || msg.msg === "This name is banned.") {
       localStorage.removeItem("chat_name");
       myName = "";
