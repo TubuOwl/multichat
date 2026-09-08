@@ -6,6 +6,7 @@ var wsConnected = false;
 var currentVideoId = "";
 var myName = localStorage.getItem("chatName") || "";
 var rulesViewed = false;
+var awaitingNameConfirm = false;
 var myColor = "#fff";
 var pendingVoiceMeta = null;
 var lastViewerData = null;
@@ -34,7 +35,10 @@ function connectWS() {
     wsConnected = true;
     statusEl.textContent = "⬤ Connected";
     statusEl.className = "connected";
-    if (myName) wsSend({ type: "set_name", name: myName });
+    if (myName) {
+      awaitingNameConfirm = true;
+      wsSend({ type: "set_name", name: myName });
+    }
   };
   ws.onclose = function() {
     wsConnected = false;
@@ -91,6 +95,11 @@ function handleServerMsg(msg) {
   if (msg.viewers !== undefined && Array.isArray(msg.viewers)) {
     lastViewerData = { viewers: msg.viewers, count: msg.count };
     renderViewerList(msg.viewers, msg.count || msg.viewers.length);
+  }
+
+  if (msg.type === "name_taken") {
+    forceNewName(msg.msg);
+    return;
   }
 
   if (msg.type === "sync") {
@@ -183,6 +192,21 @@ function showNameModal() {
   setTimeout(function(){ document.getElementById("nameInput").focus(); }, 100);
 }
 
+function forceNewName(msg) {
+  myName = "";
+  localStorage.removeItem("chatName");
+
+  var input = document.getElementById("nameInput");
+  var errEl = document.getElementById("nameError");
+  input.value = "";
+  if (errEl) {
+    errEl.textContent = msg || "Nama sudah dipakai, silakan pilih nama lain.";
+    errEl.style.display = "block";
+  }
+
+  showNameModal();
+}
+
 function submitName() {
   var tosCheckbox = document.getElementById("tosCheckbox");
 
@@ -207,6 +231,8 @@ function submitName() {
     name: myName
   });
 
+  var errEl = document.getElementById("nameError");
+  if (errEl) errEl.style.display = "none";
   document.getElementById("nameModal").classList.remove("show");
 }
 
