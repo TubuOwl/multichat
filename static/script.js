@@ -5,6 +5,7 @@ var ws = null;
 var wsConnected = false;
 var currentVideoId = "";
 var myName = localStorage.getItem("chatName") || "";
+var rulesViewed = false;
 var myColor = "#fff";
 var pendingVoiceMeta = null;
 var lastViewerData = null;
@@ -183,6 +184,16 @@ function showNameModal() {
 }
 function submitName() {
   var tosCheckbox = document.getElementById("tosCheckbox");
+  var tosCheckbox = document.getElementById("tosCheckbox");
+
+  if (!rulesViewed) {
+    alert("Please read the Terms & Conditions first.");
+    return;
+  }
+  if (!tosCheckbox.checked) {
+    alert("You must agree to the Terms & Conditions first.");
+    return;
+  }
 
   if (!tosCheckbox.checked) {
     alert("You must agree to the Terms & Conditions first.");
@@ -583,6 +594,11 @@ document.addEventListener("DOMContentLoaded",function(){
   var tosCheckbox = document.getElementById("tosCheckbox");
   var nameSubmitBtn = document.getElementById("nameSubmitBtn");
   var nameInput = document.getElementById("nameInput");
+  var tosLink = document.getElementById("tosLink");
+  tosLink.addEventListener("click", function(){
+     rulesViewed = true;
+     tosCheckbox.disabled = false;
+  });
 
   function updateSubmitState() {
     nameSubmitBtn.disabled = !(nameInput.value.trim() && tosCheckbox.checked);
