@@ -408,7 +408,7 @@ async def websocket_endpoint(ws: WebSocket):
                     for c in clients.values()
                     if c is not clients[ws]
                 ):
-                    await ws.send_text(json.dumps({"type": "warn", "msg": "Name already in use."}))
+                    await ws.send_text(json.dumps({"type": "name_taken", "msg": "Name already in use."}))
                     continue
                 if new_name.lower() in banned_names:
                     await kick_spammer(ws, "This name is banned.")
