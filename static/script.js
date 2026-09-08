@@ -4,7 +4,7 @@
 var ws = null;
 var wsConnected = false;
 var currentVideoId = "";
-var myName = "";
+var myName = localStorage.getItem("chatName") || "";
 var myColor = "#fff";
 var pendingVoiceMeta = null;
 var lastViewerData = null;
@@ -195,6 +195,7 @@ function submitName() {
   if (!val) return;
 
   myName = val;
+  localStorage.setItem("chatName", myName);
   wsSend({
     type: "set_name",
     name: myName
@@ -551,7 +552,7 @@ function initChats() {
   });
 }
 
-window.onload=function(){ initChats(); connectWS(); setTimeout(showNameModal,800); };
+window.onload=function(){ initChats(); connectWS(); if(!myName) setTimeout(showNameModal,800); };
 
 function addChat() {
   var input=document.getElementById("chatInput");
