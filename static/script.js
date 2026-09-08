@@ -182,19 +182,14 @@ function showNameModal() {
   document.getElementById("nameModal").classList.add("show");
   setTimeout(function(){ document.getElementById("nameInput").focus(); }, 100);
 }
+
 function submitName() {
-  var tosCheckbox = document.getElementById("tosCheckbox");
   var tosCheckbox = document.getElementById("tosCheckbox");
 
   if (!rulesViewed) {
     alert("Please read the Terms & Conditions first.");
     return;
   }
-  if (!tosCheckbox.checked) {
-    alert("You must agree to the Terms & Conditions first.");
-    return;
-  }
-
   if (!tosCheckbox.checked) {
     alert("You must agree to the Terms & Conditions first.");
     return;
@@ -591,26 +586,32 @@ document.addEventListener("DOMContentLoaded",function(){
     var wrap=document.getElementById("viewerBadgeWrap");
     if(wrap&&!wrap.contains(e.target)) document.getElementById("viewerPanel").style.display="none";
   });
-  var tosCheckbox = document.getElementById("tosCheckbox");
+
+  var tosCheckbox   = document.getElementById("tosCheckbox");
   var nameSubmitBtn = document.getElementById("nameSubmitBtn");
-  var nameInput = document.getElementById("nameInput");
-  var tosLink = document.getElementById("tosLink");
-  tosLink.addEventListener("click", function(){
-     rulesViewed = true;
-     tosCheckbox.disabled = false;
-  });
+  var nameInput     = document.getElementById("nameInput");
+  var tosLink       = document.getElementById("tosLink");
 
   function updateSubmitState() {
-    nameSubmitBtn.disabled = !(nameInput.value.trim() && tosCheckbox.checked);
+    nameSubmitBtn.disabled = !(nameInput.value.trim() && tosCheckbox.checked && rulesViewed);
+  }
+
+  // Defensive: don't let a missing #tosLink crash the whole setup block.
+  if (tosLink) {
+    tosLink.addEventListener("click", function(){
+      rulesViewed = true;
+      tosCheckbox.disabled = false;
+      updateSubmitState();
+    });
+  } else {
+    console.warn('[name modal] Element with id="tosLink" not found in index.html — ToS gate will stay locked. Add id="tosLink" to the Terms & Conditions <a> tag.');
   }
 
   tosCheckbox.addEventListener("change", updateSubmitState);
   nameInput.addEventListener("input", updateSubmitState);
-
   nameSubmitBtn.addEventListener("click", submitName);
 
   updateSubmitState();
-
 });
 
 function nextChat() {
