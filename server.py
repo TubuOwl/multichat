@@ -56,17 +56,8 @@ MAX_BUBBLE_CHARS = 200
 ALLOWED_URL_SCHEMES = {"http", "https"}
 DEFAULT_THUMB = "https://i.imgur.com/21CjTu1.gif"
 
-# ── ROOMS ──────────────────────────────────────────────
-# Fixed set of chat "rooms" (independent of the Chatango embed rooms).
-# Each room has its own YouTube-sync state, iframe state, and viewer list.
-ROOMS = ["id", "en"]
-ROOM_LABELS = {"id": "🇮🇩 Indonesia", "en": "🇬🇧 English"}
-DEFAULT_ROOM = "id"
-
-
 def safe_equal(a: str, b: str) -> bool:
     return secrets.compare_digest(a.encode("utf-8"), b.encode("utf-8"))
-
 
 def call_groq(prompt: str) -> str:
     payload = {
@@ -82,7 +73,6 @@ def call_groq(prompt: str) -> str:
     res = http_requests.post(GROQ_API_URL, json=payload, headers=GROQ_HEADERS, timeout=15)
     res.raise_for_status()
     return res.json()["choices"][0]["message"]["content"].strip()
-
 
 @app.post("/chat/macha")
 async def chat_macha(request: Request):
@@ -103,20 +93,12 @@ async def chat_macha(request: Request):
     except Exception:
         return JSONResponse({"text": "Something went wrong, try again later."}, status_code=500)
 
-
 @app.get("/favicon.ico")
 async def favicon():
     return FileResponse("static/favicon.ico")
 
-
-@app.get("/rooms")
-async def list_rooms():
-    return JSONResponse({"rooms": [{"id": r, "label": ROOM_LABELS[r]} for r in ROOMS], "default": DEFAULT_ROOM})
-
-
 @app.get("/stats")
 async def stats():
-    # Statistics stay global (combined across all rooms) by design.
     with conn.cursor() as cur:
         cur.execute("""
             SELECT total_joins, total_messages, total_songs
@@ -126,9 +108,7 @@ async def stats():
         joins, messages, songs = cur.fetchone()
     return {"joins": joins, "messages": messages, "songs": songs}
 
-
 _TENOR_QUERY_RE = re.compile(r"^[a-zA-Z0-9 _-]+$")
-
 
 @app.get("/tenor")
 async def tenor_search(q: str, page: int = 0):
@@ -157,18 +137,14 @@ async def tenor_search(q: str, page: int = 0):
         "total": len(results),
     })
 
+yt_state = {
+    "videoId": "", "title": "", "is_playing": False,
+    "current_time": 0, "thumbnail": "",
+}
 
-def make_yt_state():
-    return {"videoId": "", "title": "", "is_playing": False, "current_time": 0, "thumbnail": ""}
-
-
-def make_iframe_state():
-    return {"url": "", "title": "", "thumb": "", "active": False}
-
-
-# Per-room state (each room gets its own independent video sync + embed state).
-yt_states = {r: make_yt_state() for r in ROOMS}
-iframe_states = {r: make_iframe_state() for r in ROOMS}
+iframe_state = {
+    "url": "", "title": "", "thumb": "", "active": False,
+}
 
 clients: dict[WebSocket, dict] = {}
 COLORS = ["#ff6b9d", "#c084fc", "#60a5fa", "#34d399", "#fbbf24", "#f87171", "#a78bfa", "#38bdf8"]
@@ -180,13 +156,11 @@ RATE_LIMITS = {
     "voice":      {"limit": 1,  "window": 15},
     "load":       {"limit": 3,  "window": 10},
     "iframe_url": {"limit": 3,  "window": 10},
-    "join_room":  {"limit": 5,  "window": 10},
 }
 
 spam_times: dict[WebSocket, dict] = defaultdict(lambda: defaultdict(list))
 spam_strikes: dict[WebSocket, int] = defaultdict(int)
 banned_names: set = set()
-
 
 def check_rate_limit(ws: WebSocket, msg_type: str) -> bool:
     cfg = RATE_LIMITS.get(msg_type)
@@ -201,7 +175,6 @@ def check_rate_limit(ws: WebSocket, msg_type: str) -> bool:
     spam_times[ws][msg_type].append(now)
     return False
 
-
 def sanitize_emoji(raw: str) -> str:
     import unicodedata
     chars = list(str(raw).strip())
@@ -212,14 +185,12 @@ def sanitize_emoji(raw: str) -> str:
         result += chars[1]
     return html.escape(result)
 
-
 def sanitize_text(raw: str, max_words: int = 10, max_chars: int = 200) -> str:
     raw = str(raw)
     if len(raw) > max_chars:
         return ""
     cleaned = " ".join(raw.strip().split()[:max_words])
     return html.escape(cleaned)
-
 
 def is_safe_url(url: str) -> bool:
     if not url or len(url) > MAX_IFRAME_URL_LEN:
@@ -230,25 +201,17 @@ def is_safe_url(url: str) -> bool:
         return False
     return parsed.scheme in ALLOWED_URL_SCHEMES and bool(parsed.netloc)
 
-
-def get_viewer_list(room: str):
+def get_viewer_list():
     return [
         {"name": v["name"], "color": v["color"], "joined_at": v["joined_at"]}
-        for v in clients.values() if v.get("name") and v.get("room") == room
+        for v in clients.values() if v.get("name")
     ]
 
-
-def get_room_count(room: str) -> int:
-    return sum(1 for v in clients.values() if v.get("room") == room)
-
-
-async def broadcast(data: dict, room: str = None, exclude: WebSocket = None):
+async def broadcast(data: dict, exclude: WebSocket = None):
     msg = json.dumps(data)
     dead = []
-    for ws, meta in list(clients.items()):
+    for ws in list(clients):
         if ws == exclude:
-            continue
-        if room is not None and meta.get("room") != room:
             continue
         try:
             await ws.send_text(msg)
@@ -256,16 +219,13 @@ async def broadcast(data: dict, room: str = None, exclude: WebSocket = None):
             dead.append(ws)
     for ws in dead:
         clients.pop(ws, None)
-    if dead and room is not None:
-        await _broadcast_viewers_safe(room)
+    if dead:
+        await _broadcast_viewers_safe()
 
-
-async def broadcast_bytes(data: bytes, room: str = None, exclude: WebSocket = None):
+async def broadcast_bytes(data: bytes, exclude: WebSocket = None):
     dead = []
-    for ws, meta in list(clients.items()):
+    for ws in list(clients):
         if ws == exclude:
-            continue
-        if room is not None and meta.get("room") != room:
             continue
         try:
             await ws.send_bytes(data)
@@ -274,62 +234,32 @@ async def broadcast_bytes(data: bytes, room: str = None, exclude: WebSocket = No
     for ws in dead:
         clients.pop(ws, None)
 
+async def broadcast_viewers():
+    await broadcast({"type": "viewer_list", "viewers": get_viewer_list(), "count": len(clients)})
 
-async def broadcast_viewers(room: str):
-    await broadcast({"type": "viewer_list", "viewers": get_viewer_list(room), "count": get_room_count(room)}, room=room)
-
-
-async def _broadcast_viewers_safe(room: str):
-    msg = json.dumps({"type": "viewer_list", "viewers": get_viewer_list(room), "count": get_room_count(room)})
-    for ws, meta in list(clients.items()):
-        if meta.get("room") != room:
-            continue
+async def _broadcast_viewers_safe():
+    msg = json.dumps({"type": "viewer_list", "viewers": get_viewer_list(), "count": len(clients)})
+    for ws in list(clients):
         try:
             await ws.send_text(msg)
         except Exception:
             clients.pop(ws, None)
 
-
-async def send_room_sync(ws: WebSocket, room: str):
-    state = yt_states[room]
-    await ws.send_text(json.dumps({
-        "type": "sync", **state,
-        "your_color": clients[ws]["color"],
-        "room": room,
-        "rooms": ROOMS,
-        "viewers": get_viewer_list(room),
-        "count": get_room_count(room),
-    }))
-    ifr = iframe_states[room]
-    if ifr.get("active"):
-        await ws.send_text(json.dumps({
-            "type": "iframe_url",
-            "url": ifr["url"], "title": ifr["title"], "thumb": ifr["thumb"],
-        }))
-
-
 async def remove_client(ws: WebSocket):
-    room = clients.get(ws, {}).get("room")
     clients.pop(ws, None)
     spam_times.pop(ws, None)
     spam_strikes.pop(ws, None)
-    if room:
-        await broadcast_viewers(room)
-
+    await broadcast_viewers()
 
 async def kick_spammer(ws: WebSocket, reason: str = "Spam detected!"):
-    meta = clients.get(ws, {})
-    name = meta.get("name", "anon")
-    room = meta.get("room")
+    name = clients.get(ws, {}).get("name", "anon")
     try:
         await ws.send_text(json.dumps({"type": "banned", "msg": reason}))
         await ws.close()
     except Exception:
         pass
     await remove_client(ws)
-    if room:
-        await broadcast({"type": "notif", "msg": f"⚠️ {name} was kicked: {reason}"}, room=room)
-
+    await broadcast({"type": "notif", "msg": f"⚠️ {name} was kicked: {reason}"})
 
 @app.get("/ban")
 async def ban_user(name: str, secret: str):
@@ -341,7 +271,6 @@ async def ban_user(name: str, secret: str):
         await kick_spammer(ws, "You have been banned by an admin.")
     return JSONResponse({"banned": name})
 
-
 @app.get("/unban")
 async def unban_user(name: str, secret: str):
     if not safe_equal(secret, BAN_SECRET):
@@ -349,13 +278,11 @@ async def unban_user(name: str, secret: str):
     banned_names.discard(name.lower())
     return JSONResponse({"unbanned": name})
 
-
 @app.get("/banned")
 async def list_banned(secret: str):
     if not safe_equal(secret, BAN_SECRET):
         return JSONResponse({"error": "Unauthorized"}, status_code=403)
     return JSONResponse({"banned": list(banned_names)})
-
 
 @app.websocket("/ws")
 async def websocket_endpoint(ws: WebSocket):
@@ -366,7 +293,7 @@ async def websocket_endpoint(ws: WebSocket):
     await ws.accept()
     color = COLORS[len(clients) % len(COLORS)]
     clients[ws] = {
-        "name": "", "color": color, "room": None,
+        "name": "", "color": color,
         "joined_at": int(time.time() * 1000),
         "last_vn_duration": 0,
     }
@@ -378,8 +305,22 @@ async def websocket_endpoint(ws: WebSocket):
         """)
         conn.commit()
 
-    # No room/viewer sync yet — sent once the client has a name and is
-    # placed into a room (see "set_name" handling below).
+    await ws.send_text(json.dumps({
+        "type": "sync", **yt_state,
+        "your_color": color,
+        "viewers": get_viewer_list(),
+        "count": len(clients),
+    }))
+
+    if iframe_state.get("active"):
+        await ws.send_text(json.dumps({
+            "type": "iframe_url",
+            "url": iframe_state["url"],
+            "title": iframe_state["title"],
+            "thumb": iframe_state["thumb"],
+        }))
+
+    await broadcast_viewers()
 
     async def ping_loop():
         while ws in clients:
@@ -401,9 +342,6 @@ async def websocket_endpoint(ws: WebSocket):
             if "bytes" in msg_data:
                 if not clients[ws]["name"]:
                     continue
-                room = clients[ws].get("room")
-                if not room:
-                    continue
                 if check_rate_limit(ws, "voice"):
                     if spam_strikes[ws] >= 3:
                         await kick_spammer(ws, "Spamming voice notes!")
@@ -417,8 +355,8 @@ async def websocket_endpoint(ws: WebSocket):
                 name = clients[ws].get("name", "")
                 color = clients[ws].get("color", "#fff")
                 duration = clients[ws].get("last_vn_duration", 0)
-                await broadcast({"type": "voice_note_incoming", "name": name, "color": color, "duration": duration}, room=room, exclude=ws)
-                await broadcast_bytes(audio, room=room, exclude=ws)
+                await broadcast({"type": "voice_note_incoming", "name": name, "color": color, "duration": duration}, exclude=ws)
+                await broadcast_bytes(audio, exclude=ws)
                 continue
 
             if "text" not in msg_data:
@@ -476,33 +414,16 @@ async def websocket_endpoint(ws: WebSocket):
                     await kick_spammer(ws, "This name is banned.")
                     break
                 clients[ws]["name"] = new_name
-                clients[ws]["room"] = DEFAULT_ROOM
-                await send_room_sync(ws, DEFAULT_ROOM)
-                await broadcast_viewers(DEFAULT_ROOM)
+                await broadcast_viewers()
 
-            elif t == "join_room":
-                if check_rate_limit(ws, "join_room"):
-                    if spam_strikes[ws] >= 5:
-                        await kick_spammer(ws, "Spamming room switches!")
-                        break
-                    await ws.send_text(json.dumps({"type": "warn", "msg": "Slow down switching rooms!"}))
-                    continue
-                new_room = str(msg.get("room", "")).strip().lower()
-                if new_room not in ROOMS:
-                    await ws.send_text(json.dumps({"type": "warn", "msg": "Unknown room."}))
-                    continue
-                old_room = clients[ws].get("room")
-                if new_room == old_room:
-                    continue
-                clients[ws]["room"] = new_room
-                await send_room_sync(ws, new_room)
-                if old_room:
-                    await broadcast_viewers(old_room)
-                await broadcast_viewers(new_room)
+            elif t == "voice_note_incoming":
+                duration = msg.get("duration", 0)
+                if not isinstance(duration, (int, float)) or duration < 0 or duration > 600:
+                    duration = 0
+                clients[ws]["last_vn_duration"] = duration
 
             elif t == "bubble":
-                room = clients[ws].get("room")
-                if not clients[ws].get("name") or not room:
+                if not clients[ws].get("name"):
                     continue
                 if check_rate_limit(ws, "bubble"):
                     if spam_strikes[ws] >= 3:
@@ -524,7 +445,7 @@ async def websocket_endpoint(ws: WebSocket):
                     "type": "bubble", "text": text,
                     "name": clients[ws].get("name", ""),
                     "color": clients[ws].get("color", "#fff"),
-                }, room=room, exclude=ws)
+                }, exclude=ws)
                 if "@macha" in text.lower():
                     prompt = text.lower().replace("@macha", "").strip()
                     if prompt and len(prompt) <= MAX_CHAT_MESSAGE_LEN:
@@ -535,13 +456,12 @@ async def websocket_endpoint(ws: WebSocket):
                                 "text": html.escape(answer),
                                 "name": "Macha",
                                 "color": "#ff69b4",
-                            }, room=room)
+                            })
                         except Exception:
                             pass
 
             elif t == "reaction":
-                room = clients[ws].get("room")
-                if not clients[ws].get("name") or not room:
+                if not clients[ws].get("name"):
                     continue
                 if check_rate_limit(ws, "reaction"):
                     if spam_strikes[ws] >= 3:
@@ -556,38 +476,26 @@ async def websocket_endpoint(ws: WebSocket):
                     "type": "reaction", "emoji": emoji,
                     "name": clients[ws].get("name", ""),
                     "color": clients[ws].get("color", "#fff"),
-                }, room=room)
+                })
 
             elif t == "play":
-                room = clients[ws].get("room")
-                if not room:
-                    continue
                 ct = msg.get("current_time", 0)
-                yt_states[room]["is_playing"] = True
-                yt_states[room]["current_time"] = ct if isinstance(ct, (int, float)) else 0
-                await broadcast({"type": "play", "current_time": yt_states[room]["current_time"]}, room=room, exclude=ws)
+                yt_state["is_playing"] = True
+                yt_state["current_time"] = ct if isinstance(ct, (int, float)) else 0
+                await broadcast({"type": "play", "current_time": yt_state["current_time"]}, exclude=ws)
 
             elif t == "pause":
-                room = clients[ws].get("room")
-                if not room:
-                    continue
                 ct = msg.get("current_time", 0)
-                yt_states[room]["is_playing"] = False
-                yt_states[room]["current_time"] = ct if isinstance(ct, (int, float)) else 0
-                await broadcast({"type": "pause", "current_time": yt_states[room]["current_time"]}, room=room, exclude=ws)
+                yt_state["is_playing"] = False
+                yt_state["current_time"] = ct if isinstance(ct, (int, float)) else 0
+                await broadcast({"type": "pause", "current_time": yt_state["current_time"]}, exclude=ws)
 
             elif t == "seek":
-                room = clients[ws].get("room")
-                if not room:
-                    continue
                 ct = msg.get("current_time", 0)
-                yt_states[room]["current_time"] = ct if isinstance(ct, (int, float)) else 0
-                await broadcast({"type": "seek", "current_time": yt_states[room]["current_time"]}, room=room, exclude=ws)
+                yt_state["current_time"] = ct if isinstance(ct, (int, float)) else 0
+                await broadcast({"type": "seek", "current_time": yt_state["current_time"]}, exclude=ws)
 
             elif t == "load":
-                room = clients[ws].get("room")
-                if not room:
-                    continue
                 if check_rate_limit(ws, "load"):
                     if spam_strikes[ws] >= 3:
                         await kick_spammer(ws, "Spamming video loads!")
@@ -610,14 +518,14 @@ async def websocket_endpoint(ws: WebSocket):
                     continue
                 if not isinstance(data, dict) or "title" not in data or "thumbnail_url" not in data:
                     continue
-                yt_states[room].update(
+                yt_state.update(
                     videoId=video_id,
                     title=html.escape(str(data["title"]))[:200],
                     thumbnail=str(data["thumbnail_url"])[:500],
                     is_playing=True,
                     current_time=0,
                 )
-                iframe_states[room].update(url="", title="", thumb="", active=False)
+                iframe_state.update(url="", title="", thumb="", active=False)
                 with conn.cursor() as cur:
                     cur.execute("""
                         UPDATE room_stats
@@ -626,13 +534,12 @@ async def websocket_endpoint(ws: WebSocket):
                     """)
                     conn.commit()
                 await broadcast({
-                    "type": "load", **yt_states[room],
+                    "type": "load", **yt_state,
                     "by": clients[ws].get("name", ""),
-                }, room=room, exclude=ws)
+                }, exclude=ws)
 
             elif t == "iframe_url":
-                room = clients[ws].get("room")
-                if not clients[ws].get("name") or not room:
+                if not clients[ws].get("name"):
                     continue
                 if check_rate_limit(ws, "iframe_url"):
                     if spam_strikes[ws] >= 3:
@@ -648,8 +555,8 @@ async def websocket_endpoint(ws: WebSocket):
                 if not is_safe_url(url) or not title:
                     continue
 
-                iframe_states[room].update(url=url, title=title, thumb=thumb, active=True)
-                yt_states[room].update(videoId="", is_playing=False)
+                iframe_state.update(url=url, title=title, thumb=thumb, active=True)
+                yt_state.update(videoId="", is_playing=False)
 
                 await broadcast({
                     "type": "iframe_url",
@@ -657,29 +564,23 @@ async def websocket_endpoint(ws: WebSocket):
                     "title": title,
                     "thumb": thumb,
                     "by": clients[ws].get("name", ""),
-                }, room=room, exclude=ws)
+                }, exclude=ws)
 
             elif t == "heartbeat":
-                room = clients[ws].get("room")
-                if not room:
-                    continue
-                ct = msg.get("current_time", yt_states[room]["current_time"])
-                yt_states[room]["current_time"] = ct if isinstance(ct, (int, float)) else yt_states[room]["current_time"]
+                ct = msg.get("current_time", yt_state["current_time"])
+                yt_state["current_time"] = ct if isinstance(ct, (int, float)) else yt_state["current_time"]
 
     except WebSocketDisconnect:
         await remove_client(ws)
     except Exception:
         await remove_client(ws)
 
-
 if os.path.exists("static"):
     app.mount("/static", StaticFiles(directory="static"), name="static")
-
 
 @app.get("/")
 async def root():
     return FileResponse("static/index.html")
-
 
 if __name__ == "__main__":
     import uvicorn
