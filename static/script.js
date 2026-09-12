@@ -5,7 +5,6 @@ var ws = null;
 var wsConnected = false;
 var currentVideoId = "";
 var myName = localStorage.getItem("chatName") || "";
-var myRoom = localStorage.getItem("chatRoom") || "id";
 var rulesViewed = false;
 var awaitingNameConfirm = false;
 var myColor = "#fff";
@@ -104,20 +103,7 @@ function handleServerMsg(msg) {
   }
 
   if (msg.type === "sync") {
-    // Sent once when we join a room (initial join or after switching rooms).
-    if (msg.room) {
-      myRoom = msg.room;
-      localStorage.setItem("chatRoom", myRoom);
-      var roomSelect = document.getElementById("roomSelect");
-      if (roomSelect) roomSelect.value = myRoom;
-    }
-    // Clear any floating messages left over from a previous room.
-    document.getElementById("reactionOverlay").innerHTML = "";
-    if (msg.videoId) {
-      loadVideoFromServer(msg.videoId, msg.title, msg.thumbnail, msg.current_time, msg.is_playing);
-    } else {
-      resetPlayerUI();
-    }
+    if (msg.videoId) loadVideoFromServer(msg.videoId, msg.title, msg.thumbnail, msg.current_time, msg.is_playing);
   }
   if (msg.type === "viewer_list") {
     lastViewerData = { viewers: msg.viewers, count: msg.count };
@@ -161,13 +147,6 @@ function handleServerMsg(msg) {
     document.getElementById("ytWindow").style.display = "flex";
     showNotif("🌐 " + msg.title);
   }
-}
-
-/* ── Room Switching ── */
-function switchRoom(room) {
-  if (!myName) { showNameModal(); var sel = document.getElementById("roomSelect"); if (sel) sel.value = myRoom; return; }
-  if (room === myRoom) return;
-  wsSend({ type: "join_room", room: room });
 }
 
 /* ── Viewer List ── */
@@ -407,19 +386,6 @@ setInterval(function() {
   if (videoPlaying && wsConnected) wsSend({ type: "heartbeat", current_time: getCurrentTimeSec() });
 }, 5000);
 
-function resetPlayerUI() {
-  currentVideoId = "";
-  videoPlaying = false;
-  document.getElementById("ytFrame").src = "";
-  document.getElementById("nowPlaying").style.display = "none";
-  document.getElementById("ytPlayerWrap").style.display = "none";
-  document.getElementById("reactionBar").style.display = "none";
-  document.getElementById("bubbleRow").style.display = "none";
-  document.getElementById("ytResults").style.display = "none";
-  document.getElementById("ytStatus").style.display = "block";
-  document.getElementById("ytStatus").textContent = "Search for a video to watch together.";
-}
-
 function loadVideoFromServer(videoId, title, thumbnail, startTime, autoplay) {
   currentVideoId = videoId;
   document.getElementById("nowPlaying").style.display = "flex";
@@ -618,13 +584,7 @@ function initChats() {
   });
 }
 
-window.onload=function(){
-  initChats();
-  var roomSelect = document.getElementById("roomSelect");
-  if (roomSelect) roomSelect.value = myRoom;
-  connectWS();
-  if(!myName) setTimeout(showNameModal,800);
-};
+window.onload=function(){ initChats(); connectWS(); if(!myName) setTimeout(showNameModal,800); };
 
 function addChat() {
   var input=document.getElementById("chatInput");
@@ -652,14 +612,6 @@ document.addEventListener("DOMContentLoaded",function(){
     var wrap=document.getElementById("viewerBadgeWrap");
     if(wrap&&!wrap.contains(e.target)) document.getElementById("viewerPanel").style.display="none";
   });
-
-  var roomSelectEl = document.getElementById("roomSelect");
-  if (roomSelectEl) {
-    roomSelectEl.value = myRoom;
-    roomSelectEl.addEventListener("change", function(){
-      switchRoom(this.value);
-    });
-  }
 
   var tosCheckbox   = document.getElementById("tosCheckbox");
   var nameSubmitBtn = document.getElementById("nameSubmitBtn");
