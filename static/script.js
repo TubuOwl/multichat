@@ -486,9 +486,45 @@ function fixContainer(container) {
   });
 }
 
+/* ── Usage tracking: box makin sering dipakai, makin besar ── */
+var FREQUENT_THRESHOLD = 3;
+function getUsageMap() {
+  try { return JSON.parse(localStorage.getItem("chatUsage") || "{}"); }
+  catch(e) { return {}; }
+}
+function bumpUsage(room) {
+  var key = room.toLowerCase();
+  var map = getUsageMap();
+  map[key] = (map[key] || 0) + 1;
+  localStorage.setItem("chatUsage", JSON.stringify(map));
+  return map[key];
+}
+function getUsageCount(room) { return getUsageMap()[room.toLowerCase()] || 0; }
+function isFrequent(room) { return getUsageCount(room) >= FREQUENT_THRESHOLD; }
+
+function addExpandButton(box, room) {
+  var btn = document.createElement("button");
+  btn.className = "expand-btn";
+  btn.innerHTML = "⤢";
+  btn.title = "Perbesar box";
+  btn.onclick = function(e) {
+    e.stopPropagation();
+    var nowExpanded = box.classList.toggle("expanded");
+    btn.innerHTML = nowExpanded ? "⤡" : "⤢";
+    btn.title = nowExpanded ? "Kecilkan box" : "Perbesar box";
+    if (nowExpanded) {
+      var count = bumpUsage(room);
+      if (count >= FREQUENT_THRESHOLD) box.classList.add("frequent");
+    }
+  };
+  box.appendChild(btn);
+}
+
 function createMachaChat() {
   var box = document.createElement("div");
   box.className = "chat-box"; box.dataset.room = "macha";
+  bumpUsage("macha");
+  if (isFrequent("macha")) box.classList.add("frequent");
   box.style.cssText = "display:flex;flex-direction:column;background:#fff;";
   box.innerHTML = `
     <div style="display:flex;align-items:center;gap:8px;padding:8px 12px;background:#eee;border-bottom:2px solid #ddd;flex-shrink:0;">
@@ -505,6 +541,7 @@ function createMachaChat() {
   var close = document.createElement("button");
   close.className = "close-btn"; close.innerHTML = "×"; close.onclick = function(){ box.remove(); };
   box.appendChild(close);
+  addExpandButton(box, "macha");
   var chatEl = box.querySelector(".macha-chat");
   var input = box.querySelector(".macha-input");
   var sendBtn = box.querySelector(".macha-send");
@@ -546,9 +583,12 @@ function createMachaChat() {
 
 function createChatElement(chatname) {
   if (chatname.toLowerCase()==="macha") return createMachaChat();
+  bumpUsage(chatname);
   var box=document.createElement("div"); box.className="chat-box"; box.dataset.room=chatname;
+  if (isFrequent(chatname)) box.classList.add("frequent");
   var close=document.createElement("button"); close.className="close-btn"; close.innerHTML="×";
   close.onclick=function(){ box.remove(); }; box.appendChild(close);
+  addExpandButton(box, chatname);
   var container=document.createElement("div"); container.className="chat-container"; box.appendChild(container);
   var scr=document.createElement("script");
   scr.setAttribute("id",fetchCid()); scr.setAttribute("data-cfasync","false"); scr.async=true;
