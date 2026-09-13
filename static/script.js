@@ -556,12 +556,28 @@ function addDragHandle(box) {
   box.appendChild(handle);
 }
 
-function getBoxAtPoint(container, x, y) {
-  var el = document.elementFromPoint(x, y);
-  if (!el) return null;
-  var box = el.closest(".chat-box");
-  if (box && container.contains(box)) return box;
-  return null;
+/* Cari box TERDEKAT dari posisi cursor (bukan cuma yang persis di bawah cursor).
+   Ini penting karena ada gap (celah) antar box di grid — kalau cursor pas ada
+   di celah, elementFromPoint gagal nemu box apapun, dan drag terasa "gagal"
+   terutama saat mendekati target dari salah satu sisi (misal geser kanan ke kiri
+   harus melewati celah dulu sebelum masuk box target). */
+function getClosestBox(container, x, y, exclude) {
+  var boxes = Array.prototype.slice.call(container.querySelectorAll(".chat-box"));
+  var closest = null;
+  var closestDist = Infinity;
+  boxes.forEach(function(box) {
+    if (box === exclude) return;
+    var rect = box.getBoundingClientRect();
+    var cx = rect.left + rect.width / 2;
+    var cy = rect.top + rect.height / 2;
+    var dx = x - cx, dy = y - cy;
+    var dist = dx * dx + dy * dy;
+    if (dist < closestDist) {
+      closestDist = dist;
+      closest = box;
+    }
+  });
+  return closest;
 }
 
 /* Reorder SECARA VISUAL SAJA lewat CSS `order`, TANPA memindahkan node DOM.
@@ -601,18 +617,18 @@ function initDragAndDropReorder() {
     e.preventDefault();
     e.dataTransfer.dropEffect = "move";
 
-    var target = getBoxAtPoint(chatArea, e.clientX, e.clientY);
+    var target = getClosestBox(chatArea, e.clientX, e.clientY, dragSrcBox);
     document.querySelectorAll(".chat-box.drag-over").forEach(function(b){ b.classList.remove("drag-over"); });
-    if (target && target !== dragSrcBox) target.classList.add("drag-over");
+    if (target) target.classList.add("drag-over");
   });
 
   chatArea.addEventListener("drop", function(e) {
     if (!dragSrcBox) return;
     e.preventDefault();
 
-    var target = getBoxAtPoint(chatArea, e.clientX, e.clientY);
+    var target = getClosestBox(chatArea, e.clientX, e.clientY, dragSrcBox);
     document.querySelectorAll(".chat-box.drag-over").forEach(function(b){ b.classList.remove("drag-over"); });
-    if (!target || target === dragSrcBox) return;
+    if (!target) return;
 
     var rect = target.getBoundingClientRect();
     var dropAfter = (e.clientX - rect.left) > rect.width / 2;
