@@ -339,6 +339,38 @@ body {
   border: none; border-radius: 50%; font-size: 18px; cursor: pointer; z-index: 10;
 }
 
+/* ── DESKTOP FRIENDLY BOX: expand & frequent-use sizing ── */
+@media (min-width: 481px) {
+  .chat-box {
+    transition: box-shadow .25s ease, height .3s ease, width .3s ease;
+  }
+  /* Box yang sudah dibuka >= FREQUENT_THRESHOLD kali otomatis dapat highlight + sedikit lebih besar */
+  .chat-box.frequent {
+    height: 430px;
+    box-shadow: 0 0 0 2px rgba(255,107,157,0.55), 0 4px 14px rgba(0,0,0,0.35);
+  }
+  /* Box yang di-expand manual lewat tombol ⤢ */
+  .chat-box.expanded {
+    grid-column: span 2;
+    grid-row: span 2;
+    height: 620px;
+    z-index: 30;
+    box-shadow: 0 10px 36px rgba(0,0,0,0.55);
+  }
+  .expand-btn {
+    position: absolute;
+    top: 6px; right: 40px;
+    width: 28px; height: 28px;
+    background: rgba(0,0,0,0.45);
+    color: #fff; border: none; border-radius: 50%;
+    font-size: 14px; cursor: pointer; z-index: 10;
+    display: flex; align-items: center; justify-content: center;
+    transition: background .2s ease, transform .2s ease;
+  }
+  .expand-btn:hover { background: rgba(0,0,0,0.7); transform: scale(1.1); }
+  .expand-btn:active { transform: scale(0.9); }
+}
+
 /* ── NAV BUTTONS (mobile) ── */
 .nav-btn { display: none; }
 @media (max-width: 480px) {
@@ -389,6 +421,8 @@ body {
     left: 14px;
     right: 14px;
   }
+  /* Tombol expand tidak relevan di layout swipe mobile */
+  .expand-btn { display: none; }
   .nav-btn {
     display: flex;
     position: fixed;
