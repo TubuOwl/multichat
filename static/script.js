@@ -564,6 +564,34 @@ function getBoxAtPoint(container, x, y) {
   return null;
 }
 
+/* Reorder SECARA VISUAL SAJA lewat CSS `order`, TANPA memindahkan node DOM.
+   Ini penting: memindahkan node <iframe> di DOM (via appendChild/before/after)
+   memicu iframe reload dari awal, yang bikin frame Chatango jadi blank/hilang.
+   Dengan cuma mengubah `order`, posisi visual berubah tapi iframe tidak pernah disentuh. */
+function reorderBoxes(chatArea, srcBox, targetBox, dropAfter) {
+  var boxes = Array.prototype.slice.call(chatArea.querySelectorAll(".chat-box"));
+
+  // Urutkan berdasarkan `order` yang sedang berlaku (fallback ke posisi DOM asli kalau order sama)
+  var withOrder = boxes.map(function(b, i) {
+    return { box: b, order: parseInt(b.style.order || "0", 10), domIndex: i };
+  });
+  withOrder.sort(function(a, b) {
+    if (a.order !== b.order) return a.order - b.order;
+    return a.domIndex - b.domIndex;
+  });
+  var seq = withOrder.map(function(item) { return item.box; });
+
+  var srcIdx = seq.indexOf(srcBox);
+  if (srcIdx > -1) seq.splice(srcIdx, 1);
+
+  var targetIdx = seq.indexOf(targetBox);
+  if (targetIdx === -1) targetIdx = seq.length;
+  var insertAt = dropAfter ? targetIdx + 1 : targetIdx;
+  seq.splice(insertAt, 0, srcBox);
+
+  seq.forEach(function(box, idx) { box.style.order = idx; });
+}
+
 function initDragAndDropReorder() {
   var chatArea = document.getElementById("chatArea");
   if (!chatArea) return;
@@ -588,11 +616,7 @@ function initDragAndDropReorder() {
 
     var rect = target.getBoundingClientRect();
     var dropAfter = (e.clientX - rect.left) > rect.width / 2;
-    if (dropAfter) {
-      target.after(dragSrcBox);
-    } else {
-      target.before(dragSrcBox);
-    }
+    reorderBoxes(chatArea, dragSrcBox, target, dropAfter);
   });
 }
 
