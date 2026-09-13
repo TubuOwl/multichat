@@ -486,21 +486,16 @@ function fixContainer(container) {
   });
 }
 
-/* ── Usage tracking: box makin sering dipakai, makin besar ── */
-var FREQUENT_THRESHOLD = 3;
-function getUsageMap() {
-  try { return JSON.parse(localStorage.getItem("chatUsage") || "{}"); }
-  catch(e) { return {}; }
+/* ── Expand box: hanya 1 box yang boleh membesar dalam satu waktu ── */
+var currentExpanded = null; // { box: HTMLElement, btn: HTMLElement }
+
+function collapseCurrentExpanded() {
+  if (!currentExpanded) return;
+  currentExpanded.box.classList.remove("expanded");
+  currentExpanded.btn.innerHTML = "⤢";
+  currentExpanded.btn.title = "Perbesar box";
+  currentExpanded = null;
 }
-function bumpUsage(room) {
-  var key = room.toLowerCase();
-  var map = getUsageMap();
-  map[key] = (map[key] || 0) + 1;
-  localStorage.setItem("chatUsage", JSON.stringify(map));
-  return map[key];
-}
-function getUsageCount(room) { return getUsageMap()[room.toLowerCase()] || 0; }
-function isFrequent(room) { return getUsageCount(room) >= FREQUENT_THRESHOLD; }
 
 function addExpandButton(box, room) {
   var btn = document.createElement("button");
@@ -509,12 +504,25 @@ function addExpandButton(box, room) {
   btn.title = "Perbesar box";
   btn.onclick = function(e) {
     e.stopPropagation();
-    var nowExpanded = box.classList.toggle("expanded");
-    btn.innerHTML = nowExpanded ? "⤡" : "⤢";
-    btn.title = nowExpanded ? "Kecilkan box" : "Perbesar box";
-    if (nowExpanded) {
-      var count = bumpUsage(room);
-      if (count >= FREQUENT_THRESHOLD) box.classList.add("frequent");
+    var isThisExpanded = box.classList.contains("expanded");
+
+    // Selalu reset box yang sedang membesar sebelumnya (kalau bukan box ini sendiri)
+    if (currentExpanded && currentExpanded.box !== box) {
+      collapseCurrentExpanded();
+    }
+
+    if (isThisExpanded) {
+      // Box ini sedang besar → kecilkan
+      box.classList.remove("expanded");
+      btn.innerHTML = "⤢";
+      btn.title = "Perbesar box";
+      currentExpanded = null;
+    } else {
+      // Perbesar box ini
+      box.classList.add("expanded");
+      btn.innerHTML = "⤡";
+      btn.title = "Kecilkan box";
+      currentExpanded = { box: box, btn: btn };
     }
   };
   box.appendChild(btn);
@@ -523,8 +531,6 @@ function addExpandButton(box, room) {
 function createMachaChat() {
   var box = document.createElement("div");
   box.className = "chat-box"; box.dataset.room = "macha";
-  bumpUsage("macha");
-  if (isFrequent("macha")) box.classList.add("frequent");
   box.style.cssText = "display:flex;flex-direction:column;background:#fff;";
   box.innerHTML = `
     <div style="display:flex;align-items:center;gap:8px;padding:8px 12px;background:#eee;border-bottom:2px solid #ddd;flex-shrink:0;">
@@ -583,9 +589,7 @@ function createMachaChat() {
 
 function createChatElement(chatname) {
   if (chatname.toLowerCase()==="macha") return createMachaChat();
-  bumpUsage(chatname);
   var box=document.createElement("div"); box.className="chat-box"; box.dataset.room=chatname;
-  if (isFrequent(chatname)) box.classList.add("frequent");
   var close=document.createElement("button"); close.className="close-btn"; close.innerHTML="×";
   close.onclick=function(){ box.remove(); }; box.appendChild(close);
   addExpandButton(box, chatname);
