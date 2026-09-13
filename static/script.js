@@ -528,6 +528,74 @@ function addExpandButton(box, room) {
   box.appendChild(btn);
 }
 
+/* ── Drag & Drop: urutkan box lewat handle ⠿ ── */
+var dragSrcBox = null;
+
+function addDragHandle(box) {
+  var handle = document.createElement("div");
+  handle.className = "drag-handle";
+  handle.innerHTML = "⠿";
+  handle.title = "Geser untuk urutkan";
+  handle.draggable = true;
+
+  handle.addEventListener("dragstart", function(e) {
+    dragSrcBox = box;
+    box.classList.add("dragging");
+    document.body.classList.add("reorder-active"); // iframe jadi pointer-events:none selama drag
+    e.dataTransfer.effectAllowed = "move";
+    try { e.dataTransfer.setData("text/plain", ""); } catch(err) {}
+  });
+
+  handle.addEventListener("dragend", function() {
+    box.classList.remove("dragging");
+    document.body.classList.remove("reorder-active");
+    document.querySelectorAll(".chat-box.drag-over").forEach(function(b){ b.classList.remove("drag-over"); });
+    dragSrcBox = null;
+  });
+
+  box.appendChild(handle);
+}
+
+function getBoxAtPoint(container, x, y) {
+  var el = document.elementFromPoint(x, y);
+  if (!el) return null;
+  var box = el.closest(".chat-box");
+  if (box && container.contains(box)) return box;
+  return null;
+}
+
+function initDragAndDropReorder() {
+  var chatArea = document.getElementById("chatArea");
+  if (!chatArea) return;
+
+  chatArea.addEventListener("dragover", function(e) {
+    if (!dragSrcBox) return;
+    e.preventDefault();
+    e.dataTransfer.dropEffect = "move";
+
+    var target = getBoxAtPoint(chatArea, e.clientX, e.clientY);
+    document.querySelectorAll(".chat-box.drag-over").forEach(function(b){ b.classList.remove("drag-over"); });
+    if (target && target !== dragSrcBox) target.classList.add("drag-over");
+  });
+
+  chatArea.addEventListener("drop", function(e) {
+    if (!dragSrcBox) return;
+    e.preventDefault();
+
+    var target = getBoxAtPoint(chatArea, e.clientX, e.clientY);
+    document.querySelectorAll(".chat-box.drag-over").forEach(function(b){ b.classList.remove("drag-over"); });
+    if (!target || target === dragSrcBox) return;
+
+    var rect = target.getBoundingClientRect();
+    var dropAfter = (e.clientX - rect.left) > rect.width / 2;
+    if (dropAfter) {
+      target.after(dragSrcBox);
+    } else {
+      target.before(dragSrcBox);
+    }
+  });
+}
+
 function createMachaChat() {
   var box = document.createElement("div");
   box.className = "chat-box"; box.dataset.room = "macha";
@@ -548,6 +616,7 @@ function createMachaChat() {
   close.className = "close-btn"; close.innerHTML = "×"; close.onclick = function(){ box.remove(); };
   box.appendChild(close);
   addExpandButton(box, "macha");
+  addDragHandle(box);
   var chatEl = box.querySelector(".macha-chat");
   var input = box.querySelector(".macha-input");
   var sendBtn = box.querySelector(".macha-send");
@@ -593,6 +662,7 @@ function createChatElement(chatname) {
   var close=document.createElement("button"); close.className="close-btn"; close.innerHTML="×";
   close.onclick=function(){ box.remove(); }; box.appendChild(close);
   addExpandButton(box, chatname);
+  addDragHandle(box);
   var container=document.createElement("div"); container.className="chat-container"; box.appendChild(container);
   var scr=document.createElement("script");
   scr.setAttribute("id",fetchCid()); scr.setAttribute("data-cfasync","false"); scr.async=true;
@@ -641,6 +711,7 @@ function addChat() {
 }
 
 document.addEventListener("DOMContentLoaded",function(){
+  initDragAndDropReorder();
   document.getElementById("chatInput").addEventListener("keydown",function(e){ if(e.key==="Enter") addChat(); });
   document.getElementById("ytInput").addEventListener("keydown",function(e){ if(e.key==="Enter") searchYT(); });
   document.getElementById("nameInput").addEventListener("keydown",function(e){ if(e.key==="Enter") submitName(); });
