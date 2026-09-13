@@ -339,20 +339,17 @@ body {
   border: none; border-radius: 50%; font-size: 18px; cursor: pointer; z-index: 10;
 }
 
-/* ── DESKTOP FRIENDLY BOX: expand & frequent-use sizing ── */
+/* ── DESKTOP FRIENDLY BOX: expand manual (lebar + tinggi) ── */
 @media (min-width: 481px) {
   .chat-box {
     transition: box-shadow .25s ease, height .3s ease, width .3s ease;
   }
-  /* Box yang sudah dibuka >= FREQUENT_THRESHOLD kali otomatis dapat highlight + sedikit lebih besar */
-  .chat-box.frequent {
-    height: 430px;
-    box-shadow: 0 0 0 2px rgba(255,107,157,0.55), 0 4px 14px rgba(0,0,0,0.35);
-  }
-  /* Box yang di-expand manual lewat tombol ⤢ */
+  /* Box yang di-expand manual lewat tombol ⤢ — melebar 2 kolom grid DAN lebih tinggi.
+     Hanya 1 box yang boleh punya class ini dalam satu waktu (diatur lewat JS). */
   .chat-box.expanded {
     grid-column: span 2;
     grid-row: span 2;
+    width: 100%;
     height: 620px;
     z-index: 30;
     box-shadow: 0 10px 36px rgba(0,0,0,0.55);
