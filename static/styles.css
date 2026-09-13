@@ -366,6 +366,33 @@ body {
   }
   .expand-btn:hover { background: rgba(0,0,0,0.7); transform: scale(1.1); }
   .expand-btn:active { transform: scale(0.9); }
+
+  /* ── Drag handle (urutkan box) ── */
+  .drag-handle {
+    position: absolute;
+    top: 6px; left: 6px;
+    width: 26px; height: 26px;
+    background: rgba(0,0,0,0.45);
+    color: #fff; border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 15px; cursor: grab; z-index: 10;
+    user-select: none; -webkit-user-select: none;
+    transition: background .2s ease;
+  }
+  .drag-handle:hover { background: rgba(0,0,0,0.7); }
+  .drag-handle:active { cursor: grabbing; }
+
+  .chat-box.dragging { opacity: 0.35; }
+  .chat-box.drag-over {
+    outline: 2px dashed #ff6b9d;
+    outline-offset: -4px;
+  }
+
+  /* Selama drag berlangsung, iframe di dalam box tidak boleh "menelan" event drag */
+  body.reorder-active .chat-container,
+  body.reorder-active .chat-container iframe {
+    pointer-events: none;
+  }
 }
 
 /* ── NAV BUTTONS (mobile) ── */
@@ -418,8 +445,9 @@ body {
     left: 14px;
     right: 14px;
   }
-  /* Tombol expand tidak relevan di layout swipe mobile */
+  /* Tombol expand & drag handle tidak relevan di layout swipe mobile */
   .expand-btn { display: none; }
+  .drag-handle { display: none; }
   .nav-btn {
     display: flex;
     position: fixed;
